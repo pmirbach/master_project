@@ -54,9 +54,12 @@ Parameter.symmpts{2} = 2 * pi / (3 * Parameter.TB.liu.values(1)) ...
     * [0, 0 ; 2, 0 ; 1, sqrt(3) ; 3 / 2, sqrt(3) / 2 ]';
 Parameter.rezGV = 2 * pi / Parameter.TB.liu.values(1) ...
     * [1, -1 / sqrt(3); 0, 2 / sqrt(3)]';
+Parameter.area_real = 3 * sqrt(3) / 2 * (Parameter.TB.liu.values(1))^2;
+Parameter.area_BZ = 3 * sqrt(3) / 2 * (norm(Parameter.symmpts{2}(:,2)))^2;
+Parameter.area_sBZ = 3 * sqrt(3) / 2 * ...
+    (norm(Parameter.symmpts{2}(:,2)) / Ctrl.k_mesh_mp.qr)^2;
 
 %% Monkhorst-Pack
-
 [Data.k] = k_mesh_mp(Ctrl, Parameter);
 
 %% Tight-Binding

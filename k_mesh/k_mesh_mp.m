@@ -2,7 +2,6 @@ function [k] = k_mesh_mp(Ctrl, Parameter)
 
 qr = Ctrl.k_mesh_mp.qr;             % Feinheit des meshes
 
-% a = Parameter.TB.liu.values(1);     % Gitterkonstante
 b1 = Parameter.rezGV(:,1);          % Reziproke Gittervektoren
 b2 = Parameter.rezGV(:,2);
 
@@ -18,11 +17,8 @@ k0 = [k_mesh_x(:), k_mesh_y(:)]';     % Alle k-Punkte
 % kleinen BZ
 k = pts_triangle_fun(k0, Parameter.symmpts{2}(:,1:3), 30 * eps);
 
-% Berechnung des Flächeninhalts der kleinen BZs und korrekte Gewichte
-b_sBZ = norm(Parameter.symmpts{2}(:,2)) / Ctrl.k_mesh_mp.qr; % Kantenlänge
-% der kleinen 6-Ecke
-B_sBZ = b_sBZ^2 * 3 / 2 * sqrt(3);     % Flächeninhalt der kleinen 6-Ecke
-k(3,:) = k(3,:) * B_sBZ;
+% Berechnung der korrekten Gewichte
+k(3,:) = k(3,:) * Parameter.area_sBZ;
 
 % Erzeugung aller red. Dreiecke mit Spiegelungen und Drehungen
 [k] = red_to_BZ(k);
@@ -38,9 +34,9 @@ if Ctrl.plot.k_mesh(1) == 1     % Plot über red. BZ mit den Gewichten
     corners = [Parameter.symmpts{2} ...
         * [1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0], [0; 0]];
     
-    in = k(3,:,1) == 6;
-    on = k(3,:,1) == 3;
-    symm = k(3,:,1) == 1;
+    in = k(3,:,1) == 6 * Parameter.area_sBZ;
+    on = k(3,:,1) == 3 * Parameter.area_sBZ;
+    symm = k(3,:,1) == 1 * Parameter.area_sBZ;
     
     plot(corners(1,:),corners(2,:),'k-x')
     plot(k(1,in,1),k(2,in,1),'rx')
@@ -76,9 +72,9 @@ if Ctrl.plot.k_mesh(2) == 1     % Plot über BZ mit Gewichten und Indizierung
     marker = {'h','p','x','+','^','v'};
     
     for ii = 1:6
-        in = k(3,:,ii) == 6;
-        on = k(3,:,ii) == 3;
-        symm = k(3,:,ii) == 1;
+        in = k(3,:,ii) == 6 * Parameter.area_sBZ;
+        on = k(3,:,ii) == 3 * Parameter.area_sBZ;
+        symm = k(3,:,ii) == 1 * Parameter.area_sBZ;
         
         instr = strcat(colors{ii},marker{1+mod(ii,2)});
         onstr = strcat(colors{ii},marker{3+mod(ii,2)});

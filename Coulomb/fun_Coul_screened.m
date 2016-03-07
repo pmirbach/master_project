@@ -1,4 +1,4 @@
-function [V] = fun_Coul_screened(q,para,kappa)
+function [V,U] = fun_Coul_screened(q,para,kappa)
 
 d = para(1);
 eps_inf = para(2);

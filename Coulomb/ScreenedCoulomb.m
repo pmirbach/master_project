@@ -78,13 +78,16 @@ N_q = size(q,2);
 figure
 for jj = 1:6
     subplot(2,3,jj)
-    V = vorf * fun_Coul_screened(q,para(jj,:),kappa);
+    [V,U] = fun_Coul_screened(q,para(jj,:),kappa);
+    V = vorf * V;
+    U = vorf * U;
     V_hartree = vorf * fun_Coul_screened_long(para(jj,:));
     V2 = V_hartree * ones(1,N_q);
     plot(q,V*1e-3)
     hold on
-    plot(q,V2*1e-3)
-%     axis([0, 13.2, 0, 30])
+    plot(q,U*1e-3)
+%     plot(q,V2*1e-3)
+    axis([0, 13.2, 0, 30])
 end
 
 % profile report

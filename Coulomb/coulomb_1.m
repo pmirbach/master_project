@@ -1,6 +1,6 @@
 function [] = coulomb_1(Parameter,k)
 
-plottt = 0;
+plottt = 1;
 plot_voranoi = 0;
 
 % size(k);
@@ -36,9 +36,9 @@ if plottt == 1
     marker = {'h','p','x','+','^','v'};
     
     for ii = 1:6
-        in = kneu(3,:,ii) == 6;
-        on = kneu(3,:,ii) == 3;
-        symm = kneu(3,:,ii) == 1;
+        in = kneu(3,:,ii) == 6 * Parameter.area_sBZ;
+        on = kneu(3,:,ii) == 3 * Parameter.area_sBZ;
+        symm = kneu(3,:,ii) == 1 * Parameter.area_sBZ;
         
         instr = strcat(colors{ii},marker{1+mod(ii,2)});
         onstr = strcat(colors{ii},marker{3+mod(ii,2)});
