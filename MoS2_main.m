@@ -2,7 +2,7 @@
 clear variables
 clear global
 close all
-profile on
+% profile on
 clc
 dbstop if error
 
@@ -36,9 +36,10 @@ Ctrl.plot.path = {'\Gamma' 'K' 'M' 'K*' '\Gamma' 'M'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 0];
-Ctrl.plot.dipol = [0 , 0];
-Ctrl.plot.exc = [0, 0];
+Ctrl.plot.tb = [0 , 0];         % Bandstructure
+Ctrl.plot.exc = [0, 0];         % Excitation
+Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
+
 
 Ctrl.plot.save = 0;             % 1 Speichern, 0 nicht
 Ctrl.plot.entireBZ = 0;         % 1 ganze BZ, 0 nur red. BZ
@@ -58,6 +59,10 @@ Parameter.area_real = 3 * sqrt(3) / 2 * (Parameter.TB.liu.values(1))^2;
 Parameter.area_BZ = 3 * sqrt(3) / 2 * (norm(Parameter.symmpts{2}(:,2)))^2;
 Parameter.area_sBZ = 3 * sqrt(3) / 2 * ...
     (norm(Parameter.symmpts{2}(:,2)) / Ctrl.k_mesh_mp.qr)^2;
+Parameter.coul_screened = [[1.17 , 7.16 , 0.199, 2.675];
+    [0.456 , 14.03 , 0.242, 2.930]; [0.46 , 13.97 , 0.24, 2.930]; 
+    [1.288 , 6.88 , 0.232, 2.682]; [0.713 , 9.9 , 0.246, 2.855]; 
+    [1.273 , 6.92 , 0.227, 2.682]];
 
 %% Monkhorst-Pack
 [Data.k] = k_mesh_mp(Ctrl, Parameter);
@@ -103,7 +108,7 @@ Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Data.Ek);
 % profile report
 
 %% Coulomb WW
-coulomb_1(Parameter,Data.k)
+coulomb_1(constAg,Parameter,Data)
 
 %% Flächeninhalt
 [B, B_integ] = flaecheninhalt(Parameter,Data.k(:,:,1));

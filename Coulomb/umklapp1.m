@@ -8,7 +8,8 @@ b_nn = [1 0 1 -1 0 -1 ; ...         % Next neighbours
     0 1 1 0 -1 -1];
 b_snn = [2 2 2 1 0 -1 -2 -2 -2 -1 0 1 ; ... % Second next neighbour
     0 1 2 2 2 1 0 -1 -2 -2 -2 -1];
-c = [b_0, b_nn, b_snn];
+% c = [b_0, b_nn, b_snn];
+c = [b_0, b_nn];
 
 % All displacement vectors
 b = zeros(3, size(c,2));            

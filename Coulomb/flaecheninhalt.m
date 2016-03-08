@@ -2,7 +2,6 @@ function [B,B_integ] = flaecheninhalt(Parameter,k)
 
 b = norm(Parameter.symmpts{2}(:,2));    % Kantenlänge der BZ    
 B = b^2 * 3/2 *sqrt(3);                 % Flächeninhalt der BZ
-disp(b)
 
 
 B_integ = 0;

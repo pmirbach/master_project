@@ -1,21 +1,71 @@
-function [] = coulomb_1(Parameter,k)
+function [] = coulomb_1(constAg,Parameter,Data)
 
-plottt = 1;
+plottt = 0;
 plot_voranoi = 0;
 
-% size(k);
+k = Data.k;
 
-% Irgend ein festes k'
+kappa = 0.1;
+vorf = constAg.ec^2 / ( 2 * constAg.eps_0 * Parameter.area_real);
+
+% Zuerst mal für eine feste Kombination aus Bändern:
+% Fock-artig zwischen spin up valenz und leitungsband 1
+% Data.Ev(:,1,:) und Data.Ev(:,2,:)
+
+%  V_{k k' k k'}^{l l' l l'}   hier l = 1  l' = 2
+
+l1 = 1;
+l2 = 2;
+
+V_hartree_12 = zeros(size(k,2));
+V_fock_12 = zeros(size(k,2));
+
+tic
+for nk = 1:size(k,2)
+    % Neue k nach Umklapp Prozess
+    kneu = umklapp1(Parameter,k,k(:,nk,1));
+    
+    parfor nks = 1:size(k,2)
+        
+        V_hartree_ges = 0;
+        V_fock_ges = 0;
+        
+        for ii = 1:6
+            q = norm(k(1:2,nk,1) - kneu(1:2,nks,ii));
+            [V_hartree, V_fock] = ...
+                fun_Coul_matrix(q,Parameter.coul_screened,kappa);
+            
+            V_hartree = vorf * V_hartree;
+            V_fock = vorf * V_fock;
+            
+            V_hartree_ges = V_hartree_ges + V_hartree;
+            V_fock_ges = V_fock_ges + V_fock;
+        end
+        
+        
+        
+        V_hartree_12(nk,nks) = V_hartree_ges(1,1);
+        V_fock_12(nk,nks) = V_fock_ges(1,1);
+        
+    end
+%     1
+end
+toc
+
+
+% Irgend ein festes k'kneu
 % Zufälliger k-Vektor:
-
 k0_ind = round(rand * size(k,2));
 % k0_ind = 115;
 k0 = k(:,k0_ind);
 
-kneu = umklapp1(Parameter,k,k0);
+
+
+% Berechnung der Coulomb WW
 
 
 if plottt == 1
+    kneu = umklapp1(Parameter,k,k0);
     
     corners = Parameter.symmpts{2}(:,[2 3]);
     [corners] = red_to_BZ(corners);
@@ -65,3 +115,7 @@ if plot_voranoi == 1
         * [1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0], [0; 0]];
     plot(corners(1,:),corners(2,:),'k-x')
 end
+
+
+
+
