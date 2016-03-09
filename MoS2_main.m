@@ -63,6 +63,7 @@ Parameter.coul_screened = [[1.17 , 7.16 , 0.199, 2.675];
     [0.456 , 14.03 , 0.242, 2.930]; [0.46 , 13.97 , 0.24, 2.930]; 
     [1.288 , 6.88 , 0.232, 2.682]; [0.713 , 9.9 , 0.246, 2.855]; 
     [1.273 , 6.92 , 0.227, 2.682]];
+Parameter.coul_kappa = 0.1;             % Kappa, because of Singularity
 
 %% Monkhorst-Pack
 [Data.k] = k_mesh_mp(Ctrl, Parameter);
