@@ -13,9 +13,9 @@ vorf = constAg.ec^2 / ( 2 * constAg.eps_0 * Parameter.area_real);
 
 %  V_{k k' k k'}^{l l' l l'}   hier l = 1  l' = 2
 
-Ek_hartree = zeros(size(Data.Ek));
-Ek_fock = zeros(size(Data.Ek));
-Ek_hf = zeros(size(Data.Ek));
+Ek_h = Data.Ek;
+Ek_f = Data.Ek;
+Ek_hf = Data.Ek;
 
 % tic
 for nk = 1:size(Data.k,2)
@@ -25,31 +25,37 @@ for nk = 1:size(Data.k,2)
     % Neue k nach Umklapp Prozess
     k_shift = umklapp1(Parameter, Data.k, Data.k(:,nk,1));
     
-    for nks = 1:size(Data.k,2)
+    for nks = 2:size(Data.k,2)
                 
         q_v = squeeze( repmat(Data.k(1:2,nk,1),1,1,6) - k_shift(1:2,nks,:) );
         q = sqrt( q_v(1,:).^2 + q_v(2,:).^2 );
-        
-        [V_hartree_orbital, V_fock_orbital] = fun_coul_orbital_m( q, ...
+                
+        [V_orbital_h, V_orbital_f] = fun_coul_orbital_m( q, ...
             Parameter.coul_screened, Parameter.coul_kappa );      
         
-%         for l1 = 1:6
-%             for l2 = 1:6
-%                 do
-%             end
-%         end
-%         l1 = 1;         % Zu renormierendes Band
-        
-        [diad_hartree, diad_fock] = ...
-            fun_coul_diad(Data.Ev(:,:,nk),Data.Ev(:,:,nks));
-        
-        
-        Ek_hartree = Data.Ek(:,nk) ;
-        Ek_fock = zeros(size(Data.Ek));
-        Ek_hf = zeros(size(Data.Ek));
-        
+        for l1 = 1:6            % Zu renormierendes Band
+            
+            for l2 = 1:6        % Andere Bänder
+                
+                test_diad(Data.Ev(:,:,nk), Data.Ev(:,:,nks),[l1, l2, l2, l1])
+                
+%                 [coul_diad_h, coul_diad_f] = ...
+%                     fun_coul_diad(Data.Ev(:,:,nk), Data.Ev(:,:,nks), ...
+%                     [l1, l2, l2, l1]);
+                
+%                 V_h = sum( sum( V_orbital_h .* coul_diad_h ) )
+%                 V_f = sum( sum( V_orbital_f .* coul_diad_f ) )
+                
+                1;
+                
+            end
+            
+        end
+%         l1 = 1;         
+                
+              
     end
-%     1
+
 end
 % toc
 

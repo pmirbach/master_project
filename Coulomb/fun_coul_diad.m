@@ -1,17 +1,15 @@
-function [diad_hartree, diad_fock] = fun_coul_diad(Ev_k, Ev_ks)
+function [coul_diad_h, coul_diad_f] = fun_coul_diad(Ev_k, Ev_ks, combi)
 
-diad_hartree = zeros(6,6,6,6);
-diad_fock = zeros(6,6,6,6);
 
-for l1 = 1:6
-    
-    for l2 = 1:6
-        
-        diad_hartree(:,:,l1,l2) = ( conj(Ev_k(l1,:)) .* Ev_k(l1,:) ) * ...
-            ( conj(Ev_ks(l2,:)) .* Ev_ks(l2,:) )';
-        diad_fock(:,:,l1,l2) = ( conj(Ev_k(l1,:)) .* Ev_ks(l2,:) ) * ...
-            ( conj(Ev_ks(l2,:)) .* Ev_k(l1,:) )';
-        
-    end
-    
-end
+coul_diad_h = ( conj(Ev_k(:,combi(1))) .* Ev_k(:,combi(4)) ) * ...
+    ( conj(Ev_ks(:,combi(2))) .* Ev_ks(:,combi(3)) )';
+% 
+% coul_diad_f = ( conj(Ev_k(:,combi(1))) .* Ev_ks(:,combi(4)) ) * ...
+%     ( conj(Ev_ks(:,combi(2))) .* Ev_k(:,combi(3)) )';
+
+
+% coul_diad_h = ( conj(Ev_k(:,combi(1))) * conj(Ev_ks(:,combi(2)))' ) .* ...
+%     ( Ev_ks(:,combi(3)) * Ev_k(:,combi(4))' );
+
+coul_diad_f = ( conj(Ev_k(:,combi(1))) * conj(Ev_ks(:,combi(2)))' ) .* ...
+    ( Ev_k(:,combi(3)) * Ev_ks(:,combi(4))' );
