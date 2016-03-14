@@ -71,10 +71,10 @@ Parameter.coul_kappa = 0.1;             % Kappa, because of Singularity
 %% Tight-Binding
 [Data.Ek,Data.Ev] = tight_binding_liu(Ctrl, Parameter, Data);
 [fig.bandstr_surf, fig.bandstr_path] = ...
-    plot_bandstr(Ctrl,Parameter,Data.k,Data.Ek,[2 3]);
+    plot_bandstr(Ctrl,Parameter,Data.k,Data.Ek(:,:,1),[2 3]);
 
 %% Thermische Anregung
-Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Data.Ek);
+Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Data.Ek(:,:,1));
 [fig.exc_surf, fig.exc_path] = ...
     plot_excitation(Ctrl,Parameter,Data.k,Data.fk,[2 3]);
 

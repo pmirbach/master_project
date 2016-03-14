@@ -17,6 +17,11 @@ Ek_h = Data.Ek;
 Ek_f = Data.Ek;
 Ek_hf = Data.Ek;
 
+
+[V_orbital_h] = fun_coul_orbital_hartree(Parameter.coul_screened);
+
+% % % repmat(blkdiag(V_orbital_h,V_orbital_h),1,1,6)
+
 % tic
 for nk = 1:size(Data.k,2)
     
@@ -29,29 +34,31 @@ for nk = 1:size(Data.k,2)
                 
         q_v = squeeze( repmat(Data.k(1:2,nk,1),1,1,6) - k_shift(1:2,nks,:) );
         q = sqrt( q_v(1,:).^2 + q_v(2,:).^2 );
-                
-        [V_orbital_h, V_orbital_f] = fun_coul_orbital_m( q, ...
-            Parameter.coul_screened, Parameter.coul_kappa );      
         
+        [V_orbital_f] = fun_coul_orbital_fock(q, ...
+            Parameter.coul_screened, Parameter.coul_kappa );
+                      
         for l1 = 1:6            % Zu renormierendes Band
             
-            for l2 = 1:6        % Andere Bänder
-                
-                test_diad(Data.Ev(:,:,nk), Data.Ev(:,:,nks),[l1, l2, l2, l1])
+            for l2 = 1:6        % Andere Bï¿½nder
                 
 %                 [coul_diad_h, coul_diad_f] = ...
-%                     fun_coul_diad(Data.Ev(:,:,nk), Data.Ev(:,:,nks), ...
-%                     [l1, l2, l2, l1]);
+%                     test_diad(Data.Ev(:,:,nk), Data.Ev(:,:,nks),[l1, l2, l2, l1]);
+                
+                [coul_diad_h, coul_diad_f] = ...
+                    fun_coul_diad(Data.Ev(:,:,nk,1), Data.Ev(:,:,nks,:), ...
+                    [l1, l2, l2, l1]);
                 
 %                 V_h = sum( sum( V_orbital_h .* coul_diad_h ) )
 %                 V_f = sum( sum( V_orbital_f .* coul_diad_f ) )
+                disp(coul_diad_h)
+%                 disp(coul_diad_f)
                 
                 1;
                 
             end
             
-        end
-%         l1 = 1;         
+        end  
                 
               
     end
