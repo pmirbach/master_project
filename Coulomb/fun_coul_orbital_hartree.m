@@ -9,3 +9,5 @@ for jj = 1:size(para,1)
     V_orbital_h(ind{jj}) = fun_Coul_screened_long(para(jj,:));
     
 end
+
+V_orbital_h = repmat(V_orbital_h,2,2,6);

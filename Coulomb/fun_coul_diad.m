@@ -49,7 +49,7 @@ for a = 1:6
             
             coul_diad_f(a,b,ni) = conj(Ev_k(a,combi(1))) *...
                 conj(Ev_ks(b,combi(2),ni)) * ...
-                Ev_k(b,combi(3)) * Ev_ks(a,combi(4),ni);
+                Ev_k(b,combi(3)) * Ev_ks(a,combi(4),ni) ;
         end
         
     end

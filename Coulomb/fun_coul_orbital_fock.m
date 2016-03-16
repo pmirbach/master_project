@@ -15,3 +15,5 @@ for jj = 1:size(para,1)
     end
     
 end
+
+V_orbital_f = repmat(V_orbital_f,2,2);
