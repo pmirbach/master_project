@@ -1,6 +1,5 @@
 function [Ek,Ev] = tight_binding_liu(Ctrl, Parameter, Data)
 
-
 % Berechnung der Eigenwerte und Eigenvektoren über das k-mesh
 Ek = zeros(6, size(Data.k,2),6);
 Ev = zeros(6, 6, size(Data.k,2),6);
@@ -21,11 +20,11 @@ for nk = 1: size(Data.k,2)
             case 'TNN'
                 [H_TB] = TB_Liu_TNN_fun(Data.k(1:2,nk,ni), Parameter);
         end
-        
+
         %     H_TB_SOC = blkdiag(H_TB, H_TB) + H_SOC;
-        H_TB_SOC_up = (H_TB + H_SOC) * 1e3;         % Arbeiten in meV
-        H_TB_SOC_down = (H_TB - H_SOC) * 1e3;
-        
+        H_TB_SOC_up = (H_TB + H_SOC);         % Arbeiten in meV
+        H_TB_SOC_down = (H_TB - H_SOC);
+                
         %     [Ev(:,:,ii) , D] = eig(H_TB_SOC);
         [Ev(1:3,1:3,nk,ni) , D_up] = eig(H_TB_SOC_up);
         [Ev(4:6,4:6,nk,ni) , D_down] = eig(H_TB_SOC_down);

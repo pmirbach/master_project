@@ -49,8 +49,8 @@ for nk = 1:size(Data.k,2)
                     fun_coul_diad(Data.Ev(:,:,nk,1), Data.Ev(:,:,nks,:), ...
                     [l1, l2, l2, l1]);
                 
-                V_h = sum(sum(sum(coul_diad_h .* V_orbital_h)));
-                V_f = sum(sum(sum(coul_diad_f .* V_orbital_f)));
+                V_h = sum(sum(sum(coul_diad_h .* V_orbital_h)))
+                V_f = sum(sum(sum(coul_diad_f .* V_orbital_f)))
                 
 %                 V_h = sum( sum( V_orbital_h .* coul_diad_h ) )
 %                 V_f = sum( sum( V_orbital_f .* coul_diad_f ) )
@@ -58,7 +58,7 @@ for nk = 1:size(Data.k,2)
 %                 disp(coul_diad_f)
 
 %                 disp(imag(V_h))
-                disp(imag(coul_diad_f))
+%                 disp(imag(coul_diad_f))
 %                 disp(V_f)
                 
                 1;

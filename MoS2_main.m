@@ -68,15 +68,21 @@ Parameter.coul_kappa = 0.1;             % Kappa, because of Singularity
 %% Monkhorst-Pack
 [Data.k] = k_mesh_mp(Ctrl, Parameter);
 
+
+%% Fehlersuche
+% load('kpts_72x72.mat');
+% % Data.k = permute(kpts,[2,1,3]);
+
+
 %% Tight-Binding
 [Data.Ek,Data.Ev] = tight_binding_liu(Ctrl, Parameter, Data);
 [fig.bandstr_surf, fig.bandstr_path] = ...
     plot_bandstr(Ctrl,Parameter,Data.k,Data.Ek(:,:,1),[2 3]);
 
 %% Thermische Anregung
-Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Data.Ek(:,:,1));
-[fig.exc_surf, fig.exc_path] = ...
-    plot_excitation(Ctrl,Parameter,Data.k,Data.fk,[2 3]);
+% Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Data.Ek(:,:,1));
+% [fig.exc_surf, fig.exc_path] = ...
+%     plot_excitation(Ctrl,Parameter,Data.k,Data.fk,[2 3]);
 
 %% Dipolmatrix
 
@@ -107,6 +113,17 @@ Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Data.Ek(:,:,1));
 % BZ_surf(Ctrl,Data.k,abs(test),'at')
 
 % profile report
+
+
+%% Fehlersuche 2
+% nk = 1;
+% nks = 2;
+% [coul_diad_h, coul_diad_f] = ...
+%     fun_coul_diad(Data.Ev(:,:,nk,1), Data.Ev(:,:,nks,:), ...
+%     [1, 2, 2, 1]);
+% coul_diad_h
+% coul_diad_f
+
 
 %% Coulomb WW
 coulomb_1(constAg,Parameter,Data)
