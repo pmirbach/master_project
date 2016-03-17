@@ -23,14 +23,16 @@ Ek_hf = Data.Ek;
 % % % repmat(blkdiag(V_orbital_h,V_orbital_h),1,1,6)
 
 % tic
-for nk = 1:size(Data.k,2)
+
+
+for nk = 2 %1:size(Data.k,2)
     
 %     Data.Ek(:,nk) % ist zu renormieren
     
     % Neue k nach Umklapp Prozess
     k_shift = umklapp1(Parameter, Data.k, Data.k(:,nk,1));
     
-    for nks = 2:size(Data.k,2)
+    for nks = 1:size(Data.k,2)
                 
         q_v = squeeze( repmat(Data.k(1:2,nk,1),1,1,6) - k_shift(1:2,nks,:) );
         q = sqrt( q_v(1,:).^2 + q_v(2,:).^2 );
@@ -41,28 +43,21 @@ for nk = 1:size(Data.k,2)
         for l1 = 1:6            % Zu renormierendes Band
             
             for l2 = 1:6        % Andere B�nder
-                
+                               
 %                 [coul_diad_h, coul_diad_f] = ...
-%                     test_diad(Data.Ev(:,:,nk), Data.Ev(:,:,nks),[l1, l2, l2, l1]);
-                
-                [coul_diad_h, coul_diad_f] = ...
-                    fun_coul_diad(Data.Ev(:,:,nk,1), Data.Ev(:,:,nks,:), ...
-                    [l1, l2, l2, l1]);
-                
-                V_h = sum(sum(sum(coul_diad_h .* V_orbital_h)))
-                V_f = sum(sum(sum(coul_diad_f .* V_orbital_f)))
-                
-%                 V_h = sum( sum( V_orbital_h .* coul_diad_h ) )
-%                 V_f = sum( sum( V_orbital_f .* coul_diad_f ) )
-%                 disp(coul_diad_h)
-%                 disp(coul_diad_f)
+%                     fun_coul_diad(Data.Ev(:,:,nk,1), Data.Ev(:,:,nks,:), ...
+%                     [l1, l2, l2, l1]);
 
-%                 disp(imag(V_h))
-%                 disp(imag(coul_diad_f))
-%                 disp(V_f)
+                [coul_diad_h] = ...
+                    coul_hartree(Data.Ev(:,:,nk,1), Data.Ev(:,:,nks,:), l1, l2);
+                [coul_diad_f] = ...
+                    coul_fock(Data.Ev(:,:,nk,1), Data.Ev(:,:,nks,:), l1, l2);
                 
-                1;
+                V_h = real( sum( sum( sum( coul_diad_h .* V_orbital_h ) ) ) ); 
+                V_f = real( sum( sum( sum( coul_diad_f .* V_orbital_f ) ) ) );
                 
+                
+                                     
             end
             
         end  
