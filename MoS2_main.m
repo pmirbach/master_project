@@ -2,7 +2,8 @@
 clear variables
 clear global
 close all
-% profile on
+profile off
+profile on
 clc
 dbstop if error
 
@@ -20,7 +21,7 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh
-Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 12;        % Unterteilungsgröße
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
 
@@ -79,10 +80,14 @@ Parameter.coul_kappa = 0.1;             % Kappa, because of Singularity
 [fig.bandstr_surf, fig.bandstr_path] = ...
     plot_bandstr(Ctrl,Parameter,Data.k,Data.Ek(:,:,1),[2 3]);
 
+% tic
+CV = calc_CV( Data.Ev );
+% toc
+
 %% Thermische Anregung
-% Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Data.Ek(:,:,1));
-% [fig.exc_surf, fig.exc_path] = ...
-%     plot_excitation(Ctrl,Parameter,Data.k,Data.fk,[2 3]);
+Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Data.Ek(:,:,1));
+[fig.exc_surf, fig.exc_path] = ...
+    plot_excitation(Ctrl,Parameter,Data.k,Data.fk,[2 3]);
 
 %% Dipolmatrix
 
@@ -126,10 +131,12 @@ Parameter.coul_kappa = 0.1;             % Kappa, because of Singularity
 
 
 %% Coulomb WW
-coulomb_1(constAg,Parameter,Data)
+[Ek_hf,Ek_h,Ek_f] = coulomb_1(constAg,Parameter,Data,CV);
+% [Ek_hf,Ek_h,Ek_f] = coulomb_2(constAg,Parameter,Data,CV);
 
 %% Flächeninhalt
 [B, B_integ] = flaecheninhalt(Parameter,Data.k(:,:,1));
 
 %%
+profile viewer
 profile off

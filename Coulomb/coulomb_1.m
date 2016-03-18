@@ -1,11 +1,14 @@
-function [] = coulomb_1(constAg,Parameter,Data)
+function [Ek_hf,Ek_h,Ek_f] = coulomb_1(constAg,Parameter,Data,CV)
+
+% profile on
 
 plottt = 0;
 plot_voranoi = 0;
 
 % k = Data.k;
 
-vorf = constAg.ec^2 / ( 2 * constAg.eps_0 * Parameter.area_real);
+vorf = constAg.ec^2 / ( 2 * constAg.eps_0 * Parameter.area_real) ...
+    / ( 4 * pi )^2;
 
 % Zuerst mal für eine feste Kombination aus Bändern:
 % Fock-artig zwischen spin up valenz und leitungsband 1
@@ -17,47 +20,67 @@ Ek_h = Data.Ek;
 Ek_f = Data.Ek;
 Ek_hf = Data.Ek;
 
+renorm_sign = ones(6);
+renorm_sign([1,4],[2,3,5,6]) = -1;
+renorm_sign([2,3,5,6],[1,4]) = -1;
+
+coul_diad_h = zeros(6,6,6);
+coul_diad_f = zeros(6,6,6);
 
 [V_orbital_h] = fun_coul_orbital_hartree(Parameter.coul_screened);
 
-% % % repmat(blkdiag(V_orbital_h,V_orbital_h),1,1,6)
+
 
 % tic
 
-
-for nk = 2 %1:size(Data.k,2)
+% for nk = size(Data.k,2)
+for nk = 1:size(Data.k,2)
     
-%     Data.Ek(:,nk) % ist zu renormieren
+    disp(nk)
     
     % Neue k nach Umklapp Prozess
-    k_shift = umklapp1(Parameter, Data.k, Data.k(:,nk,1));
+    k_shift = umklapp1(Parameter, Data.k(1:2,:,:), Data.k(1:2,nk,1));
     
     for nks = 1:size(Data.k,2)
                 
-        q_v = squeeze( repmat(Data.k(1:2,nk,1),1,1,6) - k_shift(1:2,nks,:) );
-        q = sqrt( q_v(1,:).^2 + q_v(2,:).^2 );
+        q_v = repmat(Data.k(1:2,nk,1),1,1,6) - k_shift(1:2,nks,:);
+        q = squeeze(sqrt( q_v(1,1,:).^2 + q_v(2,1,:).^2 ));
         
-        [V_orbital_f] = fun_coul_orbital_fock(q, ...
-            Parameter.coul_screened, Parameter.coul_kappa );
+%         [V_orbital_f] = fun_coul_orbital_fock(q, ...
+%             Parameter.coul_screened, Parameter.coul_kappa );
+        [V_orbital_f] = fun_coul_orbital_fock2(q, ...
+            Parameter.coul_screened, Parameter.coul_kappa);
                       
         for l1 = 1:6            % Zu renormierendes Band
             
-            for l2 = 1:6        % Andere B�nder
-                               
-%                 [coul_diad_h, coul_diad_f] = ...
-%                     fun_coul_diad(Data.Ev(:,:,nk,1), Data.Ev(:,:,nks,:), ...
-%                     [l1, l2, l2, l1]);
+            for l2 = 1:6        % Andere Bänder   
 
-                [coul_diad_h] = ...
-                    coul_hartree(Data.Ev(:,:,nk,1), Data.Ev(:,:,nks,:), l1, l2);
-                [coul_diad_f] = ...
-                    coul_fock(Data.Ev(:,:,nk,1), Data.Ev(:,:,nks,:), l1, l2);
+%                 [coul_diad_h] = ...
+%                     coul_hartree(Data.Ev(:,:,nk,1), Data.Ev(:,:,nks,:), l1, l2);
+%                 
+                for ntri = 1:6
+                    
+                    coul_diad_h(:,:,ntri) = diag(CV(:,:,l1,l1,nk,1)) * ...
+                        diag(CV(:,:,l2,l2,nks,ntri))';
+                    coul_diad_f(:,:,ntri) = CV(:,:,l1,l1,nk,1) .* ...
+                        CV(:,:,l2,l2,nks,ntri).';
+                    
+                end
                 
+%                 [coul_diad_f] = ...
+%                     coul_fock(Data.Ev(:,:,nk,1), Data.Ev(:,:,nks,:), l1, l2);
+                
+                               
                 V_h = real( sum( sum( sum( coul_diad_h .* V_orbital_h ) ) ) ); 
                 V_f = real( sum( sum( sum( coul_diad_f .* V_orbital_f ) ) ) );
-                
-                
-                                     
+                          
+                Ek_h(l1,nk) = Ek_h(l1,nk) + renorm_sign(l1,l2) * ...
+                    Data.k(3,nks,1) * vorf * V_h * Data.fk(l2,nks);
+                Ek_f(l1,nk) = Ek_f(l1,nk) + renorm_sign(l1,l2) * ...
+                    Data.k(3,nks,1) * vorf * ( - V_f ) * Data.fk(l2,nks);
+                Ek_hf(l1,nk) = Ek_hf(l1,nk) + renorm_sign(l1,l2) * ...
+                    Data.k(3,nks,1) * vorf * ( V_h - V_f ) * Data.fk(l2,nks);
+                       
             end
             
         end  
@@ -66,21 +89,32 @@ for nk = 2 %1:size(Data.k,2)
     end
 
 end
+
 % toc
+% 
+% profile viewer
+% profile off
+
+1
 
 
-% Irgend ein festes k'kneu
-% Zufälliger k-Vektor:
-k0_ind = round(rand * size(Data.k,2));
-% k0_ind = 115;
-k0 = Data.k(:,k0_ind);
+
 
 
 
 % Berechnung der Coulomb WW
 
 if plottt == 1
-    k_shift = umklapp1(Parameter,Data.k,k0);
+    
+    % Irgend ein festes k'kneu
+    % Zufälliger k-Vektor:
+    k0_ind = round(rand * size(Data.k,2));
+    % k0_ind = 115;
+    k0 = Data.k(1:2,k0_ind);
+    
+    
+%     k_shift = umklapp1(Parameter,Data.k,k0);
+    k_shift = umklapp1(Parameter, Data.k(1:2,:,:), k0);
     
     corners = Parameter.symmpts{2}(:,[2 3]);
     [corners] = red_to_BZ(corners);
@@ -101,9 +135,9 @@ if plottt == 1
     marker = {'h','p','x','+','^','v'};
     
     for ii = 1:6
-        in = k_shift(3,:,ii) == 6 * Parameter.area_sBZ;
-        on = k_shift(3,:,ii) == 3 * Parameter.area_sBZ;
-        symm = k_shift(3,:,ii) == 1 * Parameter.area_sBZ;
+        in = Data.k(3,:,ii) == 6 * Parameter.area_sBZ;
+        on = Data.k(3,:,ii) == 3 * Parameter.area_sBZ;
+        symm = Data.k(3,:,ii) == 1 * Parameter.area_sBZ;
         
         instr = strcat(colors{ii},marker{1+mod(ii,2)});
         onstr = strcat(colors{ii},marker{3+mod(ii,2)});
