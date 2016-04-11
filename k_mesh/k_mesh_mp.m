@@ -6,12 +6,13 @@ b1 = Parameter.rezGV(:,1);          % Reziproke Gittervektoren
 b2 = Parameter.rezGV(:,2);
 
 
-ur = (-2:qr) / qr;                   % Einteilung des rez. Gittervektors
+ur = (0:qr-1) / qr;                   % Einteilung des rez. Gittervektors
 A = ones(numel(ur),1) * ur;          % Erzeugung eines meshes
 k_mesh_x = A * b1(1) + A' * b2(1);
 k_mesh_y = A * b1(2) + A' * b2(2);
 
 k0 = [k_mesh_x(:), k_mesh_y(:)]';     % Alle k-Punkte
+
 
 % Bestimmung der k-Punkte in der red BZ mit Gewicht als Vielfaches der 
 % kleinen BZ
@@ -22,7 +23,6 @@ k(3,:) = k(3,:) * Parameter.area_sBZ;
 
 % Erzeugung aller red. Dreiecke mit Spiegelungen und Drehungen
 [k] = red_to_BZ(k);
-
 
 
 %% Plots

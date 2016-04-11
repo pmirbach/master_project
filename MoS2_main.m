@@ -2,8 +2,8 @@
 clear variables
 clear global
 close all
-profile off
-profile on
+% profile off
+% profile on
 clc
 dbstop if error
 
@@ -21,7 +21,7 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh
-Ctrl.k_mesh_mp.qr = 12;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
 
@@ -54,89 +54,47 @@ Ctrl.plot.entireBZ = 0;         % 1 ganze BZ, 0 nur red. BZ
 Parameter.symmpts{1} = {'\Gamma', 'K', 'K*', 'M'};
 Parameter.symmpts{2} = 2 * pi / (3 * Parameter.TB.liu.values(1)) ...
     * [0, 0 ; 2, 0 ; 1, sqrt(3) ; 3 / 2, sqrt(3) / 2 ]';
-Parameter.rezGV = 2 * pi / Parameter.TB.liu.values(1) ...
-    * [1, -1 / sqrt(3); 0, 2 / sqrt(3)]';
+Parameter.rezGV = 2 * pi / Parameter.TB.liu.values(1) * [1, -1 / sqrt(3); 0, 2 / sqrt(3)]';
 Parameter.area_real = 3 * sqrt(3) / 2 * (Parameter.TB.liu.values(1))^2;
 Parameter.area_BZ = 3 * sqrt(3) / 2 * (norm(Parameter.symmpts{2}(:,2)))^2;
-Parameter.area_sBZ = 3 * sqrt(3) / 2 * ...
-    (norm(Parameter.symmpts{2}(:,2)) / Ctrl.k_mesh_mp.qr)^2;
+Parameter.area_sBZ = 3 * sqrt(3) / 2 * (norm(Parameter.symmpts{2}(:,2)) / Ctrl.k_mesh_mp.qr)^2;
 Parameter.coul_screened = [[1.17 , 7.16 , 0.199, 2.675];
     [0.456 , 14.03 , 0.242, 2.930]; [0.46 , 13.97 , 0.24, 2.930]; 
     [1.288 , 6.88 , 0.232, 2.682]; [0.713 , 9.9 , 0.246, 2.855]; 
     [1.273 , 6.92 , 0.227, 2.682]];
 Parameter.coul_kappa = 0.1;             % Kappa, because of Singularity
+Parameter.dipol_trans = [1, 2 ; 1 , 3 ; 2, 1 ; 3 , 1 ; 4 , 5 ; 4 , 6 ; 5 , 4 ; 6 , 4 ];
 
 %% Monkhorst-Pack
 [Data.k] = k_mesh_mp(Ctrl, Parameter);
-
-
-%% Fehlersuche
-% load('kpts_72x72.mat');
-% % Data.k = permute(kpts,[2,1,3]);
+Parameter.nrk = size(Data.k,2);
 
 
 %% Tight-Binding
-[Data.Ek,Data.Ev] = tight_binding_liu(Ctrl, Parameter, Data);
-[fig.bandstr_surf, fig.bandstr_path] = ...
-    plot_bandstr(Ctrl,Parameter,Data.k,Data.Ek(:,:,1),[2 3]);
+[Data.Ek, Data.Ev, Prep.CV] = tight_binding_liu(Ctrl, Parameter, Data);
+[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Parameter,Data.k,Data.Ek(:,:,1),[2 3]);
 
-% tic
-CV = calc_CV( Data.Ev );
-% toc
 
 %% Thermische Anregung
 Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Data.Ek(:,:,1));
-[fig.exc_surf, fig.exc_path] = ...
-    plot_excitation(Ctrl,Parameter,Data.k,Data.fk,[2 3]);
+[fig.exc_surf, fig.exc_path] = plot_excitation(Ctrl,Parameter,Data.k,Data.fk,[2 3]);
 
 %% Dipolmatrix
+Data.dipol = dipol(Parameter, Prep, Data);
+titlestr = {'1 \rightarrow 2 \uparrow','1 \rightarrow 3 \uparrow','2 \rightarrow 1 \uparrow','2 \rightarrow 1 \uparrow'};
+[fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Parameter,Data.k,Data.dipol(1:3,1:3),[2 2],titlestr);
+titlestr = {'1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow','2 \rightarrow 1 \downarrow','2 \rightarrow 1 \downarrow'};
+[fig.dipolDown_surf, fig.dipolDown_path] = plot_dipol(Ctrl,Parameter,Data.k,Data.dipol(4:6,4:6),[2 2],titlestr);
 
-% Data.dipol = dipol(Parameter, Data);
-% Darstellung
-%% Darstellung Dipol
-% A = 1 / sqrt(2) * (Data.dipol(1,:) + 1i * Data.dipol(2,:));
-% BZ_surf(Ctrl,Data.k,abs(A))
-
-% von = 1;
-% zu = 2;
-%
-% A = 1 / sqrt(2) * (Data.dipol{von,zu}(1,:) + 1i * Data.dipol{von,zu}(2,:));
-% BZ_surf(Ctrl,Data.k,abs(A),'normal')
-
-
-% von = 2;
-% zu = 3;
-%
-% A = 1 / sqrt(2) * (Data.dipol{von,zu}(1,:) + 1i * Data.dipol{von,zu}(2,:));
-% BZ_surf(Ctrl,Data.k,abs(A))
-
-% BZ_surf(Ctrl,Data.k,Data.dipol_plot(1:4,:),'subplot')
-% BZ_surf(Ctrl,Data.k,Data.dipol_plot(5:8,:),'subplot')
-
-% test= squeeze(P(3,3,:));
-
-% BZ_surf(Ctrl,Data.k,abs(test),'at')
-
-% profile report
-
-
-%% Fehlersuche 2
-% nk = 1;
-% nks = 2;
-% [coul_diad_h, coul_diad_f] = ...
-%     fun_coul_diad(Data.Ev(:,:,nk,1), Data.Ev(:,:,nks,:), ...
-%     [1, 2, 2, 1]);
-% coul_diad_h
-% coul_diad_f
 
 
 %% Coulomb WW
-[Ek_hf,Ek_h,Ek_f] = coulomb_1(constAg,Parameter,Data,CV);
+% [Ek_hf,Ek_h,Ek_f] = coulomb_1(constAg,Parameter,Data,CV);
 % [Ek_hf,Ek_h,Ek_f] = coulomb_2(constAg,Parameter,Data,CV);
 
 %% Flächeninhalt
-[B, B_integ] = flaecheninhalt(Parameter,Data.k(:,:,1));
+% [B, B_integ] = flaecheninhalt(Parameter,Data.k(:,:,1));
 
 %%
-profile viewer
-profile off
+% profile viewer
+% profile off
