@@ -1,8 +1,8 @@
-function [Ek,Ev,CV] = tight_binding_liu(Ctrl, Parameter, Data)
+function [Ek, Ev, CV] = tight_binding_liu(Ctrl, Parameter, Data)
 
 % Berechnung der Eigenwerte und Eigenvektoren über das k-mesh
-Ek = zeros(6, size(Data.k,2),6);
-Ev = zeros(6, 6, size(Data.k,2),6);
+Ek = zeros(6, Parameter.nrk, 6);
+Ev = zeros(6, 6, Parameter.nrk, 6);
 
 % SOC Hamiltonian
 lambda = Parameter.TB.liu.values(end);
@@ -10,7 +10,7 @@ L_z = [0 0 0; 0 0 2i; 0 -2i 0];
 H_SOC = Ctrl.SOC * lambda / 2 * L_z;
 % H_SOC = Ctrl.SOC * lambda / 2 * blkdiag(L_z, -L_z);
 
-for nk = 1: size(Data.k,2)
+for nk = 1:Parameter.nrk
     
     for ni = 1:6
         

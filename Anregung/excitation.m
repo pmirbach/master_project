@@ -24,6 +24,7 @@ Ek_shift(band_ind{2},:) = ...
 
 for ii = 1:2
     ind = band_ind{ii};
+    Nr_ind = size(ind,2);
     
     mu = [-1000, 0, 1000];      % Grenzen zum Suchen - Verbessern!!!
     
@@ -37,7 +38,7 @@ for ii = 1:2
         W_k = zeros(size(ind,2),size(Ek,2),3);
         D = zeros(size(ind,2),3);
         
-        for jj = 1:size(ind,2)
+        for jj = 1:Nr_ind
             for kk = 1:3
                 W_k(jj,:,kk) = 1 ./ ( exp( ( Ek_shift(ind(jj),:) ...
                     - mu(kk) ) ./ ( constAg.k_B * T ) ) + 1 );
