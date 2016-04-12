@@ -29,6 +29,8 @@ for ii = 1:2
     
     diff(2) = D_0;
     
+    lauf = 0;
+    
     while abs(diff(2)) > tol
         mu(2) = (mu(1) + mu(3)) / 2;
         
@@ -51,6 +53,8 @@ for ii = 1:2
         else
             error('doof')
         end
+        
+        lauf = lauf + 1;
         
     end
         

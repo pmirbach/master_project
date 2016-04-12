@@ -1,20 +1,13 @@
 function [Ek_hf,Ek_h,Ek_f] = coulomb_1(constAg,Parameter,Data,CV)
 
-% profile on
+profile on
 
 plottt = 0;
 plot_voranoi = 0;
 
 % k = Data.k;
 
-vorf = constAg.ec^2 / ( 2 * constAg.eps_0 * Parameter.area_real) ...
-    / ( 4 * pi )^2;
-
-% Zuerst mal für eine feste Kombination aus Bändern:
-% Fock-artig zwischen spin up valenz und leitungsband 1
-% Data.Ev(:,1,:) und Data.Ev(:,2,:)
-
-%  V_{k k' k k'}^{l l' l l'}   hier l = 1  l' = 2
+vorf = constAg.ec^2 / ( 2 * constAg.eps_0 * Parameter.area_real) / ( 4 * pi )^2;
 
 Ek_h = Data.Ek;
 Ek_f = Data.Ek;
@@ -28,8 +21,6 @@ coul_diad_h = zeros(6,6,6);
 coul_diad_f = zeros(6,6,6);
 
 [V_orbital_h] = fun_coul_orbital_hartree(Parameter.coul_screened);
-
-
 
 % tic
 
@@ -92,8 +83,8 @@ end
 
 % toc
 % 
-% profile viewer
-% profile off
+profile viewer
+profile off
 
 1
 

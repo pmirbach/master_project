@@ -2,8 +2,8 @@
 clear variables
 clear global
 close all
-profile off
-profile on
+% profile off
+% profile on
 clc
 dbstop if error
 
@@ -21,13 +21,13 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh
-Ctrl.k_mesh_mp.qr = 12;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 120;        % Unterteilungsgröße
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
 
 % Anregungsdichte
 Ctrl.temperature = 300;         % Temperatur in K
-Ctrl.carrier_density = 1e13;    % Anregungsdichte in 1/cm^2
+Ctrl.carrier_density = 1e12;    % Anregungsdichte in 1/cm^2
 Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
 
 %% Plot Control
@@ -37,7 +37,7 @@ Ctrl.plot.path = {'\Gamma' 'K' 'M' 'K*' '\Gamma' 'M'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 0];         % Bandstructure
+Ctrl.plot.tb = [0, 0];         % Bandstructure
 Ctrl.plot.exc = [0, 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 
@@ -69,25 +69,17 @@ Parameter.coul_kappa = 0.1;             % Kappa, because of Singularity
 %% Monkhorst-Pack
 [Data.k] = k_mesh_mp(Ctrl, Parameter);
 
-
-%% Fehlersuche
-% load('kpts_72x72.mat');
-% % Data.k = permute(kpts,[2,1,3]);
-
-
 %% Tight-Binding
-[Data.Ek,Data.Ev] = tight_binding_liu(Ctrl, Parameter, Data);
+[Data.Ek, Data.Ev, Prep.CV] = tight_binding_liu(Ctrl, Parameter, Data);
 [fig.bandstr_surf, fig.bandstr_path] = ...
     plot_bandstr(Ctrl,Parameter,Data.k,Data.Ek(:,:,1),[2 3]);
 
-% tic
-CV = calc_CV( Data.Ev );
-% toc
 
 %% Thermische Anregung
 Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Data.Ek(:,:,1));
 [fig.exc_surf, fig.exc_path] = ...
     plot_excitation(Ctrl,Parameter,Data.k,Data.fk,[2 3]);
+
 
 %% Dipolmatrix
 
@@ -130,13 +122,20 @@ Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Data.Ek(:,:,1));
 % coul_diad_f
 
 
+% profile off
+profile on
+
+prae_q( Parameter, Data.k );
+
+profile viewer
+profile off
+
 %% Coulomb WW
-[Ek_hf,Ek_h,Ek_f] = coulomb_1(constAg,Parameter,Data,CV);
-% [Ek_hf,Ek_h,Ek_f] = coulomb_2(constAg,Parameter,Data,CV);
+% [Ek_hf,Ek_h,Ek_f] = coulomb_1(constAg,Parameter,Data,Prep.CV);
 
 %% Flächeninhalt
 [B, B_integ] = flaecheninhalt(Parameter,Data.k(:,:,1));
 
 %%
-profile viewer
-profile off
+% profile viewer
+% profile off
