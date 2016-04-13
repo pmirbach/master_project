@@ -1,4 +1,4 @@
-function q_p = prae_q( Parameter, k )
+function q_p = call_minq( Parameter, k )
     
 b1 = Parameter.rezGV(:,1);                              % Reziproke Gittervektoren
 b2 = Parameter.rezGV(:,2);
@@ -17,16 +17,8 @@ end
 numk = size(k,2);
 numb = size(b,2);
 
-k(3,:,:) = [];
+% k(3,:,:) = [];
 
-
-kx = 0;
-ky = 0;
-
-kxs = 0;
-kys = 0;
-
-tic
 q = zeros(1,size(b,2));
 q_p = zeros(size(k,2),size(k,2),size(k,3));
 
@@ -46,8 +38,7 @@ for nk = 1:numk
              
             for nb = 1:numb
             
-                q(nb) = sqrt( (kx - kxs + b(1, nb) )^2 + (ky - kys + b(1, nb))^2 );
-%                 q(nb) = norm( k(:,nk,1) - k(:,nks,tri) + b(:,nb) );
+                q(nb) = sqrt( (kx - kxs + b(1, nb) )^2 + (ky - kys + b(2, nb))^2 );
                 
             end
             
@@ -58,8 +49,3 @@ for nk = 1:numk
     end
     
 end
-toc       
-
-
-
-

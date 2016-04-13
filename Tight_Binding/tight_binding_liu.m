@@ -1,4 +1,4 @@
-function [Ek, Ev, CV] = tight_binding_liu(Ctrl, Parameter, Data)
+function [Ek, Ev] = tight_binding_liu(Ctrl, Parameter, Data)
 
 % Berechnung der Eigenwerte und Eigenvektoren über das k-mesh
 Ek = zeros(6, Parameter.nrk, 6);
@@ -37,4 +37,4 @@ for nk = 1:Parameter.nrk
     
 end
 
-CV = calc_CV( Ev );
+Ek = Ek - max(Ek(1,:));

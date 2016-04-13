@@ -28,7 +28,7 @@ Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
 
 % Anregungsdichte
 Ctrl.temperature = 300;         % Temperatur in K
-Ctrl.carrier_density = 1e12;    % Anregungsdichte in 1/cm^2
+Ctrl.carrier_density = 1e13;    % Anregungsdichte in 1/cm^2
 Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
 
 %% Plot Control
@@ -38,9 +38,9 @@ Ctrl.plot.path = {'\Gamma' 'K' 'M' 'K*' '\Gamma' 'M'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0, 0];         % Bandstructure
-Ctrl.plot.exc = [0, 0];         % Excitation
-Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
+Ctrl.plot.tb = [0, 1];         % Bandstructure
+Ctrl.plot.exc = [0, 1];         % Excitation
+Ctrl.plot.dipol = [0 , 1];      % Dipol matrix elements
 
 
 Ctrl.plot.save = 0;             % 1 Speichern, 0 nicht
@@ -68,40 +68,98 @@ Parameter.dipol_trans = [1, 2 ; 1 , 3 ; 2, 1 ; 3 , 1 ; 4 , 5 ; 4 , 6 ; 5 , 4 ; 6
 
 %% Monkhorst-Pack
 [Data.k] = k_mesh_mp(Ctrl, Parameter);
-
-%% Tight-Binding
-[Data.Ek, Data.Ev, Prep.CV] = tight_binding_liu(Ctrl, Parameter, Data);
-[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Parameter,Data.k,Data.Ek(:,:,1),[2 3]);
 Parameter.nrk = size(Data.k,2);
 
+%% Tight-Binding
+fprintf('Tight-binding:  Start'); tic
+
+[Data.Ek, Data.Ev] = tight_binding_liu(Ctrl, Parameter, Data);
+
+period = toc; fprintf('   -   Finished in %g seconds\n',period) 
+
+[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Parameter,Data.k,Data.Ek(:,:,1),[2 3]);
+
+%% Simulation-preperations
+fprintf('Preperations:   Start'); tic
+
+[Prep.Eks, Prep.CV, Prep.minq, Prep.coul_intrp] = prep(constAg, Parameter, Data);
+
+period = toc; fprintf('   -   Finished in %g seconds\n',period) 
+
+
 %% Thermische Anregung
-Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Data.Ek(:,:,1));
+fprintf('Excitation:     Start'); tic
+
+Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Prep.Eks);
+
+period = toc; fprintf('   -   Finished in %g seconds\n',period) 
+
 [fig.exc_surf, fig.exc_path] = plot_excitation(Ctrl,Parameter,Data.k,Data.fk,[2 3]);
 
 
 %% Dipolmatrix
+fprintf('Dipol:          Start'); tic
+
 Data.dipol = dipol(Parameter, Prep, Data);
+
+period = toc; fprintf('   -   Finished in %g seconds\n',period) 
+
 titlestr = {'1 \rightarrow 2 \uparrow','1 \rightarrow 3 \uparrow','2 \rightarrow 1 \uparrow','2 \rightarrow 1 \uparrow'};
 [fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Parameter,Data.k,Data.dipol(1:3,1:3),[2 2],titlestr);
 titlestr = {'1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow','2 \rightarrow 1 \downarrow','2 \rightarrow 1 \downarrow'};
 [fig.dipolDown_surf, fig.dipolDown_path] = plot_dipol(Ctrl,Parameter,Data.k,Data.dipol(4:6,4:6),[2 2],titlestr);
 
 
-
-% profile off
-profile on
-
-prae_q( Parameter, Data.k );
-
-profile viewer
-profile off
-
 %% Coulomb WW
+
 % [Ek_hf,Ek_h,Ek_f] = coulomb_1(constAg,Parameter,Data,Prep.CV);
+[Ek_hf,Ek_h,Ek_f] = coulomb_2(constAg,Parameter,Data,Prep);
 
 
-%% Flächeninhalt
-% [B, B_integ] = flaecheninhalt(Parameter,Data.k(:,:,1));
+%% 
+
+
+% [d1, d2] = plot_bandstr(Ctrl,Parameter,Data.k,Prep.Eks,[2 3]);
+
+
+% y0 = 0;
+
+%% Zeitentwicklung
+
+% tspan = [0 2];
+% psik_E_ini = zeros(1,Parameter.nrk + 4002);
+% 
+% % opts = odeset('RelTol',1e-1,'AbsTol',1e-3);
+% [t,psik_E] = ode45(@(t,psik_E) dgl_bloch(t,psik_E,Data,constAg), tspan, psik_E_ini);
+% % plot(t,y,'-o')
+ 
+%%
+
+% psik = psik_E(:,1:Parameter.nrk);
+% P_w = psik_E(end,Parameter.nrk+1:Parameter.nrk+2001);
+% E_w = psik_E(end,Parameter.nrk+2002:end);
+% 
+% chi_w = P_w ./ E_w;
+% 
+% plot(-1000:1000,imag(chi_w))
+
+
+% P = zeros(1,numel(t));
+% 
+% d = 1 / sqrt(2) * transpose(Data.dipol{2,1}(1,:) - 1i * Data.dipol{2,1}(2,:));
+% 
+% for ii = 1:numel(t)
+%     P(ii) = 1 / (2 * pi)^2 * Data.k(3,:,1) * (conj(d) .* transpose(psik));
+% end
+% 
+% figure
+% plot(t,real(P))
+% hold on
+% plot(t,imag(P),'r')
+% legend('real','imag')
+
+
+
 
 %%
 % profile viewer

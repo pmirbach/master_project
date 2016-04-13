@@ -38,40 +38,6 @@ vorf = constAg.ec^2 / ( 2 * constAg.eps_0 * A);
 q = 0:0.001:13.2;
 N_q = size(q,2);
 
-%% Dielektrische Funktion
-
-% epsilon = zeros(1,N_q);
-% 
-% figure
-% for jj = 1:6
-%     subplot(2,3,jj)
-%     [diel] = fun_diel2(q, para(jj,1), para(jj,2) );
-%     plot(q,epsilon)
-% end
-
-%% Bare Coulomb Matrixelemente
-
-% figure
-% for jj = 1:6
-%     subplot(2,3,jj)
-%     [U] = vorf * fun_Coulomb(q, para(jj,3));
-%     plot(q,U*1e-3)
-%     axis([0, 13.2, 0, 30])
-% end
-
-%% Screened Coulomb Matrixlemente
-
-% for jj = 1:6
-%     subplot(2,3,jj)
-%     [diel] = fun_diel2(q, para(jj,1), para(jj,2) );
-%     [U] = vorf * fun_Coulomb(q, para(jj,3), kappa);
-%     V = U ./ diel;
-%     plot(q,U*1e-3)
-%     hold on
-%     plot(q,V*1e-3)
-%     
-%     axis([0, 13.2, 0, 30])
-% end
 
 %% Screened, all in one
 
