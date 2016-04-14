@@ -10,4 +10,4 @@ for jj = 1:size(para,1)
     
 end
 
-V_orbital_h = repmat(V_orbital_h,2,2,6);
+V_orbital_h = repmat(V_orbital_h,2,2);

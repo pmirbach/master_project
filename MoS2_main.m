@@ -4,7 +4,7 @@ clear global
 close all
 % profile off
 % profile on
-clc
+% clc
 dbstop if error
 
 % Unterordner für Funktionsaufrufe:
@@ -21,7 +21,7 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh
-Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 18;        % Unterteilungsgröße
 
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
@@ -38,9 +38,9 @@ Ctrl.plot.path = {'\Gamma' 'K' 'M' 'K*' '\Gamma' 'M'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0, 1];         % Bandstructure
-Ctrl.plot.exc = [0, 1];         % Excitation
-Ctrl.plot.dipol = [0 , 1];      % Dipol matrix elements
+Ctrl.plot.tb = [0 , 0];         % Bandstructure
+Ctrl.plot.exc = [0 , 0];         % Excitation
+Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 
 
 Ctrl.plot.save = 0;             % 1 Speichern, 0 nicht
@@ -63,7 +63,7 @@ Parameter.coul_screened = [[1.17 , 7.16 , 0.199, 2.675];
     [0.456 , 14.03 , 0.242, 2.930]; [0.46 , 13.97 , 0.24, 2.930]; 
     [1.288 , 6.88 , 0.232, 2.682]; [0.713 , 9.9 , 0.246, 2.855]; 
     [1.273 , 6.92 , 0.227, 2.682]];
-Parameter.coul_kappa = 0.1;             % Kappa, because of Singularity
+Parameter.coul_kappa = 1000;             % Kappa, because of Singularity
 Parameter.dipol_trans = [1, 2 ; 1 , 3 ; 2, 1 ; 3 , 1 ; 4 , 5 ; 4 , 6 ; 5 , 4 ; 6 , 4 ];
 
 %% Monkhorst-Pack
@@ -82,7 +82,7 @@ period = toc; fprintf('   -   Finished in %g seconds\n',period)
 %% Simulation-preperations
 fprintf('Preperations:   Start'); tic
 
-[Prep.Eks, Prep.CV, Prep.minq, Prep.coul_intrp] = prep(constAg, Parameter, Data);
+[Prep.Eks, Prep.CV, Prep.minq, Prep.coul_intrp, Prep.coul_h] = prep(constAg, Parameter, Data);
 
 period = toc; fprintf('   -   Finished in %g seconds\n',period) 
 
@@ -110,11 +110,22 @@ titlestr = {'1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow','2 \righta
 [fig.dipolDown_surf, fig.dipolDown_path] = plot_dipol(Ctrl,Parameter,Data.k,Data.dipol(4:6,4:6),[2 2],titlestr);
 
 
+%% Tests
+% figure; hold on
+% jj = 2;
+% for ii = 1:6
+%     plot(Prep.minq(jj,:,ii))
+% end
+
 %% Coulomb WW
+
+% profile on
 
 % [Ek_hf,Ek_h,Ek_f] = coulomb_1(constAg,Parameter,Data,Prep.CV);
 [Ek_hf,Ek_h,Ek_f] = coulomb_2(constAg,Parameter,Data,Prep);
 
+% profile report
+% profile off
 
 %% 
 

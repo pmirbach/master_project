@@ -29,3 +29,4 @@ coul_intrp{2,3} = coul_intrp_tmp{5};
 coul_intrp{3,2} = coul_intrp_tmp{5};
 coul_intrp{3,3} = coul_intrp_tmp{6};
 
+coul_intrp = repmat(coul_intrp,[2,2]);
