@@ -20,8 +20,9 @@ Ctrl.material = 'MoS2';   % Materialien: MoS2 WS2 MoSe2 WSe2 MoTe2 WTe2
 Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
-% k-mesh
-Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
+% k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Ctrl.k_mesh_mp.qr = 12;        % Unterteilungsgröße
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
@@ -38,9 +39,9 @@ Ctrl.plot.path = {'\Gamma' 'K' 'M' 'K*' '\Gamma' 'M'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0, 1];         % Bandstructure
-Ctrl.plot.exc = [0, 1];         % Excitation
-Ctrl.plot.dipol = [0 , 1];      % Dipol matrix elements
+Ctrl.plot.tb = [0, 0];         % Bandstructure
+Ctrl.plot.exc = [0, 0];         % Excitation
+Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 
 
 Ctrl.plot.save = 0;             % 1 Speichern, 0 nicht
@@ -63,7 +64,7 @@ Parameter.coul_screened = [[1.17 , 7.16 , 0.199, 2.675];
     [0.456 , 14.03 , 0.242, 2.930]; [0.46 , 13.97 , 0.24, 2.930]; 
     [1.288 , 6.88 , 0.232, 2.682]; [0.713 , 9.9 , 0.246, 2.855]; 
     [1.273 , 6.92 , 0.227, 2.682]];
-Parameter.coul_kappa = 0.1;             % Kappa, because of Singularity
+Parameter.coul_kappa = 0;             % Kappa, because of Singularity
 Parameter.dipol_trans = [1, 2 ; 1 , 3 ; 2, 1 ; 3 , 1 ; 4 , 5 ; 4 , 6 ; 5 , 4 ; 6 , 4 ];
 
 %% Monkhorst-Pack
@@ -82,7 +83,7 @@ period = toc; fprintf('   -   Finished in %g seconds\n',period)
 %% Simulation-preperations
 fprintf('Preperations:   Start'); tic
 
-[Prep.Eks, Prep.CV, Prep.minq, Prep.coul_intrp] = prep(constAg, Parameter, Data);
+[Prep.Eks, Prep.CV, Prep.CV2, Prep.minq, Prep.coul_intrp, Prep.V_orbital_h] = prep(constAg, Parameter, Data);
 
 period = toc; fprintf('   -   Finished in %g seconds\n',period) 
 
@@ -112,15 +113,19 @@ titlestr = {'1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow','2 \righta
 
 %% Coulomb WW
 
-% [Ek_hf,Ek_h,Ek_f] = coulomb_1(constAg,Parameter,Data,Prep.CV);
-[Ek_hf,Ek_h,Ek_f] = coulomb_2(constAg,Parameter,Data,Prep);
+[V_fock, V_hartree] = coulomb_5(constAg,Parameter,Data,Prep);
+
+%% Band renorm
+
+renorm1(Parameter, Data.Ek, V_fock, V_hartree, Data.fk, Data.k(3,:,1))
+
+
+
+
 
 
 %% 
-
-
 % [d1, d2] = plot_bandstr(Ctrl,Parameter,Data.k,Prep.Eks,[2 3]);
-
 
 % y0 = 0;
 
