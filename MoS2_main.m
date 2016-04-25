@@ -21,7 +21,7 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 12;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
@@ -29,7 +29,7 @@ Ctrl.k_mesh_mp.qr = 12;        % Unterteilungsgröße
 
 % Anregungsdichte
 Ctrl.temperature = 300;         % Temperatur in K
-Ctrl.carrier_density = 1e13;    % Anregungsdichte in 1/cm^2
+Ctrl.carrier_density = 1e12;    % Anregungsdichte in 1/cm^2
 Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
 
 %% Plot Control
@@ -39,7 +39,7 @@ Ctrl.plot.path = {'\Gamma' 'K' 'M' 'K*' '\Gamma' 'M'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 0];         % Bandstructure
+Ctrl.plot.tb = [0 , 1];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 
@@ -56,9 +56,16 @@ Parameter.symmpts{1} = {'\Gamma', 'K', 'K*', 'M'};
 Parameter.symmpts{2} = 2 * pi / (3 * Parameter.TB.liu.values(1)) ...
     * [0, 0 ; 2, 0 ; 1, sqrt(3) ; 3 / 2, sqrt(3) / 2 ]';
 Parameter.rezGV = 2 * pi / Parameter.TB.liu.values(1) * [1, -1 / sqrt(3); 0, 2 / sqrt(3)]';
+
 Parameter.area_real = 3 * sqrt(3) / 2 * (Parameter.TB.liu.values(1))^2;
 Parameter.area_BZ = 3 * sqrt(3) / 2 * (norm(Parameter.symmpts{2}(:,2)))^2;
-Parameter.area_sBZ = 3 * sqrt(3) / 2 * (norm(Parameter.symmpts{2}(:,2)) / Ctrl.k_mesh_mp.qr)^2;
+
+Parameter.aBZred = norm(Parameter.symmpts{2}(:,2)) / Ctrl.k_mesh_mp.qr;
+Parameter.area_sBZ = 3 * sqrt(3) / 2 * Parameter.aBZred^2;
+Parameter.qmin = Parameter.aBZred * sqrt(3);
+
+Parameter.coul_pol = 3 * sqrt(3) * log(3) * Parameter.aBZred / Parameter.area_sBZ;
+
 Parameter.coul_screened = [[1.17 , 7.16 , 0.199, 2.675];
     [0.456 , 14.03 , 0.242, 2.930]; [0.46 , 13.97 , 0.24, 2.930]; 
     [1.288 , 6.88 , 0.232, 2.682]; [0.713 , 9.9 , 0.246, 2.855]; 
@@ -110,19 +117,18 @@ titlestr = {'1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow','2 \righta
 [fig.dipolDown_surf, fig.dipolDown_path] = plot_dipol(Ctrl,Parameter,Data.k,Data.dipol(4:6,4:6),[2 2],titlestr);
 
 
-%% Tests
-% figure; hold on
-% jj = 2;
-% for ii = 1:6
-%     plot(Prep.minq(jj,:,ii))
-% end
-
 %% Coulomb WW
+fprintf('Coulomb matrix: Start'); tic
 [V_fock, V_hartree] = coulomb_5(constAg,Parameter,Data,Prep);
+period = toc; fprintf('   -   Finished in %g seconds\n',period) 
 
 %% Band renorm
 
-renorm1(Parameter, Data.Ek, V_fock, V_hartree, Data.fk, Data.k(3,:,1))
+[Ek_hf, Ek_h, Ek_f] = renorm2(Parameter, Data.Ek, V_fock, V_hartree, Data.fk, Data.k(3,:,1));
+
+
+%%
+[a, b] = plot_bandstr(Ctrl,Parameter,Data.k,Ek_f(:,:),[2 3]);
 
 % % profile on
 % 

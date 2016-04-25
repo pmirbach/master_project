@@ -49,3 +49,6 @@ for nk = 1:numk
     end
     
 end
+
+
+q_p( q_p < Parameter.qmin / 2 ) = 0;
