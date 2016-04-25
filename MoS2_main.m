@@ -119,13 +119,14 @@ titlestr = {'1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow','2 \righta
 
 %% Coulomb WW
 
-% profile on
-
-% [Ek_hf,Ek_h,Ek_f] = coulomb_1(constAg,Parameter,Data,Prep.CV);
-[Ek_hf,Ek_h,Ek_f] = coulomb_2(constAg,Parameter,Data,Prep);
-
-% profile report
-% profile off
+% % profile on
+% 
+% % [Ek_hf,Ek_h,Ek_f] = coulomb_1(constAg,Parameter,Data,Prep.CV);
+% [Ek_hf,Ek_h,Ek_f] = coulomb_2(constAg,Parameter,Data,Prep);
+% [a,b,c] = coulomb_3(constAg,Parameter,Data,Prep);
+% 
+% % profile report
+% % profile off
 
 %% 
 

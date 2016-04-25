@@ -30,12 +30,10 @@ for l1 = 1
            
             for nks = 1:numk
                 
-                performance1 = 0;
-                performance2 = 0;
                 
-%                 V_h = 0;
-%                 
-%                 V_f = 0;
+                V_h = 0;
+                
+                V_f = 0;
                 
                 for tri = 1:6
                     
@@ -43,22 +41,14 @@ for l1 = 1
                         
                         for b = 1:3
                             
-%                             V_h = V_h + ( real( CV(a,a,l1,l1,nk,1) * CV(b,b,l2,l2,nks,tri) ) + ...
-%                                 real( CV(a+3,a+3,l1,l1,nk,1) * CV(b+3,b+3,l2,l2,nks,tri) ) ) * ...
-%                                 coul_h(a,b);
-%                             
-%                             V_f = V_f + ( real( CV(a,b,l1,l1,nk,1) * CV(b,a,l2,l2,nks,tri) ) + ...
-%                                 real( CV(a+3,b+3,l1,l1,nk,1) * CV(b+3,a+3,l2,l2,nks,tri) ) );
-%                                 * Prep.coul_intrp{a,b}(Prep.minq(nk,nks,tri))
+                            V_h = V_h + ( real( CV(a,a,l1,l1,nk,1) * CV(b,b,l2,l2,nks,tri) ) + ...
+                                real( CV(a+3,a+3,l1,l1,nk,1) * CV(b+3,b+3,l2,l2,nks,tri) ) ) * ...
+                                coul_h(a,b);
                             
-                            
-                             performance1 = performance1 + ( real( CV(a,b,l1,l1,nk,1) * CV(b,a,l2,l2,nks,tri) ) + ...
-                                 real( CV(a+3,b+3,l1,l1,nk,1) * CV(b+3,a+3,l2,l2,nks,tri) ) );
-                            
-%                             performance2 = performance2 + Prep.coul_intrp{a,b}(Prep.minq(nk,nks,tri));
-                            
-                            %                               a = 1 + 1;
-                            
+                            V_f = V_f + ( real( CV(a,b,l1,l1,nk,1) * CV(b,a,l2,l2,nks,tri) ) + ...
+                                real( CV(a+3,b+3,l1,l1,nk,1) * CV(b+3,a+3,l2,l2,nks,tri) ) ) ...
+                                * Prep.coul_intrp{a,b}(Prep.minq(nk,nks,tri));
+                                                        
                         end
                         
                     end
@@ -74,9 +64,9 @@ for l1 = 1
 %                 
 %                                 Ek_f(l1,nk) = Ek_f(l1,nk) + renorm_sign(l1,l2) * ...
 %                                     Data.k(3,nks,1) * vorf * ( - V_f ) * Data.fk(l2,nks);
-%                 
-%                                 Ek_hf(l1,nk) = Ek_hf(l1,nk) + renorm_sign(l1,l2) * ...
-%                                     Data.k(3,nks,1) * vorf * ( V_h - V_f ) * Data.fk(l2,nks);
+                
+                                Ek_hf(l1,nk) = Ek_hf(l1,nk) + renorm_sign(l1,l2) * ...
+                                    Data.k(3,nks,1) * vorf * ( V_h - V_f ) * Data.fk(l2,nks);
                 
                 
             end
