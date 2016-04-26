@@ -21,7 +21,7 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 54;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 12;        % Unterteilungsgröße
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
@@ -37,11 +37,12 @@ Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
 Ctrl.plot.path = {'\Gamma' 'K' 'M' 'K*' '\Gamma' 'M'};
 % Ctrl.plot.path = {'K' '\Gamma' 'K*'};
 
-Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
+Ctrl.plot.k_mesh = [0 , 1];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 1];         % Bandstructure
+Ctrl.plot.tb = [0 , 0];         % Bandstructure
 Ctrl.plot.exc = [0 , 1];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
+Ctrl.plot.ren_bs = [0 , 1];      % Dipol matrix elements
 
 Ctrl.plot.save = 0;             % 1 Speichern, 0 nicht
 Ctrl.plot.entireBZ = 0;         % 1 ganze BZ, 0 nur red. BZ
@@ -93,7 +94,6 @@ fprintf('Preperations:   Start'); tic
 
 period = toc; fprintf('   -   Finished in %g seconds\n',period)
 
-
 %% Thermische Anregung
 fprintf('Excitation:     Start'); tic
 
@@ -102,7 +102,6 @@ Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Prep.Eks);
 period = toc; fprintf('   -   Finished in %g seconds\n',period)
 
 [fig.exc_surf, fig.exc_path] = plot_excitation(Ctrl,Parameter,Data.k,Data.fk,[2 3]);
-
 
 %% Dipolmatrix
 fprintf('Dipol:          Start'); tic
@@ -116,11 +115,11 @@ titlestr = {'1 \rightarrow 2 \uparrow','1 \rightarrow 3 \uparrow','2 \rightarrow
 titlestr = {'1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow','2 \rightarrow 1 \downarrow','2 \rightarrow 1 \downarrow'};
 [fig.dipolDown_surf, fig.dipolDown_path] = plot_dipol(Ctrl,Parameter,Data.k,Data.dipol(4:6,4:6),[2 2],titlestr);
 
-
 %% Coulomb WW
 fprintf('Coulomb matrix: Start'); tic
 [V_fock, V_hartree] = coulomb_5(constAg,Parameter,Data,Prep);
 period = toc; fprintf('   -   Finished in %g seconds\n',period)
+
 
 %% Band renorm
 
@@ -142,30 +141,14 @@ d = 0;
 figure
 for ii = 1:9
     subplot(3,3,ii)
-    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(end,:,ii)')
+    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(200,:,ii)')
     hold on
-    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(end,:,ii+9)','+')
+    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(200,:,ii+9)','+')
     title(num2str(ll(ii+d,:)))
 end
 
-
-
 %%
-
-
-
-% % profile on
-%
-% % [Ek_hf,Ek_h,Ek_f] = coulomb_1(constAg,Parameter,Data,Prep.CV);
-% [Ek_hf,Ek_h,Ek_f] = coulomb_2(constAg,Parameter,Data,Prep);
-% [a,b,c] = coulomb_3(constAg,Parameter,Data,Prep);
-%
-% % profile report
-% % profile off
-
-
-
-
+[B,B_integ] = flaecheninhalt(Parameter,Data.k);
 
 %%
 % [d1, d2] = plot_bandstr(Ctrl,Parameter,Data.k,Prep.Eks,[2 3]);

@@ -11,6 +11,7 @@ ll=reshape(c,[],2);
 ll = [ll; ll+3];
 
 para_map = [1 2 3 ; 2 4 5 ; 3 5 6];
+para_map = repmat(para_map,[2,2]);
 
 
 V_fock = zeros( numk, numk, size(ll,1) );
@@ -24,9 +25,9 @@ for nll = 1:size(ll,1)
     l1 = ll(nll,1);
     l2 = ll(nll,2);
     
-%     if l1 == 4
-%         d = 3;
-%     end
+    if l1 == 4
+        d = 3;
+    end
     
     for a = 1:3
         
@@ -34,12 +35,13 @@ for nll = 1:size(ll,1)
             
             for tri = 1:6
                                 
-                V_fock(:,:,nll) = V_fock(:,:,nll) + vorf * ...
+                V_fock(:,:,nll) = V_fock(:,:,nll) + ...
                     abs( Prep.CV2(:,1,a+d,b+d,l1,l1) * Prep.CV2(:,tri,b+d,a+d,l2,l2).' ) .* ...
                     final_coul_scr(Prep.minq(:,:,tri),Parameter.coul_screened(para_map(a,b),:),Parameter.coul_pol);
                 
-                V_hartree(:,:,nll) = V_hartree(:,:,nll) + vorf * ...
+                V_hartree(:,:,nll) = V_hartree(:,:,nll) + ...
                     abs( Prep.CV2(:,1,a+d,a+d,l1,l1) * Prep.CV2(:,tri,b+d,b+d,l2,l2).' ) * Prep.V_orbital_h(a,b);
+                
                 
             end
             
@@ -47,8 +49,9 @@ for nll = 1:size(ll,1)
         
     end
     
-    
 end
+V_fock = vorf * V_fock;
+V_hartree = vorf * V_hartree;
 
 % toc
 

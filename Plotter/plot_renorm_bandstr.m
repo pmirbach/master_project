@@ -1,13 +1,13 @@
 function [ren_bandstr_surf, ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Parameter,k,Daten,layout)
 
-if any(Ctrl.plot.tb)
+if any(Ctrl.plot.ren_bs)
     Daten_plot = Daten * 1e-3;
     titlestr = {'V \uparrow','L1 \uparrow','L2 \uparrow',...
         'V \downarrow','L1 \downarrow','L2 \downarrow'};
     titlestr = [titlestr, titlestr];
 end
 
-if Ctrl.plot.tb(1) == 1
+if Ctrl.plot.ren_bs(1) == 1
     if Ctrl.plot.entireBZ == 1
         k_plot = k;
     else
@@ -40,7 +40,7 @@ else
     ren_bandstr_surf = [];
 end
 
-if Ctrl.plot.tb(2) == 1
+if Ctrl.plot.ren_bs(2) == 1
     ren_bandstr_path = plot_path(Ctrl,Parameter,k,Daten_plot,200);
        
     title_string = sprintf('Renormierte Bandstruktur bei D_0 = %g', Ctrl.carrier_density);
