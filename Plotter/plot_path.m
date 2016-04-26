@@ -21,12 +21,15 @@ handle_path.Position = [0.1 0.1 0.8 0.8];
 handle_path.Color = [1 1 1];
 
 colors = {'b','r','k','g','c','m'};
+colors = [colors, colors];
+
+linest = {'-','-','-','-','-','-','--','--','--','--','--','--'};
 
 for ii = 1:size(Daten,1)
     Daten_interp = repmat(Daten(ii,:),1,6*4);
     f = scatteredInterpolant(k_interp(1,:)',k_interp(2,:)',...
         Daten_interp(:),'linear','none');
-    plot(k_p_tick,f(k_p'),'color',colors{ii})
+    plot(k_p_tick,f(k_p'),'color',colors{ii},'linestyle',linest{ii})
 end
 ax = gca;
 ax.FontSize = 16';
