@@ -1,10 +1,4 @@
-function [Ek_hf, Ek_h, Ek_f] = renorm2(Parameter, Ek, V_f, V_h, fk, wk)
-
-
-[A,B] = meshgrid(1:3,1:3);
-c=cat(2,A,B);
-ll=reshape(c,[],2);
-ll = [ll; ll+3];
+function [Ek_hf, Ek_h, Ek_f] = renorm2(Parameter, Ek, V_f, V_h, fk, wk, ll)
 
 
 Ek_h = Ek(:,:,1);
@@ -36,17 +30,18 @@ Ek_hf = Ek(:,:,1);
 %     
 % end
 
-vorz = [1 -1 -1 -1 1 1 -1 1 1];
-vorz = -[vorz, vorz];
+vorz = [-1 1 1; 1 -1 -1; 1 -1 -1];
+vorz = blkdiag(vorz,vorz);
 
-for nll = 12     %:size(ll,1)
+for nll = 1:size(ll,1)
     
     l1 = ll(nll,1);
     l2 = ll(nll,2);
+    l3 = ll(nll,3);
    
-    Ek_f(l1,:) = Ek_f(l1,:) + 1 / ( 2 * pi )^2 * vorz(nll) * ( fk(l2,:) .* wk ) * (-1) * V_f(:,:,l2).';
-%     Ek_h(l1,:) = Ek_h(l1,:) + 1 / ( 2 * pi )^2 * vorz(nll) * ( fk(l2,:) .* wk ) * V_h(:,:,l2)';
-%     Ek_hf(l1,:) = Ek_hf(l1,:) + 1 / ( 2 * pi )^2 * vorz(nll) * ( fk(l2,:) .* wk ) * ( V_h(:,:,l2) - V_f(:,:,l2))';
+    Ek_f(l1,:) = Ek_f(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ( fk(l2,:) .* wk / 6 ) * (-1) * V_f(:,:,l3).';
+%     Ek_h(l1,:) = Ek_h(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ( fk(l2,:) .* wk / 6 ) * V_h(:,:,l2)';
+%     Ek_hf(l1,:) = Ek_hf(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ( fk(l2,:) .* wk / 6 ) * ( V_h(:,:,l2) - V_f(:,:,l2))';
     
 end
 

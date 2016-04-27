@@ -29,7 +29,7 @@ Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
 
 % Anregungsdichte
 Ctrl.temperature = 300;         % Temperatur in K
-Ctrl.carrier_density = 1e12;    % Anregungsdichte in 1/cm^2
+Ctrl.carrier_density = 1e13;    % Anregungsdichte in 1/cm^2
 Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
 
 %% Plot Control
@@ -37,9 +37,9 @@ Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
 Ctrl.plot.path = {'\Gamma' 'K' 'M' 'K*' '\Gamma' 'M'};
 % Ctrl.plot.path = {'K' '\Gamma' 'K*'};
 
-Ctrl.plot.k_mesh = [0 , 1];     % Kontrollbilder
+Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 0];         % Bandstructure
+Ctrl.plot.tb = [0 , 1];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 Ctrl.plot.ren_bs = [0 , 1];      % Dipol matrix elements
@@ -81,11 +81,11 @@ Parameter.nrk = size(Data.k,2);
 %% Tight-Binding
 fprintf('Tight-binding:  Start'); tic
 
-[Data.Ek, Data.Ev] = tight_binding_liu(Ctrl, Parameter, Data);
+[Data.Ek, Data.Ev, temp.Ek_noSOC, temp.Ev_noSOC] = tight_binding_liu(Ctrl, Parameter, Data);
 
 period = toc; fprintf('   -   Finished in %g seconds\n',period)
 
-[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Parameter,Data.k,Data.Ek(:,:,1),[2 3]);
+[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Parameter,Data.k,temp.Ek_noSOC(:,:,1),[2 3]);
 
 %% Simulation-preperations
 fprintf('Preperations:   Start'); tic
@@ -117,13 +117,24 @@ titlestr = {'1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow','2 \righta
 
 %% Coulomb WW
 fprintf('Coulomb matrix: Start'); tic
+
 [V_fock, V_hartree] = coulomb_5(constAg,Parameter,Data,Prep);
+
 period = toc; fprintf('   -   Finished in %g seconds\n',period)
 
 
 %% Band renorm
+[A,B] = meshgrid(1:3,1:3);
+c=cat(2,A,B);
+ll=reshape(c,[],2);
+ll = [ll; ll+3];
 
-[Ek_hf, Ek_h, Ek_f] = renorm2(Parameter, Data.Ek, V_fock, V_hartree, Data.fk, Data.k(3,:,1));
+ll = ll(:,:);
+
+ll2 = [ll, ll(:,2)];
+ll2(ll2(:,3)>3,3) = ll2(ll2(:,3)>3,3)-3;
+
+[Ek_hf, Ek_h, Ek_f] = renorm2(Parameter, Data.Ek, V_fock, V_hartree, Data.fk, Data.k(3,:,1),ll2);
 
 close all
 [fig.ren_bandstr_surf, fig.ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Parameter,Data.k,[Data.Ek(:,:,1);Ek_f],[2 3]);
@@ -141,11 +152,14 @@ d = 0;
 figure
 for ii = 1:9
     subplot(3,3,ii)
-    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(200,:,ii)')
+    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(1,:,ii)')
     hold on
-    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(200,:,ii+9)','+')
+    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(1,:,ii+9)','+')
     title(num2str(ll(ii+d,:)))
 end
+
+
+
 
 %%
 [B,B_integ] = flaecheninhalt(Parameter,Data.k);

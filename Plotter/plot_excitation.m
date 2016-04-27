@@ -43,6 +43,11 @@ end
 
 if Ctrl.plot.exc(2) == 1
     Daten_plot = diag([-1 1 1 -1 1 1]) * Daten;
+    
+    Daten_plot([1,4],:) = Daten_plot([1,4],:) + min(min(Daten_plot([1,4],:))) / 4;
+    Daten_plot([2,5],:) = Daten_plot([2,5],:) + max(max(Daten_plot([2,5],:))) / 4;
+    Daten_plot([3,6],:) = Daten_plot([3,6],:) + max(max(Daten_plot([3,6],:))) / 2;
+    
     bandstr_path = plot_path(Ctrl,Parameter,k,Daten_plot,200);
     
     ax = findobj(bandstr_path,'type','axes');
