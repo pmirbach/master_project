@@ -21,7 +21,7 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 54;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
@@ -39,8 +39,8 @@ Ctrl.plot.path = {'\Gamma' 'K' 'M' 'K*' '\Gamma' 'M'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 1];         % Bandstructure
-Ctrl.plot.exc = [0 , 1];         % Excitation
+Ctrl.plot.tb = [0 , 0];         % Bandstructure
+Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 
 Ctrl.plot.save = 0;             % 1 Speichern, 0 nicht
@@ -89,7 +89,7 @@ period = toc; fprintf('   -   Finished in %g seconds\n',period)
 %% Simulation-preperations
 fprintf('Preperations:   Start'); tic
 
-[Prep.Eks, Prep.CV, Prep.CV2, Prep.minq, Prep.coul_intrp, Prep.V_orbital_h] = prep(constAg, Parameter, Data);
+[Prep.Eks, Prep.CV, Prep.CV2, Prep.minq, Prep.V_orbital_h] = prep(Parameter, Data);
 
 period = toc; fprintf('   -   Finished in %g seconds\n',period)
 
