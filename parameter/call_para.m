@@ -4,7 +4,7 @@ function Para = call_para(Ctrl)
 
 [Para.TB.liu.names, Para.TB.liu.values] = load_TB_parameter_old(Ctrl);
 
-
+load_TB_parameter( Ctrl )
 
 
 
