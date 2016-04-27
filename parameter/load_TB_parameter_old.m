@@ -1,4 +1,4 @@
-function [names, values] = load_TB_parameter(Ctrl)
+function [names, values] = load_TB_parameter_old(Ctrl)
 
 % Empirische TB-Parameter für zu berechnendes Single-Layer Dichalcogenide
 
