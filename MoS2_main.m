@@ -56,6 +56,9 @@ Para = call_para(Ctrl, constAg);
 [Data.k] = k_mesh_mp(Ctrl, Para);
 Para.nr.k = size(Data.k,2);
 
+Para.symm_indices = find( Data.k(3,:,1) == 1 );
+
+
 %% Tight-Binding
 fprintf('Tight-binding:  Start'); tic
 
@@ -96,8 +99,8 @@ titlestr = {'1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow','2 \righta
 %% Coulomb WW
 fprintf('Coulomb matrix: Start'); tic
 
-[V_fock, V_hartree] = coulomb_5(constAg,Para,Data,Prep);
-% [V_fock, V_hartree] = coulomb_noSOC(Para,Prep);
+% [V_fock, V_hartree] = coulomb_5(constAg,Para,Data,Prep);
+[V_fock, V_hartree] = coulomb_noSOC(Para,Prep);
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
@@ -109,7 +112,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 % ll = [ll; ll+3];
 
 ll = Para.coul_indices;
-ll = ll(1:9,:);
+% ll = ll(4,:);
 
 
 [Ek_hf, Ek_h, Ek_f] = renorm2(Para, Data.Ek, V_fock, V_hartree, Data.fk, Data.k(3,:,1),ll);
@@ -121,19 +124,19 @@ close all
 
 
 %%
-% [A,B] = meshgrid(1:3,1:3);
-% c=cat(2,A,B);
-% ll=reshape(c,[],2);
-% ll = [ll; ll+3];
-% 
-% d = 0;
-% 
-% figure
-% for ii = 1:9
-%     subplot(3,3,ii)
-%     scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(1,:,ii)')
-%     title(num2str(ll(ii+d,:)))
-% end
+[A,B] = meshgrid(1:3,1:3);
+c=cat(2,A,B);
+ll=reshape(c,[],2);
+ll = [ll; ll+3];
+
+d = 0;
+
+figure
+for ii = 1:9
+    subplot(3,3,ii)
+    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(Para.symm_indices(1),:,ii)')
+    title(num2str(ll(ii+d,:)))
+end
 
 
 

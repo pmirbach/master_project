@@ -29,7 +29,7 @@ for ii = 1:2
             for kk = 1:3
                 W_k(jj,:,kk) = 1 ./ ( exp( ( Eks(ind(jj),:) ...
                     - mu(kk) ) ./ ( constAg.k_B * T ) ) + 1 );
-                D(jj,kk) = 1 / (2 * pi)^2 * sum( W_k(jj,:,kk) .* k(3,:));
+                D(jj,kk) = 1 / (2 * pi)^2 * sum( W_k(jj,:,kk) .* k(3,:)) * Para.BZsmall.area;
             end
         end
         diff = sum(D) - D_0;

@@ -11,8 +11,8 @@ gew = wk * Para.BZsmall.area / 6;
 
 
 coul_map = reshape(1:9,[3,3])';
-coul_map = blkdiag(coul_map,coul_map+9);
-
+% coul_map = blkdiag(coul_map,coul_map+9);
+coul_map = blkdiag(coul_map,coul_map);
 
 
 
@@ -26,7 +26,7 @@ for nll = 1:size(ll,1)
    
     Ek_f(l1,:) = Ek_f(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ( fk(l2,:) .* gew ) * (-1) * V_f(:,:,coul_map(l1,l2)).';
 %     Ek_h(l1,:) = Ek_h(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ( fk(l2,:) .* wk / 6 ) * V_h(:,:,l2)';
-%     Ek_hf(l1,:) = Ek_hf(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ( fk(l2,:) .* wk / 6 ) * ( V_h(:,:,l2) - V_f(:,:,l2))';
+%     Ek_hf(l1,:) = Ek_hf(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ( fk(l2,:) .* gew ) * ( V_h(:,:,coul_map(l1,l2)) - V_f(:,:,coul_map(l1,l2)))';
     
 end
 
