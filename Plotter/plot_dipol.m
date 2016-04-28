@@ -1,10 +1,10 @@
-function [bandstr_surf, bandstr_path] = plot_dipol(Ctrl,Parameter,k,Daten,layout,titlestr)
+function [bandstr_surf, bandstr_path] = plot_dipol(Ctrl,Para,k,Daten,layout,titlestr)
 
 if any(Ctrl.plot.dipol)
     
-    transitions = Parameter.dipol_trans;
+    transitions = Para.dipol_trans;
     
-    Daten_plot = zeros(4,Parameter.nrk);
+    Daten_plot = zeros(4,Para.nr.k);
     
     for ii = 1:4
         
@@ -22,7 +22,7 @@ if Ctrl.plot.dipol(1) == 1
     else
         k_plot = k(:,:,1);
     end
-    bandstr_surf = plot_surf(Parameter,k_plot,Daten_plot,layout);
+    bandstr_surf = plot_surf(Para,k_plot,Daten_plot,layout);
     for ii = 1:size(bandstr_surf,2)
         figure(bandstr_surf)
         ax = flip(findobj(bandstr_surf(ii),'type','axes'),1);
@@ -50,7 +50,7 @@ else
 end
 
 if Ctrl.plot.dipol(2) == 1
-    bandstr_path = plot_path(Ctrl,Parameter,k,Daten_plot,200);
+    bandstr_path = plot_path(Ctrl,Para,k,Daten_plot,200);
     
     ax = findobj(bandstr_path,'type','axes');
     ax.Title.String = 'Bandstruktur entlang eines Pfades durch die BZ';

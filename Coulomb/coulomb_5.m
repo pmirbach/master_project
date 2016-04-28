@@ -4,6 +4,8 @@ numk = size(Data.k,2);
 
 vorf = constAg.ec^2 / ( 2 * constAg.eps_0);
 
+% % % % % % % % %  V orbital h hier berechnen
+% fun_coul_orbital_hartree <----
 
 [A,B] = meshgrid(1:3,1:3);
 c=cat(2,A,B);
@@ -36,11 +38,11 @@ for nll = 1:size(ll,1)
             for tri = 1:6
                                 
                 V_fock(:,:,nll) = V_fock(:,:,nll) + ...
-                    abs( Prep.CV2(:,1,a+d,b+d,l1,l1) * Prep.CV2(:,tri,b+d,a+d,l2,l2).' ) .* ...
+                    abs( Prep.CV(:,1,a+d,b+d,l1,l1) * Prep.CV(:,tri,b+d,a+d,l2,l2).' ) .* ...
                     final_coul_scr(Prep.minq(:,:,tri),Parameter.coul_screened(para_map(a,b),:),Parameter.coul_pol);
                 
                 V_hartree(:,:,nll) = V_hartree(:,:,nll) + ...
-                    abs( Prep.CV2(:,1,a+d,a+d,l1,l1) * Prep.CV2(:,tri,b+d,b+d,l2,l2).' ) * Prep.V_orbital_h(a,b);
+                    abs( Prep.CV(:,1,a+d,a+d,l1,l1) * Prep.CV(:,tri,b+d,b+d,l2,l2).' ) * Prep.V_orbital_h(a,b);
                 
                 
             end

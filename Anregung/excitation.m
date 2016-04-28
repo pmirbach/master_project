@@ -1,4 +1,4 @@
-function fk = excitation(Ctrl,constAg,k,Eks)
+function fk = excitation(Ctrl,constAg,Para,k,Eks)
 
 T = Ctrl.temperature;                       % Temperatur
 D_0 = Ctrl.carrier_density * 1e-14;         % Anregungsdichte in 1/nm^2
@@ -6,15 +6,11 @@ tol = Ctrl.carrier_density_tol * 1e-14;     % Toleranz
 
 fk = zeros(size(Eks));
 
-band_ind{1} = [1,4];        % Indizes der Valenzbänder
-band_ind{2} = [2,3,5,6];    % Indizes der Leitungsbänder
-
-
 % Zunächst müssen für Elektronen und Löcher die chemischen Potentiale mu so
 % bestimmt werden, dass ihre Anregungsdichten D0 betragen.
 
 for ii = 1:2
-    ind = band_ind{ii};
+    ind = Para.TB_ind{ii};
     Nr_ind = size(ind,2);
     
     mu = [-1000, 0, 1000];      % Grenzen zum Suchen - Verbessern!!!

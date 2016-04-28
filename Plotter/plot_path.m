@@ -1,16 +1,16 @@
-function handle_path = plot_path(Ctrl,Parameter,k,Daten,nrpts)
+function handle_path = plot_path(Ctrl,Para,k,Daten,nrpts)
 
 warning('off','MATLAB:scatteredInterpolant:DupPtsAvValuesWarnId')
 
-b1 = [Parameter.rezGV(:,1); 0];
-b2 = [Parameter.rezGV(:,2); 0];
+b1 = [Para.k.GV(:,1); 0];
+b2 = [Para.k.GV(:,2); 0];
 
 k_BZ = reshape(k,3,[]);
 k_interp = [k_BZ, k_BZ + b1 * ones(1,size(k_BZ,2)),...
     k_BZ + b2 * ones(1,size(k_BZ,2)),...
     k_BZ + (b1 + b2) * ones(1,size(k_BZ,2))];
 
-[k_p, path_tick] = k_path(Parameter.symmpts, Ctrl.plot.path, nrpts);
+[k_p, path_tick] = k_path(Para.BZred.symmpts, Ctrl.plot.path, nrpts);
 k_p_tick = 0:size(k_p,2)-1;
 
 handle_path = figure;

@@ -1,4 +1,4 @@
-function [bandstr_surf, bandstr_path] = plot_bandstr(Ctrl,Parameter,k,Daten,layout)
+function [bandstr_surf, bandstr_path] = plot_bandstr(Ctrl,Para,k,Daten,layout)
 
 if any(Ctrl.plot.tb)
     Daten_plot = Daten * 1e-3;
@@ -12,7 +12,7 @@ if Ctrl.plot.tb(1) == 1
     else
         k_plot = k(:,:,1);
     end
-    bandstr_surf = plot_surf(Parameter,k_plot,Daten_plot,layout);
+    bandstr_surf = plot_surf(Para,k_plot,Daten_plot,layout);
     for ii = 1:size(bandstr_surf,2)
         figure(bandstr_surf)
         ax = flip(findobj(bandstr_surf(ii),'type','axes'),1);
@@ -40,7 +40,7 @@ else
 end
 
 if Ctrl.plot.tb(2) == 1
-    bandstr_path = plot_path(Ctrl,Parameter,k,Daten_plot,200);
+    bandstr_path = plot_path(Ctrl,Para,k,Daten_plot,200);
     
     ax = findobj(bandstr_path,'type','axes');
     ax.Title.String = 'Bandstruktur entlang eines Pfades durch die BZ';

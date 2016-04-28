@@ -1,9 +1,9 @@
-function [k] = k_mesh_mp(Ctrl, Parameter)
+function [k] = k_mesh_mp(Ctrl, Para)
 
 qr = Ctrl.k_mesh_mp.qr;             % Feinheit des meshes
 
-b1 = Parameter.rezGV(:,1);          % Reziproke Gittervektoren
-b2 = Parameter.rezGV(:,2);
+b1 = Para.k.GV(:,1);          % Reziproke Gittervektoren
+b2 = Para.k.GV(:,2);
 
 
 ur = (0:qr-1) / qr;                   % Einteilung des rez. Gittervektors
@@ -16,10 +16,7 @@ k0 = [k_mesh_x(:), k_mesh_y(:)]';     % Alle k-Punkte
 
 % Bestimmung der k-Punkte in der red BZ mit Gewicht als Vielfaches der 
 % kleinen BZ
-k = pts_triangle_fun(k0, Parameter.symmpts{2}(:,1:3), 30 * eps);
-
-% Berechnung der korrekten Gewichte
-k(3,:) = k(3,:) * Parameter.area_sBZ;
+k = pts_triangle_fun(k0, Para.BZred.symmpts{2}(:,1:3), 30 * eps);
 
 % Erzeugung aller red. Dreiecke mit Spiegelungen und Drehungen
 [k] = red_to_BZ(k);
@@ -31,12 +28,12 @@ if Ctrl.plot.k_mesh(1) == 1     % Plot über red. BZ mit den Gewichten
     figure
     hold on
     set(gcf, 'units','normalized','outerposition',[0.1 0.1 0.6 0.9]);
-    corners = [Parameter.symmpts{2} ...
+    corners = [Para.BZred.symmpts{2} ...
         * [1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0], [0; 0]];
     
-    in = k(3,:,1) == 6 * Parameter.area_sBZ;
-    on = k(3,:,1) == 3 * Parameter.area_sBZ;
-    symm = k(3,:,1) == 1 * Parameter.area_sBZ;
+    in = k(3,:,1) == 6;
+    on = k(3,:,1) == 3;
+    symm = k(3,:,1) == 1;
     
     plot(corners(1,:),corners(2,:),'k-x')
     plot(k(1,in,1),k(2,in,1),'rx')
@@ -60,7 +57,7 @@ if Ctrl.plot.k_mesh(1) == 1     % Plot über red. BZ mit den Gewichten
 end
 
 if Ctrl.plot.k_mesh(2) == 1     % Plot über BZ mit Gewichten und Indizierung
-    corners = [Parameter.symmpts{2} ...
+    corners = [Para.BZred.symmpts{2} ...
         * [1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0], [0; 0]];
     [corners] = red_to_BZ(corners);
         
@@ -72,9 +69,9 @@ if Ctrl.plot.k_mesh(2) == 1     % Plot über BZ mit Gewichten und Indizierung
     marker = {'h','p','x','+','^','v'};
     
     for ii = 1:6
-        in = k(3,:,ii) == 6 * Parameter.area_sBZ;
-        on = k(3,:,ii) == 3 * Parameter.area_sBZ;
-        symm = k(3,:,ii) == 1 * Parameter.area_sBZ;
+        in = k(3,:,ii) == 6;
+        on = k(3,:,ii) == 3;
+        symm = k(3,:,ii) == 1;
         
         instr = strcat(colors{ii},marker{1+mod(ii,2)});
         onstr = strcat(colors{ii},marker{3+mod(ii,2)});

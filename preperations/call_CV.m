@@ -1,4 +1,4 @@
-function CV = calc_CV2( Ev )
+function CV = call_CV( Ev )
 %Berechne dyadisches Produkt der Eigenvektoren, was später zur Entwicklung
 %der Coulomb- und Dipolmatrixelemente in die Tight-Binding-Basis benötigt
 %wird.

@@ -1,5 +1,10 @@
-function load_TB_parameter( Ctrl )
+function [tb_parameter, parameter_names] = load_TB_parameter( Ctrl )
 
-d = importdata('TB_Liu_parameter.txt');
+RawData = importdata('TB_Liu_parameter.txt');
 
-1
+material_list = RawData.textdata(1,2:end);
+parameter_names = RawData.textdata(2:end,1);
+
+material_index = ismember(material_list,Ctrl.material);
+
+tb_parameter = RawData.data(:,material_index);

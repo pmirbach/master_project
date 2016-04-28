@@ -1,32 +1,37 @@
-function [dipol] = dipol(Parameter, Prep, Data)
-
+function [dipol] = dipol(Para, Prep, Data)
 
 dipol = cell(6);
 
+transitions = Para.dipol_trans;
 
-transitions = Parameter.dipol_trans;
+[grad_H_kx , grad_H_ky] = grad_TB_Liu_TNN_fun(Data.k(1:2,:,1),Para.TB);
+mapping = reshape(1:9,[3,3]);
 
 for nn = 1:size(transitions,1)
     
     m = transitions(nn,1);
     n = transitions(nn,2);
     
-    dipol_k = zeros(2, Parameter.nrk);
-    
-    for nk = 1:Parameter.nrk
-        prefix = 1.602e4 / ( 1i * ( Data.Ek(m,nk) - Data.Ek(n,nk) ) );
-        [grad_H_kx , grad_H_ky] = grad_TB_Liu_TNN_fun(Data.k(1:2,nk,1) , Parameter);
-%         B =  transpose(Data.Ev(:,n,ii) * Data.Ev(:,m,ii)');
-%         transform_tensor = conj(Data.Ev(:,n,nk))*Data.Ev(:,m,nk).';
-                 
-        dipol_k(1,nk) = prefix * sum( sum( blkdiag(grad_H_kx,grad_H_kx) .* Prep.CV(:,:,n,m,nk,1) ) );
-        dipol_k(2,nk) = prefix * sum( sum( blkdiag(grad_H_ky,grad_H_ky) .* Prep.CV(:,:,n,m,nk,1) ) );
-
+    if m <= 3
+        d = 0;
+    else
+        d = 3;
     end
     
-    dipol{n,m} = dipol_k;
+    dipol_k = zeros(2, Para.nr.k);
     
-%     dipol_plot(nn,:) = abs(1 / sqrt(2) * ...
-%         (dipol{n,m}(1,:) - 1i * dipol{n,m}(2,:)));
+    for a = 1:3
+        
+        for b = 1:3
+            
+            dipol_k(1,:) = dipol_k(1,:) + grad_H_kx(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,m,n).';
+            dipol_k(2,:) = dipol_k(2,:) + grad_H_ky(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,m,n).';
+            
+        end
+        
+    end
+    
+    dipol{n,m} = Para.vorf.dipol / 1i  * dipol_k ./ repmat( Data.Ek(m,:,1) - Data.Ek(n,:,1) ,2,1);
     
 end
+

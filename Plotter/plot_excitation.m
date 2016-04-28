@@ -1,4 +1,4 @@
-function [bandstr_surf, bandstr_path] = plot_excitation(Ctrl,Parameter,k,Daten,layout)
+function [bandstr_surf, bandstr_path] = plot_excitation(Ctrl,Para,k,Daten,layout)
 
 if any(Ctrl.plot.exc)
     Data_str = {'V \uparrow','L1 \uparrow','L2 \uparrow',...
@@ -14,7 +14,7 @@ if Ctrl.plot.exc(1) == 1
     else
         k_plot = k(:,:,1);
     end
-    bandstr_surf = plot_surf(Parameter,k_plot,Daten_plot,layout);
+    bandstr_surf = plot_surf(Para,k_plot,Daten_plot,layout);
     for ii = 1:size(bandstr_surf,2)
         figure(bandstr_surf)
         ax = flip(findobj(bandstr_surf(ii),'type','axes'),1);
@@ -48,7 +48,7 @@ if Ctrl.plot.exc(2) == 1
     Daten_plot([2,5],:) = Daten_plot([2,5],:) + max(max(Daten_plot([2,5],:))) / 4;
     Daten_plot([3,6],:) = Daten_plot([3,6],:) + max(max(Daten_plot([3,6],:))) / 2;
     
-    bandstr_path = plot_path(Ctrl,Parameter,k,Daten_plot,200);
+    bandstr_path = plot_path(Ctrl,Para,k,Daten_plot,200);
     
     ax = findobj(bandstr_path,'type','axes');
     ax.Title.String = [title_str ' entlang eines Pfades durch die BZ'];

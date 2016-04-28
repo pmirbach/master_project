@@ -1,26 +1,26 @@
 function [H_TNN] = TB_Liu_TNN_fun(k,Parameter)
 
 
-a = Parameter.TB.liu.values(1);
-eps_1 = Parameter.TB.liu.values(3);
-eps_2 = Parameter.TB.liu.values(4);
-t_0 = Parameter.TB.liu.values(5);
-t_1 = Parameter.TB.liu.values(6);
-t_2 = Parameter.TB.liu.values(7);
-t_11 = Parameter.TB.liu.values(8);
-t_12 = Parameter.TB.liu.values(9);
-t_22 = Parameter.TB.liu.values(10);
-r_0 = Parameter.TB.liu.values(11);
-r_1 = Parameter.TB.liu.values(12);
-r_2 = Parameter.TB.liu.values(13);
-r_11 = Parameter.TB.liu.values(14);
-r_12 = Parameter.TB.liu.values(15);
-u_0 = Parameter.TB.liu.values(16);
-u_1 = Parameter.TB.liu.values(17);
-u_2 = Parameter.TB.liu.values(18);
-u_11 = Parameter.TB.liu.values(19);
-u_12 = Parameter.TB.liu.values(20);
-u_22 = Parameter.TB.liu.values(21);
+a = Parameter(1);
+eps_1 = Parameter(3);
+eps_2 = Parameter(4);
+t_0 = Parameter(5);
+t_1 = Parameter(6);
+t_2 = Parameter(7);
+t_11 = Parameter(8);
+t_12 = Parameter(9);
+t_22 = Parameter(10);
+r_0 = Parameter(11);
+r_1 = Parameter(12);
+r_2 = Parameter(13);
+r_11 = Parameter(14);
+r_12 = Parameter(15);
+u_0 = Parameter(16);
+u_1 = Parameter(17);
+u_2 = Parameter(18);
+u_11 = Parameter(19);
+u_12 = Parameter(20);
+u_22 = Parameter(21);
 
 
 
@@ -75,16 +75,4 @@ v_22 = eps_2 + ( 3 * t_11 + t_22 ) * ca * cb + 2 * t_22 * c2a ...
     + ( 3 * u_11 + u_22 ) * c2a * c2b + 2 * u_22 * c4a;
 
 H_TNN = [v_0, v_1, v_2; v_1', v_11, v_12; v_2', v_12', v_22];
-
-
-
-
-
-
-
-
-
-
-
-
 

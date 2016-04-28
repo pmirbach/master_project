@@ -39,7 +39,7 @@ Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
 Ctrl.plot.tb = [0 , 0];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
-Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
+Ctrl.plot.dipol = [1 , 0];      % Dipol matrix elements
 Ctrl.plot.ren_bs = [0 , 0];      % Dipol matrix elements
 
 Ctrl.plot.save = 0;             % 1 Speichern, 0 nicht
@@ -49,35 +49,35 @@ Ctrl.plot.entireBZ = 0;         % 1 ganze BZ, 0 nur red. BZ
 
 %% Material & Tight-Binding Parameter & Hochsymmetriepunkte
 
-Para = call_para(Ctrl);
-
+Para = call_para(Ctrl, constAg);
 
 %% Monkhorst-Pack
+
 [Data.k] = k_mesh_mp(Ctrl, Para);
-Para.nrk = size(Data.k,2);
+Para.nr.k = size(Data.k,2);
 
 %% Tight-Binding
 fprintf('Tight-binding:  Start'); tic
 
 [Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC] = tight_binding_liu(Ctrl, Para, Data);
 
-period = toc; fprintf('   -   Finished in %g seconds\n',period)
+fprintf('   -   Finished in %g seconds\n',toc)
 
-[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Prep.Ek_noSOC(:,:,1),[2 3]);
+[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
 
 %% Simulation-preperations
 fprintf('Preperations:   Start'); tic
 
-[Prep.Eks, Prep.CV, Prep.CV2, Prep.minq, Prep.V_orbital_h] = prep(Para, Data, Prep.Ev_noSOC);
+[Prep.Eks, Prep.CV, Prep.CV_noSOC, Prep.minq] = prep(Para, Data, Prep.Ev_noSOC);
 
-period = toc; fprintf('   -   Finished in %g seconds\n',period)
+fprintf('   -   Finished in %g seconds\n',toc)
 
 %% Thermische Anregung
 fprintf('Excitation:     Start'); tic
 
-Data.fk = excitation(Ctrl,constAg,Data.k(:,:,1),Prep.Eks);
+Data.fk = excitation(Ctrl,constAg,Para,Data.k(:,:,1),Prep.Eks);
 
-period = toc; fprintf('   -   Finished in %g seconds\n',period)
+fprintf('   -   Finished in %g seconds\n',toc)
 
 [fig.exc_surf, fig.exc_path] = plot_excitation(Ctrl,Para,Data.k,Data.fk,[2 3]);
 
@@ -86,7 +86,7 @@ fprintf('Dipol:          Start'); tic
 
 Data.dipol = dipol(Para, Prep, Data);
 
-period = toc; fprintf('   -   Finished in %g seconds\n',period)
+fprintf('   -   Finished in %g seconds\n',toc)
 
 titlestr = {'1 \rightarrow 2 \uparrow','1 \rightarrow 3 \uparrow','2 \rightarrow 1 \uparrow','2 \rightarrow 1 \uparrow'};
 [fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,Data.dipol(1:3,1:3),[2 2],titlestr);
@@ -98,7 +98,7 @@ fprintf('Coulomb matrix: Start'); tic
 
 [V_fock, V_hartree] = coulomb_5(constAg,Para,Data,Prep);
 
-period = toc; fprintf('   -   Finished in %g seconds\n',period)
+fprintf('   -   Finished in %g seconds\n',toc)
 
 
 %% Band renorm

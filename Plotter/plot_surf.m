@@ -1,4 +1,4 @@
-function handle_surf = plot_surf(Parameter,k,Daten,layout)
+function handle_surf = plot_surf(Para,k,Daten,layout)
 
 warning('off','MATLAB:scatteredInterpolant:DupPtsAvValuesWarnId')
 
@@ -11,7 +11,7 @@ x2 = ones(Nsubplots,1)*(1:Nr_fig);
 er = reshape(x2,1,Nr_fig * Nsubplots);
 
 % Reihenfolge der Symm Pts zum Plotten
-corners = [Parameter.symmpts{2} ...
+corners = [Para.BZred.symmpts{2} ...
     * [1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0], [0; 0]];
 
 if size(k,3) > 1
@@ -75,8 +75,8 @@ for ii = 1:Nplots
     axis equal
     axis off
     
-    text(Parameter.symmpts{2}(1,:) + 0.8 * [-0.3 -0.3 -0.3 0.5], ...
-        Parameter.symmpts{2}(2,:) + 0.8 * [-1 -1 1 0.5], ...
-        Parameter.symmpts{1})
+    text(Para.BZred.symmpts{2}(1,:) + 0.8 * [-0.3 -0.3 -0.3 0.5], ...
+        Para.BZred.symmpts{2}(2,:) + 0.8 * [-1 -1 1 0.5], ...
+        Para.BZred.symmpts{1})
 end
 warning('on','MATLAB:scatteredInterpolant:DupPtsAvValuesWarnId')
