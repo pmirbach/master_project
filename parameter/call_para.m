@@ -30,9 +30,11 @@ Para.coul.kappa = 0;             % Kappa, because of Singularity
 
 
 Para.dipol_trans = [1, 2 ; 1 , 3 ; 2, 1 ; 3 , 1 ; 4 , 5 ; 4 , 6 ; 5 , 4 ; 6 , 4 ];
+Para.coul_indices = call_coul_indices;
 
 
 Para.vorf.dipol = constAg.ec;
+Para.vorf.coul = constAg.ec^2 / ( 2 * constAg.eps_0);
 
 
 

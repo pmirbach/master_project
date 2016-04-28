@@ -39,7 +39,7 @@ Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
 Ctrl.plot.tb = [0 , 0];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
-Ctrl.plot.dipol = [1 , 0];      % Dipol matrix elements
+Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 Ctrl.plot.ren_bs = [0 , 0];      % Dipol matrix elements
 
 Ctrl.plot.save = 0;             % 1 Speichern, 0 nicht
@@ -96,7 +96,8 @@ titlestr = {'1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow','2 \righta
 %% Coulomb WW
 fprintf('Coulomb matrix: Start'); tic
 
-[V_fock, V_hartree] = coulomb_5(constAg,Para,Data,Prep);
+% [V_fock, V_hartree] = coulomb_5(constAg,Para,Data,Prep);
+[V_fock, V_hartree] = coulomb_noSOC(Para,Prep);
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
@@ -131,8 +132,6 @@ figure
 for ii = 1:9
     subplot(3,3,ii)
     scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(1,:,ii)')
-    hold on
-    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(1,:,ii+9)','+')
     title(num2str(ll(ii+d,:)))
 end
 
