@@ -2,10 +2,7 @@ function [V_fock, V_hartree] = coulomb_5(constAg,Para,Data,Prep)
 
 
 
-% % % % % % % % %  V orbital h hier berechnen
-% fun_coul_orbital_hartree <----
-
-V_orbital_h = fun_coul_orbital_hartree(Para.coul.screened);
+V_orbital_h = final_coul_long(Para.coul.screened);
 
 para_map = [1 2 3 ; 2 4 5 ; 3 5 6];
 para_map = repmat(para_map,[2,2]);
@@ -14,7 +11,6 @@ para_map = repmat(para_map,[2,2]);
 V_fock = zeros( Para.nr.k, Para.nr.k, size(Para.coul_indices,1) );
 V_hartree = V_fock;
 
-% tic
 
 for nll = 1:size(Para.coul_indices,1)
     
@@ -51,14 +47,3 @@ end
 V_fock = Para.vorf.coul * V_fock;
 V_hartree = Para.vorf.coul * V_hartree;
 
-% toc
-
-% 1
-% 
-% figure
-% hold on
-% % for ii = 1:6
-% scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(1,:,1)')
-% % end
-% 
-% 1

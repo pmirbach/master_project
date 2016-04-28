@@ -1,4 +1,4 @@
-function [ren_bandstr_surf, ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Parameter,k,Daten,layout)
+function [ren_bandstr_surf, ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Para,k,Daten,layout)
 
 if any(Ctrl.plot.ren_bs)
     Daten_plot = Daten * 1e-3;
@@ -13,7 +13,7 @@ if Ctrl.plot.ren_bs(1) == 1
     else
         k_plot = k(:,:,1);
     end
-    ren_bandstr_surf = plot_surf(Parameter,k_plot,Daten_plot,layout);
+    ren_bandstr_surf = plot_surf(Para,k_plot,Daten_plot,layout);
     for ii = 1:size(ren_bandstr_surf,2)
         figure(ren_bandstr_surf)
         ax = flip(findobj(ren_bandstr_surf(ii),'type','axes'),1);
@@ -41,7 +41,7 @@ else
 end
 
 if Ctrl.plot.ren_bs(2) == 1
-    ren_bandstr_path = plot_path(Ctrl,Parameter,k,Daten_plot,200);
+    ren_bandstr_path = plot_path(Ctrl,Para,k,Daten_plot,200);
        
     title_string = sprintf('Renormierte Bandstruktur bei D_0 = %g', Ctrl.carrier_density);
     

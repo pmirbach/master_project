@@ -15,17 +15,17 @@ Para.BZred.symmpts{2} = 2 * pi / ( 3 * Para.real.a ) * [0, 0 ; 2, 0 ; 1, sqrt(3)
 Para.BZ.a = norm(Para.BZred.symmpts{2}(:,2));
 Para.BZ.area = 3 * sqrt(3) / 2 * Para.BZ.a^2;
 
-Para.BZred.a = Para.BZ.a / Ctrl.k_mesh_mp.qr;
-Para.BZred.area = 3 * sqrt(3) / 2 * Para.BZred.a^2;
+Para.BZsmall.a = Para.BZ.a / Ctrl.k_mesh_mp.qr;
+Para.BZsmall.area = 3 * sqrt(3) / 2 * Para.BZsmall.a^2;
 
 Para.k.GV = 2 * pi / Para.real.a * [1, -1 / sqrt(3); 0, 2 / sqrt(3)]';
-Para.k.qmin = Para.BZred.a * sqrt(3);
+Para.k.qmin = Para.BZsmall.a * sqrt(3);
 
 Para.k.b = call_bnn( Para.k.GV );
 Para.nr.b = size(Para.k.b,2);
 
 [Para.coul.screened, Para.coul.names] = load_coul_parameter( Ctrl );
-Para.coul.pol = 3 * sqrt(3) * log(3) * Para.BZred.a / Para.BZred.area;
+Para.coul.pol = 3 * sqrt(3) * log(3) * Para.BZsmall.a / Para.BZsmall.area;
 Para.coul.kappa = 0;             % Kappa, because of Singularity
 
 
