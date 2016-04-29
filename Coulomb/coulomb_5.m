@@ -30,11 +30,11 @@ for nll = 1:size(Para.coul_indices,1)
             for tri = 1:6
                                 
                 V_fock(:,:,nll) = V_fock(:,:,nll) + ...
-                    abs( Prep.CV(:,1,a+d,b+d,l1,l1) * Prep.CV(:,tri,b+d,a+d,l2,l2).' ) .* ...
+                    ( Prep.CV(:,1,a+d,b+d,l1,l1) * Prep.CV(:,tri,b+d,a+d,l2,l2).' ) .* ...
                     final_coul_scr(Prep.minq(:,:,tri),Para.coul.screened(para_map(a,b),:),Para.coul.pol);
                 
                 V_hartree(:,:,nll) = V_hartree(:,:,nll) + ...
-                    abs( Prep.CV(:,1,a+d,a+d,l1,l1) * Prep.CV(:,tri,b+d,b+d,l2,l2).' ) * V_orbital_h(a,b);
+                    ( Prep.CV(:,1,a+d,a+d,l1,l1) * Prep.CV(:,tri,b+d,b+d,l2,l2).' ) * V_orbital_h(a,b);
                 
                 
             end
@@ -44,6 +44,6 @@ for nll = 1:size(Para.coul_indices,1)
     end
     
 end
-V_fock = Para.vorf.coul * V_fock;
-V_hartree = Para.vorf.coul * V_hartree;
+V_fock = Para.vorf.coul * abs( V_fock );
+V_hartree = Para.vorf.coul * ( V_hartree );
 

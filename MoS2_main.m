@@ -32,7 +32,7 @@ Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
 
 %% Plot Control
 
-Ctrl.plot.path = {'\Gamma' 'K' 'M' 'K*' '\Gamma' 'M'};
+Ctrl.plot.path = {'K','M', 'K*', '\Gamma', 'K','M','\Gamma'};
 % Ctrl.plot.path = {'K' '\Gamma' 'K*'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
@@ -112,10 +112,12 @@ fprintf('   -   Finished in %g seconds\n',toc)
 % ll = [ll; ll+3];
 
 ll = Para.coul_indices;
-% ll = ll(4,:);
+% ll = ll(7,:);
+
+ll2 = [ll, [ll(1:9,2)+3 ; ll(10:end,2)-3 ]];
 
 
-[Ek_hf, Ek_h, Ek_f] = renorm2(Para, Data.Ek, V_fock, V_hartree, Data.fk, Data.k(3,:,1),ll);
+[Ek_hf, Ek_h, Ek_f] = renorm2(Para, Data.Ek, V_fock, V_hartree, Data.fk, Data.k(3,:,1),ll2);
 % Para.coul_indices
 
 close all
@@ -129,16 +131,60 @@ c=cat(2,A,B);
 ll=reshape(c,[],2);
 ll = [ll; ll+3];
 
-d = 0;
+d = 9;
+
+
+curr_ind = Para.symm_indices(3);
 
 figure
 for ii = 1:9
     subplot(3,3,ii)
-    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_fock(Para.symm_indices(1),:,ii)')
+    
+%     C = [zeros(Para.nr.k,1), V_fock(curr_ind,:,ii).' / max( V_fock(curr_ind,:,ii) ) , V_fock(curr_ind,:,ii).' / max( V_fock(curr_ind,:,ii) )  ];
+    C = [ zeros(Para.nr.k,1) , ( V_hartree(curr_ind,:,ii+d).' / max( V_hartree(curr_ind,:,ii+d) ) ).^(5) , zeros(Para.nr.k,1) ];
+    
+    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_hartree(curr_ind,:,ii+d)',12,C)
     title(num2str(ll(ii+d,:)))
 end
 
 
+%%
+% l1 = 4;
+% l2 = 6;
+
+ll = Para.coul_indices;
+
+tri = 1;
+
+d = 0;
+dd = 0;
+% d = 3;
+% dd = 9;
+
+figure
+for nll = 1:9
+    
+    testm = zeros( Para.nr.k );
+    
+    subplot(3,3,nll)
+    
+    l1 = ll(nll+d,1);
+    l2 = ll(nll+d,2);
+    
+    for a = 1:3
+        for b = 1:3
+%             for tri = 1:6
+%             testm = testm + Prep.CV(:,1,a+d,a+d,l1,l1) * Prep.CV(:,tri,b+d,b+d,l2,l2).';
+            testm = testm + Prep.CV(:,1,a+d,b+d,l1,l1) * Prep.CV(:,tri,b+d,a+d,l2,l2).';
+%             end
+        end
+    end
+    
+    imagesc(abs(testm))
+    colorbar
+    
+    sum(sum(testm))
+end
 
 
 %%

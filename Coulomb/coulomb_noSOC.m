@@ -36,5 +36,5 @@ for nll = 1:size(Para.coul_indices,1) / 2
 end
 
 V_fock = Para.vorf.coul * abs( V_fock );
-V_hartree = Para.vorf.coul * abs( V_hartree );
+V_hartree = Para.vorf.coul * ( V_hartree );
 

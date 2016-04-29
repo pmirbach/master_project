@@ -16,17 +16,23 @@ coul_map = blkdiag(coul_map,coul_map);
 
 
 
-vorz = [-1 1 1; 1 -1 -1; 1 -1 -1];
+vorz = [-1 1 1; -1 1 1; -1 1 1];
 vorz = blkdiag(vorz,vorz);
 
 for nll = 1:size(ll,1)
     
     l1 = ll(nll,1);
     l2 = ll(nll,2);
-   
-    Ek_f(l1,:) = Ek_f(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ( fk(l2,:) .* gew ) * (-1) * V_f(:,:,coul_map(l1,l2)).';
-%     Ek_h(l1,:) = Ek_h(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ( fk(l2,:) .* wk / 6 ) * V_h(:,:,l2)';
-%     Ek_hf(l1,:) = Ek_hf(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ( fk(l2,:) .* gew ) * ( V_h(:,:,coul_map(l1,l2)) - V_f(:,:,coul_map(l1,l2)))';
+    l3 = ll(nll,3);
+    
+    ren_hartree = ( ( fk(l2,:) + fk(l3,:) ) .* gew ) * V_h(:,:,coul_map(l1,l2))';
+    ren_fock = - ( fk(l2,:) .* gew ) * V_f(:,:,coul_map(l1,l2)).';
+    
+    Ek_f(l1,:) = Ek_f(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ren_fock;
+
+    Ek_h(l1,:) = Ek_h(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ren_hartree;
+    
+    Ek_hf(l1,:) = Ek_hf(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ( ren_hartree + ren_fock );
     
 end
 
