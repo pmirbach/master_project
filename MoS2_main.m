@@ -52,24 +52,24 @@ Ctrl.plot.entireBZ = 0;         % 1 ganze BZ, 0 nur red. BZ
 Para = call_para(Ctrl, constAg);
 
 %% Monkhorst-Pack
-% 
-% [Data.k] = k_mesh_mp(Ctrl, Para);
-% Para.nr.k = size(Data.k,2);
-% 
-% Para.symm_indices = find( Data.k(3,:,1) == 1 );
 
-
-load kpts_55x55.mat
-k1 = permute(kpts,[2,1,3]);
-
-[Data.k] = red_to_BZ(k1);
+[Data.k] = k_mesh_mp(Ctrl, Para);
 Para.nr.k = size(Data.k,2);
 
-Para.BZsmall.area = (8 / 3 / sqrt(3) / ( 55 - 1 )^2)*(pi/0.319)^2;
-Para.coul.pol = 0.801437895090000 / Para.BZsmall.area;
-Para.k.qmin = 0.1216;
+Para.symm_indices = find( Data.k(3,:,1) == 1 );
 
-Data.k(3,:,:) = round( Data.k(3,:,:) / Para.BZsmall.area );
+
+% load kpts_55x55.mat
+% k1 = permute(kpts,[2,1,3]);
+% 
+% [Data.k] = red_to_BZ(k1);
+% Para.nr.k = size(Data.k,2);
+% 
+% Para.BZsmall.area = (8 / 3 / sqrt(3) / ( 55 - 1 )^2)*(pi/0.319)^2;
+% Para.coul.pol = 0.801437895090000 / Para.BZsmall.area;
+% Para.k.qmin = 0.1216;
+% 
+% Data.k(3,:,:) = round( Data.k(3,:,:) / Para.BZsmall.area );
 
 %% Tight-Binding
 fprintf('Tight-binding:  Start'); tic
@@ -121,17 +121,12 @@ fprintf('   -   Finished in %g seconds\n',toc)
 % coulomb_7(constAg,Para,Data,Prep);
 
 %% Band renorm
-% [A,B] = meshgrid(1:3,1:3);
-% c=cat(2,A,B);
-% ll=reshape(c,[],2);
-% ll = [ll; ll+3];
 
 ll = Para.coul_indices;
 % ll = ll(7,:);
 
 
 [Ek_hf, Ek_h, Ek_f] = renorm2(Para, Data.Ek, V_fock, V_hartree, V_hartree_off, Data.fk, Data.k(3,:,1),ll);
-% Para.coul_indices
 
 close all
 [fig.ren_bandstr_surf, fig.ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Para,Data.k,[Data.Ek(:,:,1);Ek_h],[2 3]);
