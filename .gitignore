@@ -1,3 +1,6 @@
 Ergebnisse/
 Send/
 *~
+*.mat
+*.fig
+

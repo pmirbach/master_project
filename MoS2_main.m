@@ -20,7 +20,7 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 30;        % Unterteilungsgröße
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
@@ -38,7 +38,7 @@ Ctrl.plot.path = {'K','M', 'K*', '\Gamma', 'K','M','\Gamma'};
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
 Ctrl.plot.tb = [0 , 0];         % Bandstructure
-Ctrl.plot.exc = [0 , 1];         % Excitation
+Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 Ctrl.plot.ren_bs = [0 , 1];      % Dipol matrix elements
 
@@ -52,12 +52,24 @@ Ctrl.plot.entireBZ = 0;         % 1 ganze BZ, 0 nur red. BZ
 Para = call_para(Ctrl, constAg);
 
 %% Monkhorst-Pack
+% 
+% [Data.k] = k_mesh_mp(Ctrl, Para);
+% Para.nr.k = size(Data.k,2);
+% 
+% Para.symm_indices = find( Data.k(3,:,1) == 1 );
 
-[Data.k] = k_mesh_mp(Ctrl, Para);
+
+load kpts_55x55.mat
+k1 = permute(kpts,[2,1,3]);
+
+[Data.k] = red_to_BZ(k1);
 Para.nr.k = size(Data.k,2);
 
-Para.symm_indices = find( Data.k(3,:,1) == 1 );
+Para.BZsmall.area = (8 / 3 / sqrt(3) / ( 55 - 1 )^2)*(pi/0.319)^2;
+Para.coul.pol = 0.801437895090000 / Para.BZsmall.area;
+Para.k.qmin = 0.1216;
 
+Data.k(3,:,:) = round( Data.k(3,:,:) / Para.BZsmall.area );
 
 %% Tight-Binding
 fprintf('Tight-binding:  Start'); tic
@@ -99,11 +111,14 @@ titlestr = {'1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow','2 \righta
 %% Coulomb WW
 fprintf('Coulomb matrix: Start'); tic
 
-% [V_fock, V_hartree] = coulomb_5(constAg,Para,Data,Prep);
-[V_fock, V_hartree] = coulomb_noSOC(Para,Prep);
+[V_fock, V_hartree, V_hartree_off] = coulomb_5(constAg,Para,Data,Prep);
+% [V_fock, V_hartree] = coulomb_noSOC(Para,Prep);
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
+
+%%
+% coulomb_7(constAg,Para,Data,Prep);
 
 %% Band renorm
 % [A,B] = meshgrid(1:3,1:3);
@@ -114,14 +129,12 @@ fprintf('   -   Finished in %g seconds\n',toc)
 ll = Para.coul_indices;
 % ll = ll(7,:);
 
-ll2 = [ll, [ll(1:9,2)+3 ; ll(10:end,2)-3 ]];
 
-
-[Ek_hf, Ek_h, Ek_f] = renorm2(Para, Data.Ek, V_fock, V_hartree, Data.fk, Data.k(3,:,1),ll2);
+[Ek_hf, Ek_h, Ek_f] = renorm2(Para, Data.Ek, V_fock, V_hartree, V_hartree_off, Data.fk, Data.k(3,:,1),ll);
 % Para.coul_indices
 
 close all
-[fig.ren_bandstr_surf, fig.ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Para,Data.k,[Data.Ek(:,:,1);Ek_f],[2 3]);
+[fig.ren_bandstr_surf, fig.ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Para,Data.k,[Data.Ek(:,:,1);Ek_h],[2 3]);
 
 
 
@@ -134,57 +147,24 @@ ll = [ll; ll+3];
 d = 9;
 
 
-curr_ind = Para.symm_indices(3);
+% curr_ind = Para.symm_indices(3);
+curr_ind = 1;
 
 figure
 for ii = 1:9
     subplot(3,3,ii)
     
-%     C = [zeros(Para.nr.k,1), V_fock(curr_ind,:,ii).' / max( V_fock(curr_ind,:,ii) ) , V_fock(curr_ind,:,ii).' / max( V_fock(curr_ind,:,ii) )  ];
-    C = [ zeros(Para.nr.k,1) , ( V_hartree(curr_ind,:,ii+d).' / max( V_hartree(curr_ind,:,ii+d) ) ).^(5) , zeros(Para.nr.k,1) ];
+    C = [ zeros(Para.nr.k,1) , ( V_hartree_off(curr_ind,:,ii+d).' / max( V_hartree_off(curr_ind,:,ii+d) ) ).^(5) , zeros(Para.nr.k,1) ];
     
-    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_hartree(curr_ind,:,ii+d)',12,C)
+    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_hartree_off(curr_ind,:,ii+d)',12,C)
+
+%     C = [ zeros(Para.nr.k,1) , ( V_hartree(curr_ind,:,ii+d).' / max( V_hartree(curr_ind,:,ii+d) ) ).^(5) , zeros(Para.nr.k,1) ];
+%     
+%     scatter3(Data.k(1,:,1),Data.k(2,:,1),V_hartree(curr_ind,:,ii+d)',12,C)
+
     title(num2str(ll(ii+d,:)))
 end
 
-
-%%
-% l1 = 4;
-% l2 = 6;
-
-ll = Para.coul_indices;
-
-tri = 1;
-
-d = 0;
-dd = 0;
-% d = 3;
-% dd = 9;
-
-figure
-for nll = 1:9
-    
-    testm = zeros( Para.nr.k );
-    
-    subplot(3,3,nll)
-    
-    l1 = ll(nll+d,1);
-    l2 = ll(nll+d,2);
-    
-    for a = 1:3
-        for b = 1:3
-%             for tri = 1:6
-%             testm = testm + Prep.CV(:,1,a+d,a+d,l1,l1) * Prep.CV(:,tri,b+d,b+d,l2,l2).';
-            testm = testm + Prep.CV(:,1,a+d,b+d,l1,l1) * Prep.CV(:,tri,b+d,a+d,l2,l2).';
-%             end
-        end
-    end
-    
-    imagesc(abs(testm))
-    colorbar
-    
-    sum(sum(testm))
-end
 
 
 %%

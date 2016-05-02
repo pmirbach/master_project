@@ -20,6 +20,7 @@ for ii = 1:2
     lauf = 0;
     
     while abs(diff(2)) > tol
+                
         mu(2) = (mu(1) + mu(3)) / 2;
         
         W_k = zeros(size(ind,2),size(Eks,2),3);
