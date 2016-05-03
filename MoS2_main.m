@@ -20,7 +20,7 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 30;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
@@ -37,7 +37,7 @@ Ctrl.plot.path = {'K','M', 'K*', '\Gamma', 'K','M','\Gamma'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 1];         % Bandstructure
+Ctrl.plot.tb = [0 , 0];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 Ctrl.plot.ren_bs = [0 , 1];      % Dipol matrix elements
@@ -72,7 +72,7 @@ Para.symm_indices = find( Data.k(3,:,1) == 1 );
 % Data.k(3,:,:) = round( Data.k(3,:,:) / Para.BZsmall.area );
 
 %% Tight-Binding
-fprintf('Tight-binding:  Start'); tic
+fprintf('Tight-binding:        Start'); tic
 
 [Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC] = tight_binding_liu(Ctrl, Para, Data);
 
@@ -81,14 +81,14 @@ fprintf('   -   Finished in %g seconds\n',toc)
 [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
 
 %% Simulation-preperations
-fprintf('Preperations:   Start'); tic
+fprintf('Preperations:         Start'); tic
 
 [Prep.Eks, Prep.CV, Prep.CV_noSOC, Prep.minq] = prep(Para, Data, Prep.Ev_noSOC);
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
 %% Thermische Anregung
-fprintf('Excitation:     Start'); tic
+fprintf('Excitation:           Start'); tic
 
 Data.fk = excitation(Ctrl,constAg,Para,Data.k(:,:,1),Prep.Eks);
 
@@ -97,7 +97,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 [fig.exc_surf, fig.exc_path] = plot_excitation(Ctrl,Para,Data.k,Data.fk,[2 3]);
 
 %% Dipolmatrix
-fprintf('Dipol:          Start'); tic
+fprintf('Dipol:                Start'); tic
 
 Data.dipol = dipol(Para, Prep, Data);
 
@@ -107,61 +107,61 @@ titlestr = {'1 \rightarrow 2 \uparrow','1 \rightarrow 3 \uparrow','2 \rightarrow
 [fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,Data.dipol(1:3,1:3),[2 2],titlestr);
 titlestr = {'1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow','2 \rightarrow 1 \downarrow','2 \rightarrow 1 \downarrow'};
 [fig.dipolDown_surf, fig.dipolDown_path] = plot_dipol(Ctrl,Para,Data.k,Data.dipol(4:6,4:6),[2 2],titlestr);
+clear titlestr
 
 %% Coulomb WW
-fprintf('Coulomb matrix: Start'); tic
+fprintf('Coulomb matrix:       Start'); tic
 
-[Data.V_f, Data.V_h, Data.V_h_off] = coulomb_5(Para,Prep);
-% [V_fock, V_hartree] = coulomb_noSOC(Para,Prep);
+[Data.V.f, Data.V.h, Data.V.h_off] = coulomb_hf(Para,Prep);
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
 
 %% Band renorm
 
-ll = Para.coul_indices;
-% ll = ll(7,:);
+fprintf('Band renormalization: Start'); tic
 
+[Data.Ek_hf, Data.Ek_h, Data.Ek_f, Test.ren_h] = renorm2(Para, Data.Ek, Data.V, Data.fk, Data.k(3,:,1));
 
-[Ek_hf, Ek_h, Ek_f, ren_h] = renorm2(Para, Data.Ek, V_fock, V_hartree, V_hartree_off, Data.fk, Data.k(3,:,1),ll);
+fprintf('   -   Finished in %g seconds\n',toc)
 
-close all
-[fig.ren_bandstr_surf, fig.ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Para,Data.k,[Data.Ek(:,:,1);Ek_h],[2 3]);
+[fig.ren_bandstr_surf, fig.ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Para,Data.k,[Data.Ek(:,:,1);Data.Ek_h],[2 3]);
 
+%% Renorm tests
 
-as = plot_path(Ctrl,Para,Data.k,ren_h,200);
+as = plot_path(Ctrl,Para,Data.k,Test.ren_h,200);
 
 %%
-[A,B] = meshgrid(1:3,1:3);
-c=cat(2,A,B);
-ll=reshape(c,[],2);
-ll = [ll; ll+3];
-
-d = 9;
-
-
-% curr_ind = Para.symm_indices(3);
-curr_ind = 1;
-
-figure
-for ii = 1:9
-    subplot(3,3,ii)
-    
-    C = [ zeros(Para.nr.k,1) , ( V_hartree_off(curr_ind,:,ii+d).' / max( V_hartree_off(curr_ind,:,ii+d) ) ).^(5) , zeros(Para.nr.k,1) ];
-    
-    scatter3(Data.k(1,:,1),Data.k(2,:,1),V_hartree_off(curr_ind,:,ii+d)',12,C)
-
-%     C = [ zeros(Para.nr.k,1) , ( V_hartree(curr_ind,:,ii+d).' / max( V_hartree(curr_ind,:,ii+d) ) ).^(5) , zeros(Para.nr.k,1) ];
+% [A,B] = meshgrid(1:3,1:3);
+% c=cat(2,A,B);
+% ll=reshape(c,[],2);
+% ll = [ll; ll+3];
+% 
+% d = 9;
+% 
+% 
+% % curr_ind = Para.symm_indices(3);
+% curr_ind = 1;
+% 
+% figure
+% for ii = 1:9
+%     subplot(3,3,ii)
 %     
-%     scatter3(Data.k(1,:,1),Data.k(2,:,1),V_hartree(curr_ind,:,ii+d)',12,C)
-
-    title(num2str(ll(ii+d,:)))
-end
-
+%     C = [ zeros(Para.nr.k,1) , ( V_hartree_off(curr_ind,:,ii+d).' / max( V_hartree_off(curr_ind,:,ii+d) ) ).^(5) , zeros(Para.nr.k,1) ];
+%     
+%     scatter3(Data.k(1,:,1),Data.k(2,:,1),V_hartree_off(curr_ind,:,ii+d)',12,C)
+% 
+% %     C = [ zeros(Para.nr.k,1) , ( V_hartree(curr_ind,:,ii+d).' / max( V_hartree(curr_ind,:,ii+d) ) ).^(5) , zeros(Para.nr.k,1) ];
+% %     
+% %     scatter3(Data.k(1,:,1),Data.k(2,:,1),V_hartree(curr_ind,:,ii+d)',12,C)
+% 
+%     title(num2str(ll(ii+d,:)))
+% end
+% 
 
 
 %%
-[B_integ] = flaecheninhalt(Para,Data.k);
+% [B_integ] = flaecheninhalt(Para,Data.k);
 
 %%
 % [d1, d2] = plot_bandstr(Ctrl,Parameter,Data.k,Prep.Eks,[2 3]);
