@@ -42,7 +42,7 @@ Ctrl.plot.tb = [0 , 0];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 Ctrl.plot.coul = 0;
-Ctrl.plot.ren_bs = [0 , 1];      % Dipol matrix elements
+Ctrl.plot.ren_bs = [0 , 0];      % Dipol matrix elements
 
 Ctrl.plot.save = 0;             % 1 Speichern, 0 nicht
 Ctrl.plot.entireBZ = 0;         % 1 ganze BZ, 0 nur red. BZ
@@ -134,47 +134,65 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 [fig.ren_bandstr_surf, fig.ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Para,Data.k,[Data.Ek(:,:,1);Data.Ek_h],[2 3]);
 
-% as = plot_path(Ctrl,Para,Data.k,Test.ren_h,200);      % Test der Hartree Renormierung
+% as1 = plot_path(Ctrl,Para,Data.k,Test.ren_h,200);      % Test der Hartree Renormierung
 
 
 %%
-% [d1, d2] = plot_bandstr(Ctrl,Parameter,Data.k,Prep.Eks,[2 3]);
-% 
-% y0 = 0;
+% as2 = plot_path(Ctrl,Para,Data.k,Prep.Eks,200);
 
-%% Zeitentwicklung
+%% structure für Variablen für Blochgleichungen
+% Hab ich schon
+Bloch.hbar = constAg.hbar;
+Bloch.wk = Data.wk;
+Bloch.Eks = Prep.Eks;
+Bloch.dipol = 1 / sqrt(2) * transpose(Data.dipol{2,1}(1,:) + 1i * Data.dipol{2,1}(2,:));
+Bloch.gamma = 10;
+Bloch.E0 = 1e-6;
+Bloch.t_peak = 0.003;
+Bloch.sigma = 0.001;
+Bloch.nrk = Para.nr.k;
+
+% Kommt noch dazu
+Bloch.w = (-500:1:500)';             % Energiefenster in omega ???
+
+Para.nr.w = numel(Bloch.w);
+
+
+% Zeitentwicklung
 
 tspan = [0 2];
-psik_E_ini = zeros(1,Para.nr.k + 4002);
+psik_E_ini = zeros(1,Para.nr.k + size(Bloch.w,1) * 2);
 
+options=odeset('OutputFcn',@odeprog,'Events',@odeabort);
 % opts = odeset('RelTol',1e-1,'AbsTol',1e-3);
-[t,psik_E] = ode45(@(t,psik_E) dgl_bloch(t,psik_E,Data,constAg), tspan, psik_E_ini);
-% plot(t,y,'-o')
+[t,psik_E] = ode45(@(t,psik_E) dgl_bloch(t,psik_E,Bloch), tspan, psik_E_ini, options);
 
-%%
 
-psik = psik_E(:,1:Parameter.nrk);
-P_w = psik_E(end,Parameter.nrk+1:Parameter.nrk+2001);
-E_w = psik_E(end,Parameter.nrk+2002:end);
+%
+
+% psik = psik_E(:,1:Parameter.nrk);
+P_w = psik_E(end,( end - 2 * Para.nr.w + 1 ):( end - 1 * Para.nr.w ));
+E_w = psik_E(end,( end - 1 * Para.nr.w + 1 ):end);
 
 chi_w = P_w ./ E_w;
 
-plot(-1000:1000,imag(chi_w))
+close all
+plot(Bloch.w,imag(chi_w))
 
 
-P = zeros(1,numel(t));
-
-d = 1 / sqrt(2) * transpose(Data.dipol{2,1}(1,:) - 1i * Data.dipol{2,1}(2,:));
-
-for ii = 1:numel(t)
-    P(ii) = 1 / (2 * pi)^2 * Data.k(3,:,1) * (conj(d) .* transpose(psik));
-end
-
-figure
-plot(t,real(P))
-hold on
-plot(t,imag(P),'r')
-legend('real','imag')
+% P = zeros(1,numel(t));
+% 
+% d = 1 / sqrt(2) * transpose(Data.dipol{2,1}(1,:) - 1i * Data.dipol{2,1}(2,:));
+% 
+% for ii = 1:numel(t)
+%     P(ii) = 1 / (2 * pi)^2 * Data.k(3,:,1) * (conj(d) .* transpose(psik));
+% end
+% 
+% figure
+% plot(t,real(P))
+% hold on
+% plot(t,imag(P),'r')
+% legend('real','imag')
 
 
 
