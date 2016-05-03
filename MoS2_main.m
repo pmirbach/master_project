@@ -37,7 +37,7 @@ Ctrl.plot.path = {'K','M', 'K*', '\Gamma', 'K','M','\Gamma'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 0];         % Bandstructure
+Ctrl.plot.tb = [0 , 1];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 Ctrl.plot.ren_bs = [0 , 1];      % Dipol matrix elements
@@ -111,14 +111,11 @@ titlestr = {'1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow','2 \righta
 %% Coulomb WW
 fprintf('Coulomb matrix: Start'); tic
 
-[V_fock, V_hartree, V_hartree_off] = coulomb_5(constAg,Para,Data,Prep);
+[Data.V_f, Data.V_h, Data.V_h_off] = coulomb_5(Para,Prep);
 % [V_fock, V_hartree] = coulomb_noSOC(Para,Prep);
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
-
-%%
-% coulomb_7(constAg,Para,Data,Prep);
 
 %% Band renorm
 
@@ -126,12 +123,13 @@ ll = Para.coul_indices;
 % ll = ll(7,:);
 
 
-[Ek_hf, Ek_h, Ek_f] = renorm2(Para, Data.Ek, V_fock, V_hartree, V_hartree_off, Data.fk, Data.k(3,:,1),ll);
+[Ek_hf, Ek_h, Ek_f, ren_h] = renorm2(Para, Data.Ek, V_fock, V_hartree, V_hartree_off, Data.fk, Data.k(3,:,1),ll);
 
 close all
 [fig.ren_bandstr_surf, fig.ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Para,Data.k,[Data.Ek(:,:,1);Ek_h],[2 3]);
 
 
+as = plot_path(Ctrl,Para,Data.k,ren_h,200);
 
 %%
 [A,B] = meshgrid(1:3,1:3);
