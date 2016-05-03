@@ -27,7 +27,8 @@ Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
 
 % Anregungsdichte
 Ctrl.temperature = 300;         % Temperatur in K
-Ctrl.carrier_density = 1e13;    % Anregungsdichte in 1/cm^2
+% Ctrl.carrier_density = 1e13;    % Anregungsdichte in 1/cm^2
+Ctrl.carrier_density = 0;    % Anregungsdichte in 1/cm^2
 Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
 
 %% Plot Control
@@ -40,6 +41,7 @@ Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 Ctrl.plot.tb = [0 , 0];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
+Ctrl.plot.coul = 0;
 Ctrl.plot.ren_bs = [0 , 1];      % Dipol matrix elements
 
 Ctrl.plot.save = 0;             % 1 Speichern, 0 nicht
@@ -53,10 +55,10 @@ Para = call_para(Ctrl, constAg);
 
 %% Monkhorst-Pack
 
-[Data.k] = k_mesh_mp(Ctrl, Para);
+[Data.k, Data.wk] = k_mesh_mp(Ctrl, Para);
 Para.nr.k = size(Data.k,2);
 
-Para.symm_indices = find( Data.k(3,:,1) == 1 );
+Para.symm_indices = find( Data.wk == 1 );
 
 
 % load kpts_55x55.mat
@@ -90,7 +92,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 %% Thermische Anregung
 fprintf('Excitation:           Start'); tic
 
-Data.fk = excitation(Ctrl,constAg,Para,Data.k(:,:,1),Prep.Eks);
+[Data.fk, Para.mu] = excitation(Ctrl,constAg,Para,Data.wk,Prep.Eks);
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
@@ -112,95 +114,67 @@ clear titlestr
 %% Coulomb WW
 fprintf('Coulomb matrix:       Start'); tic
 
-[Data.V.f, Data.V.h, Data.V.h_off] = coulomb_hf(Para,Prep);
+[Data.V.f, Data.V.h, Data.V.h_off] = coulomb_hf( Ctrl , Para , Prep );
 
 fprintf('   -   Finished in %g seconds\n',toc)
+
+
+%% Coulomb Plots
+
+[fig.coulomb_up, fig.coulomb_down] = plot_coulomb( Ctrl , Para,Data.k , Data.V.h , Para.symm_indices(2) );
 
 
 %% Band renorm
 
 fprintf('Band renormalization: Start'); tic
 
-[Data.Ek_hf, Data.Ek_h, Data.Ek_f, Test.ren_h] = renorm2(Para, Data.Ek, Data.V, Data.fk, Data.k(3,:,1));
+[Data.Ek_hf, Data.Ek_h, Data.Ek_f, Test.ren_h] = renorm2(Para, Data.Ek, Data.V, Data.fk, Data.wk);
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
 [fig.ren_bandstr_surf, fig.ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Para,Data.k,[Data.Ek(:,:,1);Data.Ek_h],[2 3]);
 
-%% Renorm tests
+% as = plot_path(Ctrl,Para,Data.k,Test.ren_h,200);      % Test der Hartree Renormierung
 
-as = plot_path(Ctrl,Para,Data.k,Test.ren_h,200);
-
-%%
-% [A,B] = meshgrid(1:3,1:3);
-% c=cat(2,A,B);
-% ll=reshape(c,[],2);
-% ll = [ll; ll+3];
-% 
-% d = 9;
-% 
-% 
-% % curr_ind = Para.symm_indices(3);
-% curr_ind = 1;
-% 
-% figure
-% for ii = 1:9
-%     subplot(3,3,ii)
-%     
-%     C = [ zeros(Para.nr.k,1) , ( V_hartree_off(curr_ind,:,ii+d).' / max( V_hartree_off(curr_ind,:,ii+d) ) ).^(5) , zeros(Para.nr.k,1) ];
-%     
-%     scatter3(Data.k(1,:,1),Data.k(2,:,1),V_hartree_off(curr_ind,:,ii+d)',12,C)
-% 
-% %     C = [ zeros(Para.nr.k,1) , ( V_hartree(curr_ind,:,ii+d).' / max( V_hartree(curr_ind,:,ii+d) ) ).^(5) , zeros(Para.nr.k,1) ];
-% %     
-% %     scatter3(Data.k(1,:,1),Data.k(2,:,1),V_hartree(curr_ind,:,ii+d)',12,C)
-% 
-%     title(num2str(ll(ii+d,:)))
-% end
-% 
-
-
-%%
-% [B_integ] = flaecheninhalt(Para,Data.k);
 
 %%
 % [d1, d2] = plot_bandstr(Ctrl,Parameter,Data.k,Prep.Eks,[2 3]);
-
+% 
 % y0 = 0;
 
 %% Zeitentwicklung
 
-% tspan = [0 2];
-% psik_E_ini = zeros(1,Parameter.nrk + 4002);
-%
-% % opts = odeset('RelTol',1e-1,'AbsTol',1e-3);
-% [t,psik_E] = ode45(@(t,psik_E) dgl_bloch(t,psik_E,Data,constAg), tspan, psik_E_ini);
-% % plot(t,y,'-o')
+tspan = [0 2];
+psik_E_ini = zeros(1,Para.nr.k + 4002);
+
+% opts = odeset('RelTol',1e-1,'AbsTol',1e-3);
+[t,psik_E] = ode45(@(t,psik_E) dgl_bloch(t,psik_E,Data,constAg), tspan, psik_E_ini);
+% plot(t,y,'-o')
 
 %%
 
-% psik = psik_E(:,1:Parameter.nrk);
-% P_w = psik_E(end,Parameter.nrk+1:Parameter.nrk+2001);
-% E_w = psik_E(end,Parameter.nrk+2002:end);
-%
-% chi_w = P_w ./ E_w;
-%
-% plot(-1000:1000,imag(chi_w))
+psik = psik_E(:,1:Parameter.nrk);
+P_w = psik_E(end,Parameter.nrk+1:Parameter.nrk+2001);
+E_w = psik_E(end,Parameter.nrk+2002:end);
+
+chi_w = P_w ./ E_w;
+
+plot(-1000:1000,imag(chi_w))
 
 
-% P = zeros(1,numel(t));
-%
-% d = 1 / sqrt(2) * transpose(Data.dipol{2,1}(1,:) - 1i * Data.dipol{2,1}(2,:));
-%
-% for ii = 1:numel(t)
-%     P(ii) = 1 / (2 * pi)^2 * Data.k(3,:,1) * (conj(d) .* transpose(psik));
-% end
-%
-% figure
-% plot(t,real(P))
-% hold on
-% plot(t,imag(P),'r')
-% legend('real','imag')
+P = zeros(1,numel(t));
+
+d = 1 / sqrt(2) * transpose(Data.dipol{2,1}(1,:) - 1i * Data.dipol{2,1}(2,:));
+
+for ii = 1:numel(t)
+    P(ii) = 1 / (2 * pi)^2 * Data.k(3,:,1) * (conj(d) .* transpose(psik));
+end
+
+figure
+plot(t,real(P))
+hold on
+plot(t,imag(P),'r')
+legend('real','imag')
 
 
 

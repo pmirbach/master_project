@@ -1,10 +1,12 @@
-function fk = excitation(Ctrl,constAg,Para,k,Eks)
+function [fk,mu_final] = excitation(Ctrl,constAg,Para,wk,Eks)
 
 T = Ctrl.temperature;                       % Temperatur
 D_0 = Ctrl.carrier_density * 1e-14;         % Anregungsdichte in 1/nm^2
 tol = Ctrl.carrier_density_tol * 1e-14;     % Toleranz
 
 fk = zeros(size(Eks));
+
+mu_final = zeros(1,2);
 
 % Zunächst müssen für Elektronen und Löcher die chemischen Potentiale mu so
 % bestimmt werden, dass ihre Anregungsdichten D0 betragen.
@@ -14,6 +16,7 @@ for ii = 1:2
     Nr_ind = size(ind,2);
     
     mu = [-1000, 0, 1000];      % Grenzen zum Suchen - Verbessern!!!
+    W_k = zeros(size(ind,2),size(Eks,2),3);
     
     diff(2) = D_0;
     
@@ -30,7 +33,7 @@ for ii = 1:2
             for kk = 1:3
                 W_k(jj,:,kk) = 1 ./ ( exp( ( Eks(ind(jj),:) ...
                     - mu(kk) ) ./ ( constAg.k_B * T ) ) + 1 );
-                D(jj,kk) = 1 / (2 * pi)^2 * sum( W_k(jj,:,kk) .* k(3,:)) * Para.BZsmall.area;
+                D(jj,kk) = 1 / (2 * pi)^2 * sum( W_k(jj,:,kk) .* wk) * Para.BZsmall.area;
             end
         end
         diff = sum(D) - D_0;
@@ -48,5 +51,6 @@ for ii = 1:2
     end
         
     fk(ind,:) = W_k(:,:,2);
+    mu_final(ii) = mu(2);
     
 end

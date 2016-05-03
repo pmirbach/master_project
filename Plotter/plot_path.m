@@ -2,10 +2,10 @@ function handle_path = plot_path(Ctrl,Para,k,Daten,nrpts)
 
 warning('off','MATLAB:scatteredInterpolant:DupPtsAvValuesWarnId')
 
-b1 = [Para.k.GV(:,1); 0];
-b2 = [Para.k.GV(:,2); 0];
+b1 = [Para.k.GV(:,1)];
+b2 = [Para.k.GV(:,2)];
 
-k_BZ = reshape(k,3,[]);
+k_BZ = reshape(k,2,[]);
 k_interp = [k_BZ, k_BZ + b1 * ones(1,size(k_BZ,2)),...
     k_BZ + b2 * ones(1,size(k_BZ,2)),...
     k_BZ + (b1 + b2) * ones(1,size(k_BZ,2))];

@@ -1,4 +1,4 @@
-function [k] = k_mesh_mp(Ctrl, Para)
+function [k, wk] = k_mesh_mp(Ctrl, Para)
 
 qr = Ctrl.k_mesh_mp.qr;             % Feinheit des meshes
 
@@ -14,9 +14,16 @@ k_mesh_y = A * b1(2) + A' * b2(2);
 k0 = [k_mesh_x(:), k_mesh_y(:)]';     % Alle k-Punkte
 
 
-% Bestimmung der k-Punkte in der red BZ mit Gewicht als Vielfaches der 
-% kleinen BZ
+% Bestimmung der k-Punkte in der red BZ
 k = pts_triangle_fun(k0, Para.BZred.symmpts{2}(:,1:3), 30 * eps);
+% Bestimmung der Gewichte der k-Punkte
+wk = pts_weight(k, Para.BZred.symmpts{2}(:,1:3), 30 * eps);
+
+if ( sum(wk) * Para.BZsmall.area ) ~= Para.BZ.area
+    warning off backtrace
+    warning('Integrated weights do not agree with area of BZ!')
+    warning on backtrace
+end
 
 % Erzeugung aller red. Dreiecke mit Spiegelungen und Drehungen
 [k] = red_to_BZ(k);
@@ -31,9 +38,9 @@ if Ctrl.plot.k_mesh(1) == 1     % Plot über red. BZ mit den Gewichten
     corners = [Para.BZred.symmpts{2} ...
         * [1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0], [0; 0]];
     
-    in = k(3,:,1) == 6;
-    on = k(3,:,1) == 3;
-    symm = k(3,:,1) == 1;
+    in = wk == 6;
+    on = wk == 3;
+    symm = wk == 1;
     
     plot(corners(1,:),corners(2,:),'k-x')
     plot(k(1,in,1),k(2,in,1),'rx')
@@ -69,9 +76,9 @@ if Ctrl.plot.k_mesh(2) == 1     % Plot über BZ mit Gewichten und Indizierung
     marker = {'h','p','x','+','^','v'};
     
     for ii = 1:6
-        in = k(3,:,ii) == 6;
-        on = k(3,:,ii) == 3;
-        symm = k(3,:,ii) == 1;
+        in = wk == 6;
+        on = wk == 3;
+        symm = wk == 1;
         
         instr = strcat(colors{ii},marker{1+mod(ii,2)});
         onstr = strcat(colors{ii},marker{3+mod(ii,2)});

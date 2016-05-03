@@ -65,33 +65,3 @@ else
     bandstr_path = [];
 end
 
-
-
-
-
-
-
-
-
-% A = 1 / sqrt(2) * (Data.dipol(1,:) + 1i * Data.dipol(2,:));
-% BZ_surf(Ctrl,Data.k,abs(A))
-
-% von = 1;
-% zu = 2;
-%
-% A = 1 / sqrt(2) * (Data.dipol{von,zu}(1,:) + 1i * Data.dipol{von,zu}(2,:));
-% BZ_surf(Ctrl,Data.k,abs(A),'normal')
-
-
-% von = 2;
-% zu = 3;
-%
-% A = 1 / sqrt(2) * (Data.dipol{von,zu}(1,:) + 1i * Data.dipol{von,zu}(2,:));
-% BZ_surf(Ctrl,Data.k,abs(A))
-
-% BZ_surf(Ctrl,Data.k,Data.dipol_plot(1:4,:),'subplot')
-% BZ_surf(Ctrl,Data.k,Data.dipol_plot(5:8,:),'subplot')
-
-% test= squeeze(P(3,3,:));
-
-% BZ_surf(Ctrl,Data.k,abs(test),'at')
