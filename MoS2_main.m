@@ -144,8 +144,12 @@ fprintf('   -   Finished in %g seconds\n',toc)
 % Hab ich schon
 Bloch.hbar = constAg.hbar;
 Bloch.wk = Data.wk;
+
 Bloch.Eks = Prep.Eks;
-Bloch.dipol = 1 / sqrt(2) * transpose(Data.dipol{2,1}(1,:) + 1i * Data.dipol{2,1}(2,:));
+
+% Bloch.dipol = 1 / sqrt(2) * transpose(Data.dipol{1,2}(1,:) + 1i * Data.dipol{1,2}(2,:));
+Bloch.dipol = 5e4 * ones(2461,1);
+
 Bloch.gamma = 10;
 Bloch.E0 = 1e-6;
 Bloch.t_peak = 0.003;

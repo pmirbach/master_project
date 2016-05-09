@@ -13,8 +13,8 @@ dpsik = -1i / Bloch.hbar * ( Bloch.Eks(1,:) + Bloch.Eks(2,:) )' .* psi_k ...
 
 % dpsik = - gamma / constAg.hbar * psi_k;
 
-P_t = 1 / (2 * pi)^2 * sum( conj(Bloch.dipol) .* psi_k );
-% P_t = 1 / (2 * pi)^2 * sum( conj(Bloch.dipol) .* psi_k .* Bloch.wk.' );
+% P_t = 1 / (2 * pi)^2 * sum( conj(Bloch.dipol) .* psi_k );
+P_t = 1 / (2 * pi)^2 * sum( conj(Bloch.dipol) .* psi_k .* Bloch.wk.' );
 
 
 
