@@ -194,19 +194,28 @@ chi_w = P_w ./ E_w;
 close all
 plot(E * 1e-3, imag(chi_w))
 
+%%
+P_t2 = zeros(1,numel(t));
+% psik = psik_E(1:Bloch.nrk);
 
-% P = zeros(1,numel(t));
-% 
-% d = 1 / sqrt(2) * transpose(Data.dipol{2,1}(1,:) - 1i * Data.dipol{2,1}(2,:));
-% 
-% for ii = 1:numel(t)
-%     P(ii) = 1 / (2 * pi)^2 * Data.k(3,:,1) * (conj(d) .* transpose(psik));
-% end
-% 
+for ii = 1:numel(t)
+    P_t2(ii) = 1 / (2 * pi)^2 * Data.wk * (conj(Bloch.dipol) .*  psik_E(ii,1:Bloch.nrk).' );
+end
+
+E_t2 = Bloch.E0 * exp(-1/2 * ( ( t.' - Bloch.t_peak ) / Bloch.sigma ).^2 * 4 * log(2) );
+
+P_w2 = fft(P_t2);
+E_w2 = fft(E_t2);
+
+chi_w2 = P_w2 ./ E_w2;
+
+close all
+plot(imag(P_w2))
+
 % figure
-% plot(t,real(P))
+% plot(t,real(P_t2))
 % hold on
-% plot(t,imag(P),'r')
+% plot(t,imag(P_t2),'r')
 % legend('real','imag')
 
 %%
