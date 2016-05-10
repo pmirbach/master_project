@@ -19,7 +19,7 @@ k = pts_triangle_fun(k0, Para.BZred.symmpts{2}(:,1:3), 30 * eps);
 % Bestimmung der Gewichte der k-Punkte
 wk = pts_weight(k, Para.BZred.symmpts{2}(:,1:3), 30 * eps);
 
-if ( sum(wk) * Para.BZsmall.area ) ~= Para.BZ.area
+if round ( sum(wk) * Para.BZsmall.area * 1e3 ) ~= round( Para.BZ.area * 1e3 )
     warning off backtrace
     warning('Integrated weights do not agree with area of BZ!')
     warning on backtrace

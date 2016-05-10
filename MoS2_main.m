@@ -20,7 +20,7 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 18;        % Unterteilungsgröße
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
@@ -38,7 +38,7 @@ Ctrl.plot.path = {'K','M', 'K*', '\Gamma', 'K','M','\Gamma'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 0];         % Bandstructure
+Ctrl.plot.tb = [0 , 1];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 Ctrl.plot.coul = 0;
@@ -55,23 +55,27 @@ Para = call_para(Ctrl, constAg);
 
 %% Monkhorst-Pack
 
-[Data.k, Data.wk] = k_mesh_mp(Ctrl, Para);
-Para.nr.k = size(Data.k,2);
-
-Para.symm_indices = find( Data.wk == 1 );
-
-
-% load kpts_55x55.mat
-% k1 = permute(kpts,[2,1,3]);
-% 
-% [Data.k] = red_to_BZ(k1);
+% [Data.k, Data.wk] = k_mesh_mp(Ctrl, Para);
 % Para.nr.k = size(Data.k,2);
 % 
+% Para.symm_indices = find( Data.wk == 1 );
+
+
+load kpts_11x11.mat
+k1 = permute(k_11x11,[2,1,3]);
+k2 = k1(1:2,1:66);
+Data.wk = k1(3,1:66);
+Para.BZsmall.area = 1;
+Para.symm_indices = find( Data.wk == 1 );
+
+[Data.k] = red_to_BZ(k2);
+Para.nr.k = size(Data.k,2);
+
+ 
 % Para.BZsmall.area = (8 / 3 / sqrt(3) / ( 55 - 1 )^2)*(pi/0.319)^2;
 % Para.coul.pol = 0.801437895090000 / Para.BZsmall.area;
 % Para.k.qmin = 0.1216;
-% 
-% Data.k(3,:,:) = round( Data.k(3,:,:) / Para.BZsmall.area );
+
 
 %% Tight-Binding
 fprintf('Tight-binding:        Start'); tic
@@ -121,7 +125,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 %% Coulomb Plots
 
-[fig.coulomb_up, fig.coulomb_down] = plot_coulomb( Ctrl , Para,Data.k , Data.V.h , Para.symm_indices(2) );
+% [fig.coulomb_up, fig.coulomb_down] = plot_coulomb( Ctrl , Para,Data.k , Data.V.h , Para.symm_indices(2) );
 
 
 %% Band renorm
@@ -138,7 +142,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 
 %%
-% as2 = plot_path(Ctrl,Para,Data.k,Prep.Eks,200);
+as2 = plot_path(Ctrl,Para,Data.k,Prep.Eks,200);
 
 %% structure für Variablen für Blochgleichungen
 % Hab ich schon
@@ -147,8 +151,9 @@ Bloch.wk = Data.wk;
 
 Bloch.Eks = Prep.Eks;
 
-% Bloch.dipol = 1 / sqrt(2) * transpose(Data.dipol{1,2}(1,:) + 1i * Data.dipol{1,2}(2,:));
-Bloch.dipol = 5e4 * ones(2461,1);
+Bloch.dipol = 1 / sqrt(2) * abs( Data.dipol{2,1}(1,:) - 1i * Data.dipol{2,1}(2,:) ).';
+% Bloch.dipol = 5e4 * ones(2461,1);
+
 
 Bloch.gamma = 10;
 Bloch.E0 = 1e-6;
@@ -156,8 +161,14 @@ Bloch.t_peak = 0.003;
 Bloch.sigma = 0.001;
 Bloch.nrk = Para.nr.k;
 
+
+
 % Kommt noch dazu
-Bloch.w = (-500:1:500)';             % Energiefenster in omega ???
+Emin = -200;
+Emax = 1000;
+E = linspace(Emin,Emax,500)';
+
+Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
 
 Para.nr.w = numel(Bloch.w);
 
@@ -181,7 +192,7 @@ E_w = psik_E(end,( end - 1 * Para.nr.w + 1 ):end);
 chi_w = P_w ./ E_w;
 
 close all
-plot(Bloch.w,imag(chi_w))
+plot(E * 1e-3, imag(chi_w))
 
 
 % P = zeros(1,numel(t));
@@ -198,7 +209,8 @@ plot(Bloch.w,imag(chi_w))
 % plot(t,imag(P),'r')
 % legend('real','imag')
 
-
+%%
+% plot_surf(Para,Data.k(:,:,1),Bloch.dipol,[1,1])
 
 
 %%
