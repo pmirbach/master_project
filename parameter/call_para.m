@@ -29,7 +29,7 @@ Para.coul.pol = 3 * sqrt(3) * log(3) * Para.BZsmall.a / Para.BZsmall.area;
 Para.coul.kappa = 0;             % Kappa, because of Singularity
 
 
-Para.dipol_trans = [1, 2 ; 1 , 3 ; 2, 1 ; 3 , 1 ; 4 , 5 ; 4 , 6 ; 5 , 4 ; 6 , 4 ];
+Para.dipol_trans = [1, 2 ; 1 , 3 ; 4 , 5 ; 4 , 6 ];
 Para.coul_indices = call_coul_indices;
 
 
