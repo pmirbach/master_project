@@ -147,24 +147,33 @@ fprintf('   -   Finished in %g seconds\n',toc)
 % as2 = plot_path(Ctrl,Para,Data.k,Prep.Eks,200);
 
 %% structure für Variablen für Blochgleichungen
+
+% Para.dipol_trans = [1, 2 ; 1 , 3 ; 4 , 5 ; 4 , 6 ];
+Para.dipol_trans = [1, 2 ];
+Para.nr.dipol = size(Para.dipol_trans,1);
+
+Bloch.nrd = Para.nr.dipol;
+
 % Hab ich schon
 Bloch.hbar = constAg.hbar;
-Bloch.wk = Data.wk * Para.BZsmall.area;     % Zeilenvektor
-Bloch.wkentire = Bloch.wk.' / 6;            % Spaltenvektor
+Bloch.wk = repmat( Data.wk.' * Para.BZsmall.area , [Para.nr.dipol,1] );     % Spaltenvektor
+Bloch.wkentire = Data.wk.' * Para.BZsmall.area / 6;                         % Spaltenvektor
 
-Bloch.Eks = Prep.Eks.';
+Bloch.Esum = zeros(Para.nr.k * Para.nr.dipol , 1 );
+Bloch.dipol = zeros(Para.nr.k * Para.nr.dipol , 1 );
+Bloch.feff = zeros(Para.nr.k * Para.nr.dipol , 1 );                         % In the linear regime. feff const.
 
-
-Bloch.dipol = zeros(Para.nr.k, size(Para.dipol_trans,1) );
-for ii = 1:size(Para.dipol_trans,1)
-    Bloch.dipol(:,ii) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
+for ii = 1:Para.nr.dipol
+    Bloch.Esum( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = ( Prep.Eks(Para.dipol_trans(ii,1),:) + Prep.Eks(Para.dipol_trans(ii,2),:) ).';
+    Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
+    Bloch.feff( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';
 end
 
-% Bloch.dipol = 5e4 * ones(Para.nr.k,1);
+% Bloch.dipol = 5e4 * ones(Para.nr.k,Para.nr.dipol);                % ? 1-3 too strong.
 
 [V_rabi_fock] = coulomb_rabi_f(Ctrl, Para, Prep);
 
-Bloch.coulomb = V_rabi_fock(:,:,1);
+Bloch.coulomb = V_rabi_fock;
 % Bloch.coulomb = COULD12rmat;
 
 
@@ -192,7 +201,7 @@ Bloch.coul_ctrl = 1;                    % Coulomb Interaktion
 
 
 tspan = [0 0.5];
-psik_E_ini = zeros(1,Para.nr.k + size(Bloch.w,1) * 2);
+psik_E_ini = zeros(1,Para.nr.dipol * Para.nr.k + size(Bloch.w,1) * 2);
 
 options=odeset('OutputFcn',@odeprog,'Events',@odeabort,'RelTol',1e-5);
 % opts = odeset('RelTol',1e-1,'AbsTol',1e-3);
