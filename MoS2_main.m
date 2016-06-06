@@ -20,7 +20,7 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 30;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
@@ -57,13 +57,13 @@ Para = call_para(Ctrl, constAg);
 
 % [Data.k, Data.wk] = k_mesh_mp(Ctrl, Para);
 % Para.nr.k = size(Data.k,2);
-% 
+%
 % Para.symm_indices = find( Data.wk == 1 );
 
 
 
-% % load kpts_11x11.mat
-% % k1 = permute(k_11x11,[2,1,3]);
+% load kpts_11x11.mat
+% k1 = permute(k_11x11,[2,1,3]);
 
 load kpts_35x35.mat
 k1 = permute(kpts_35x35,[2,1,3]);
@@ -75,7 +75,7 @@ Para.symm_indices = find( Data.wk == 1 );
 [Data.k] = red_to_BZ(k2);
 Para.nr.k = size(Data.k,2);
 
- 
+
 Para.BZsmall.area = min(k1(3,:));
 Para.coul.pol = 1.27287195103197  / Para.BZsmall.area;
 Para.k.qmin = 0.193102996717152;
@@ -149,17 +149,23 @@ fprintf('   -   Finished in %g seconds\n',toc)
 %% structure für Variablen für Blochgleichungen
 % Hab ich schon
 Bloch.hbar = constAg.hbar;
-Bloch.wk = Data.wk * Para.BZsmall.area;
-Bloch.wkentire = Data.wk * Para.BZsmall.area / 6;
+Bloch.wk = Data.wk * Para.BZsmall.area;     % Zeilenvektor
+Bloch.wkentire = Bloch.wk.' / 6;            % Spaltenvektor
 
-Bloch.Eks = Prep.Eks;
+Bloch.Eks = Prep.Eks.';
 
-Bloch.dipol = 1 / sqrt(2) * abs( Data.dipol{1}(1,:) - 1i * Data.dipol{1}(2,:) ).';
-% Bloch.dipol = 5e4 * ones(2461,1);
+
+Bloch.dipol = zeros(Para.nr.k, size(Para.dipol_trans,1) );
+for ii = 1:size(Para.dipol_trans,1)
+    Bloch.dipol(:,ii) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
+end
+
+% Bloch.dipol = 5e4 * ones(Para.nr.k,1);
 
 [V_rabi_fock] = coulomb_rabi_f(Ctrl, Para, Prep);
 
 Bloch.coulomb = V_rabi_fock(:,:,1);
+% Bloch.coulomb = COULD12rmat;
 
 
 Bloch.gamma = 10;
@@ -171,8 +177,8 @@ Bloch.nrk = Para.nr.k;
 
 
 % Kommt noch dazu
-Emin = -1000;
-Emax = 1000;
+Emin = -500;
+Emax = 0;
 E = linspace(Emin,Emax,500)';
 
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
@@ -180,12 +186,15 @@ Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
 Para.nr.w = numel(Bloch.w);
 
 
-% Zeitentwicklung
+%% Zeitentwicklung
 
-tspan = [0 2];
+Bloch.coul_ctrl = 1;                    % Coulomb Interaktion
+
+
+tspan = [0 0.5];
 psik_E_ini = zeros(1,Para.nr.k + size(Bloch.w,1) * 2);
 
-options=odeset('OutputFcn',@odeprog,'Events',@odeabort);
+options=odeset('OutputFcn',@odeprog,'Events',@odeabort,'RelTol',1e-5);
 % opts = odeset('RelTol',1e-1,'AbsTol',1e-3);
 [t,psik_E] = ode45(@(t,psik_E) dgl_bloch(t,psik_E,Bloch), tspan, psik_E_ini, options);
 
@@ -200,22 +209,23 @@ chi_w = P_w ./ E_w;
 
 close all
 plot(E , imag(chi_w))
+% xlim([-500 0])
 
 %%
 % P_t2 = zeros(1,numel(t));
 % % psik = psik_E(1:Bloch.nrk);
-% 
+%
 % for ii = 1:numel(t)
 %     P_t2(ii) = 1 / (2 * pi)^2 * Data.wk * (conj(Bloch.dipol) .*  psik_E(ii,1:Bloch.nrk).' );
 % end
-% 
+%
 % E_t2 = Bloch.E0 * exp(-1/2 * ( ( t.' - Bloch.t_peak ) / Bloch.sigma ).^2 * 4 * log(2) );
-% 
+%
 % P_w2 = fft(P_t2);
 % E_w2 = fft(E_t2);
-% 
+%
 % chi_w2 = P_w2 ./ E_w2;
-% 
+%
 % close all
 % plot(imag(P_w2))
 

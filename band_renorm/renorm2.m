@@ -34,12 +34,10 @@ for nll = 1:size(Para.coul_indices,1)
     ren_hartree = ( fk(l2,:) .* gew ) * V.h(:,:,coul_map(l1,l2)).' + ( fk(l3,:) .* gew ) * V.h_off(:,:,coul_map(l1,l3)).' ; 
     ren_fock = - ( fk(l2,:) .* gew ) * V.f(:,:,coul_map(l1,l2)).';
     
-    
     Ek_f(l1,:) = Ek_f(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ren_fock;  
     Ek_h(l1,:) = Ek_h(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ren_hartree;   
     Ek_hf(l1,:) = Ek_hf(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ( ren_hartree + ren_fock );
-    
-    
+      
     test_ren_h(l1,:) = test_ren_h(l1,:) + 1 / ( 2 * pi )^2 * vorz(l1,l2) * ren_hartree;
 end
 
