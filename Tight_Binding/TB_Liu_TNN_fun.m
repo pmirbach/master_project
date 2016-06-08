@@ -24,20 +24,20 @@ u_22 = Parameter(21);
 
 
 
-alpha = k(1) / 2 * a;
-ca = cos(alpha);
-c2a = cos(2 * alpha);
-c3a = cos(3 * alpha);
-c4a = cos(4 * alpha);
-sa = sin(alpha);
-s2a = sin(2 * alpha);
-s3a = sin(3 * alpha);
+a = k(1) / 2 * a;
+ca = cos(a);
+c2a = cos(2 * a);
+c3a = cos(3 * a);
+c4a = cos(4 * a);
+sa = sin(a);
+s2a = sin(2 * a);
+s3a = sin(3 * a);
 
-beta = sqrt(3) * k(2) / 2 * a;
-cb = cos(beta);
-c2b = cos(2 * beta);
-sb = sin(beta);
-s2b = sin(2 * beta);
+b = sqrt(3) * k(2) / 2 * a;
+cb = cos(b);
+c2b = cos(2 * b);
+sb = sin(b);
+s2b = sin(2 * b);
 
 v_0 = eps_1 + 2 * t_0 * ( 2 * ca * cb + c2a ) ...
     + 2 * r_0 * ( 2 * c3a * cb + c2b ) ...

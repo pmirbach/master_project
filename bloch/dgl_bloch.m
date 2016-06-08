@@ -11,7 +11,7 @@ psi_k = psik_E(1:Bloch.nrd * Bloch.nrk);
 
 % Berechnung von        hbar * Omega:
 if Bloch.coul_ctrl == 1
-    hbarOmega = E_t * conj( Bloch.dipol ) + 1 / ( 2 * pi )^2 * Bloch.coulomb * ( psi_k .* Bloch.wkentire ) ;
+    hbarOmega = E_t * conj( Bloch.dipol ) + 1 / ( 2 * pi )^2 * Bloch.coulomb.' * ( psi_k .* Bloch.wkentire ) ;
 else 
     hbarOmega = E_t * conj( Bloch.dipol );
 end

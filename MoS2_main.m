@@ -27,8 +27,8 @@ Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
 
 % Anregungsdichte
 Ctrl.temperature = 300;         % Temperatur in K
-% Ctrl.carrier_density = 1e13;    % Anregungsdichte in 1/cm^2
-Ctrl.carrier_density = 0;    % Anregungsdichte in 1/cm^2
+Ctrl.carrier_density = 1e13;    % Anregungsdichte in 1/cm^2
+% Ctrl.carrier_density = 0;    % Anregungsdichte in 1/cm^2
 Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
 
 %% Plot Control
@@ -40,8 +40,8 @@ Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
 Ctrl.plot.tb = [0 , 0];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
-Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
-Ctrl.plot.coul = 0;
+Ctrl.plot.dipol = [1 , 0];      % Dipol matrix elements
+Ctrl.plot.coul = 1;
 Ctrl.plot.ren_bs = [0 , 0];      % Dipol matrix elements
 
 Ctrl.plot.save = 0;             % 1 Speichern, 0 nicht
@@ -90,6 +90,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
 
+
 %% Simulation-preperations
 fprintf('Preperations:         Start'); tic
 
@@ -127,7 +128,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 %% Coulomb Plots
 
-% [fig.coulomb_up, fig.coulomb_down] = plot_coulomb( Ctrl , Para,Data.k , Data.V.h , Para.symm_indices(2) );
+[fig.coulomb_up, fig.coulomb_down] = plot_coulomb( Ctrl , Para,Data.k , Data.V.f , Para.symm_indices(2) );
 
 
 %% Band renorm
@@ -149,31 +150,41 @@ fprintf('   -   Finished in %g seconds\n',toc)
 %% structure für Variablen für Blochgleichungen
 
 % Para.dipol_trans = [1, 2 ; 1 , 3 ; 4 , 5 ; 4 , 6 ];
-Para.dipol_trans = [1, 2 ];
+Para.dipol_trans = [1, 2; 4, 5];
 Para.nr.dipol = size(Para.dipol_trans,1);
 
 Bloch.nrd = Para.nr.dipol;
 
+
+[V_rabi_fock] = coulomb_rabi_f(Ctrl, Para, Prep);                           % All coulomb matrices. (in 3rd dimension)
+
+
 % Hab ich schon
 Bloch.hbar = constAg.hbar;
 Bloch.wk = repmat( Data.wk.' * Para.BZsmall.area , [Para.nr.dipol,1] );     % Spaltenvektor
-Bloch.wkentire = Data.wk.' * Para.BZsmall.area / 6;                         % Spaltenvektor
+% Bloch.wkentire = Data.wk.' * Para.BZsmall.area / 6;                         % Spaltenvektor
+Bloch.wkentire = Bloch.wk / 6; 
+
+
 
 Bloch.Esum = zeros(Para.nr.k * Para.nr.dipol , 1 );
 Bloch.dipol = zeros(Para.nr.k * Para.nr.dipol , 1 );
 Bloch.feff = zeros(Para.nr.k * Para.nr.dipol , 1 );                         % In the linear regime. feff const.
+Bloch.coulomb = zeros(Para.nr.k * Para.nr.dipol);
 
 for ii = 1:Para.nr.dipol
     Bloch.Esum( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = ( Prep.Eks(Para.dipol_trans(ii,1),:) + Prep.Eks(Para.dipol_trans(ii,2),:) ).';
+    
     Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
+    
     Bloch.feff( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';
+    
+    Bloch.coulomb((ii-1) * Para.nr.k + 1 : ii * Para.nr.k  ,  (ii-1) * Para.nr.k + 1 : ii * Para.nr.k) = V_rabi_fock(:,:,ii);   
 end
 
 % Bloch.dipol = 5e4 * ones(Para.nr.k,Para.nr.dipol);                % ? 1-3 too strong.
 
-[V_rabi_fock] = coulomb_rabi_f(Ctrl, Para, Prep);
-
-Bloch.coulomb = V_rabi_fock;
+% Bloch.coulomb = V_rabi_fock;
 % Bloch.coulomb = COULD12rmat;
 
 
