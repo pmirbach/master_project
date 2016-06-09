@@ -53,6 +53,8 @@ Ctrl.plot.entireBZ = 0;         % 1 ganze BZ, 0 nur red. BZ
 
 Para = call_para(Ctrl, constAg);
 
+constAg.hbar = 0.6582119514;
+
 %% Monkhorst-Pack
 
 % [Data.k, Data.wk] = k_mesh_mp(Ctrl, Para);
@@ -68,6 +70,7 @@ k1 = k1(:,1:66);
 
 % load kpts_35x35.mat
 % k1 = permute(kpts_35x35,[2,1,3]);
+
 k2 = k1(1:2,:);
 Data.wk = round( k1(3,:) / min(k1(3,:)) );
 Para.BZsmall.area = 1;
@@ -99,9 +102,12 @@ fprintf('   -   Finished in %g seconds\n',toc)
 fprintf('Preperations:         Start'); tic
 
 [Prep.Eks, Prep.CV, Prep.CV_noSOC, Prep.minq] = prep(Para, Data, Prep.Ev_noSOC);
-Prep.CV = ones(size(Prep.CV));
 
 fprintf('   -   Finished in %g seconds\n',toc)
+
+%%
+% Prep.CV = ones(size(Prep.CV));
+
 
 %% Thermische Anregung
 fprintf('Excitation:           Start'); tic
@@ -112,16 +118,6 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 [fig.exc_surf, fig.exc_path] = plot_excitation(Ctrl,Para,Data.k,Data.fk,[2 3]);
 
-%% Dipolmatrix
-fprintf('Dipol:                Start'); tic
-
-Data.dipol = dipol(Para, Prep, Data);
-
-fprintf('   -   Finished in %g seconds\n',toc)
-
-titlestr = {'1 \rightarrow 2 \uparrow','1 \rightarrow 3 \uparrow','1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow'};
-[fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,Data.dipol,[2 2],titlestr);
-clear titlestr
 
 %% Coulomb WW
 fprintf('Coulomb matrix:       Start'); tic
@@ -163,8 +159,18 @@ dipolmap(1,2:3) = 1:2;
 dipolmap(4,5:6) = 3:4;
 
 
+%% Dipolmatrix
+fprintf('Dipol:                Start'); tic
 
+Data.dipol = dipol(Para, Prep, Data);
 
+fprintf('   -   Finished in %g seconds\n',toc)
+
+titlestr = {'1 \rightarrow 2 \uparrow','1 \rightarrow 3 \uparrow','1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow'};
+[fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,Data.dipol,[2 2],titlestr);
+clear titlestr
+
+%%
 
 Bloch.nrd = Para.nr.dipol;
 
@@ -187,14 +193,14 @@ Bloch.feff = zeros(Para.nr.k * Para.nr.dipol , 1 );                         % In
 for ii = 1:Para.nr.dipol
     Bloch.Esum( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = ( Prep.Eks(Para.dipol_trans(ii,1),:) + Prep.Eks(Para.dipol_trans(ii,2),:) ).';
     
-    dipolnr = dipolmap(Para.dipol_trans(ii,1),Para.dipol_trans(ii,2));
-    Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 / sqrt(2) * abs( Data.dipol{dipolnr}(1,:) - 1i * Data.dipol{dipolnr}(2,:) ).'; 
+%     Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 / sqrt(2) * abs( Data.dipol{dipolnr}(1,:) - 1i * Data.dipol{dipolnr}(2,:) ).';
+    Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
     
     Bloch.feff( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';
     
 end
 
-% Bloch.dipol = 5e4 * ones(Para.nr.k,Para.nr.dipol);                % ? 1-3 too strong.
+% Bloch.dipol = 5e4 * ones(Para.nr.k * Para.nr.dipol,1);                % ? 1-3 too strong.
 
 
 Bloch.gamma = 10;
@@ -206,7 +212,7 @@ Bloch.nrk = Para.nr.k;
 
 
 % Kommt noch dazu
-Emin = -1000;
+Emin = -500;
 Emax = 0;
 E = linspace(Emin,Emax,1001)';
 
@@ -220,10 +226,12 @@ Para.nr.w = numel(Bloch.w);
 Bloch.coul_ctrl = 1;                    % Coulomb Interaktion
 
 
-tspan = [0 0.5];
+tspan = [0 2];
+% tspan = linspace(0, 2, 15000);
 psik_E_ini = zeros(1,Para.nr.dipol * Para.nr.k + size(Bloch.w,1) * 2);
 
-options=odeset('OutputFcn',@odeprog,'Events',@odeabort,'RelTol',1e-5);
+% options=odeset('OutputFcn',@odeprog,'Events',@odeabort);
+options=odeset('OutputFcn',@odeprog,'Events',@odeabort,'RelTol',1e-8,'AbsTol',1e-8);
 % opts = odeset('RelTol',1e-1,'AbsTol',1e-3);
 [t,psik_E] = ode45(@(t,psik_E) dgl_bloch(t,psik_E,Bloch), tspan, psik_E_ini, options);
 

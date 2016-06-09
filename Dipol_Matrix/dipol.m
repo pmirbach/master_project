@@ -2,17 +2,15 @@ function [dipol] = dipol(Para, Prep, Data)
 
 dipol = cell(1,4);
 
-transitions = Para.dipol_trans;
-
 [grad_H_kx , grad_H_ky] = grad_TB_Liu_TNN_fun(Data.k(1:2,:,1),Para.TB);
 mapping = reshape(1:9,[3,3]);
 
-for nn = 1:size(transitions,1)
+for nll = 1:Para.nr.dipol
+        
+    hh = Para.dipol_trans(nll,1);
+    ee = Para.dipol_trans(nll,2);
     
-    m = transitions(nn,1);
-    n = transitions(nn,2);
-    
-    if m <= 3
+    if hh <= 3
         d = 0;
     else
         d = 3;
@@ -24,14 +22,14 @@ for nn = 1:size(transitions,1)
         
         for b = 1:3
             
-            dipol_k(1,:) = dipol_k(1,:) + grad_H_kx(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,m,n).';
-            dipol_k(2,:) = dipol_k(2,:) + grad_H_ky(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,m,n).';
+            dipol_k(1,:) = dipol_k(1,:) + grad_H_kx(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,hh,ee).';
+            dipol_k(2,:) = dipol_k(2,:) + grad_H_ky(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,hh,ee).';
                         
         end
         
     end
     
-    dipol{1,nn} = Para.vorf.dipol / 1i  * dipol_k ./ repmat( Data.Ek(m,:,1) - Data.Ek(n,:,1) ,2,1);
+    dipol{1,nll} = Para.vorf.dipol / 1i  * dipol_k ./ repmat( Data.Ek(hh,:,1) - Data.Ek(ee,:,1) ,2,1);
     
 end
 
