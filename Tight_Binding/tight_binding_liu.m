@@ -27,6 +27,12 @@ for nk = 1:Para.nr.k
         [Ev(1:3,1:3,nk,ni) , D_up] = eig(H_TB_SOC_up);
         [Ev(4:6,4:6,nk,ni) , D_down] = eig(H_TB_SOC_down);
         
+        if nk == 35 && ni == 1
+            H_TB_SOC_up
+            D_up
+            Ev(1:3,1:3,nk,ni)
+        end
+        
         Ek(1:3,nk,ni) = diag(D_up);
         Ek(4:6,nk,ni) = diag(D_down);
         

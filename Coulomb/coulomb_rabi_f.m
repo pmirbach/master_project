@@ -4,7 +4,7 @@ V_rabi_fock = zeros( Para.nr.k, Para.nr.k, size(Para.dipol_trans,1) );
 
 para_map = [1 2 3 ; 2 4 5 ; 3 5 6];
 
-for nll = 1:size(Para.dipol_trans,1)
+for nll = 1:Para.nr.dipol
     
     hh = Para.dipol_trans(nll,1);
     ee = Para.dipol_trans(nll,2);

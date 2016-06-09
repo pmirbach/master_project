@@ -27,8 +27,8 @@ Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
 
 % Anregungsdichte
 Ctrl.temperature = 300;         % Temperatur in K
-Ctrl.carrier_density = 1e13;    % Anregungsdichte in 1/cm^2
-% Ctrl.carrier_density = 0;    % Anregungsdichte in 1/cm^2
+% Ctrl.carrier_density = 1e13;    % Anregungsdichte in 1/cm^2
+Ctrl.carrier_density = 0;    % Anregungsdichte in 1/cm^2
 Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
 
 %% Plot Control
@@ -40,8 +40,8 @@ Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
 Ctrl.plot.tb = [0 , 0];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
-Ctrl.plot.dipol = [1 , 0];      % Dipol matrix elements
-Ctrl.plot.coul = 1;
+Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
+Ctrl.plot.coul = 0;
 Ctrl.plot.ren_bs = [0 , 0];      % Dipol matrix elements
 
 Ctrl.plot.save = 0;             % 1 Speichern, 0 nicht
@@ -62,11 +62,12 @@ Para = call_para(Ctrl, constAg);
 
 
 
-% load kpts_11x11.mat
-% k1 = permute(k_11x11,[2,1,3]);
+load kpts_11x11.mat
+k1 = permute(k_11x11,[2,1,3]);
+k1 = k1(:,1:66);
 
-load kpts_35x35.mat
-k1 = permute(kpts_35x35,[2,1,3]);
+% load kpts_35x35.mat
+% k1 = permute(kpts_35x35,[2,1,3]);
 k2 = k1(1:2,:);
 Data.wk = round( k1(3,:) / min(k1(3,:)) );
 Para.BZsmall.area = 1;
@@ -77,8 +78,11 @@ Para.nr.k = size(Data.k,2);
 
 
 Para.BZsmall.area = min(k1(3,:));
-Para.coul.pol = 1.27287195103197  / Para.BZsmall.area;
-Para.k.qmin = 0.193102996717152;
+% Para.coul.pol = 1.27287195103197  / Para.BZsmall.area;        % 35 x 35
+Para.coul.pol = 4.32776463350871  / Para.BZsmall.area;          % 11 x 11
+ 
+% Para.k.qmin = 0.193102996717152;                                % 35 x 35
+Para.k.qmin = 0.656550188837845;                                % 11 x 11
 
 
 %% Tight-Binding
@@ -95,6 +99,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 fprintf('Preperations:         Start'); tic
 
 [Prep.Eks, Prep.CV, Prep.CV_noSOC, Prep.minq] = prep(Para, Data, Prep.Ev_noSOC);
+Prep.CV = ones(size(Prep.CV));
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
@@ -150,42 +155,46 @@ fprintf('   -   Finished in %g seconds\n',toc)
 %% structure für Variablen für Blochgleichungen
 
 % Para.dipol_trans = [1, 2 ; 1 , 3 ; 4 , 5 ; 4 , 6 ];
-Para.dipol_trans = [1, 2; 4, 5];
+Para.dipol_trans = [1 2];
 Para.nr.dipol = size(Para.dipol_trans,1);
+
+dipolmap = zeros(6);
+dipolmap(1,2:3) = 1:2;
+dipolmap(4,5:6) = 3:4;
+
+
+
+
 
 Bloch.nrd = Para.nr.dipol;
 
 
 [V_rabi_fock] = coulomb_rabi_f(Ctrl, Para, Prep);                           % All coulomb matrices. (in 3rd dimension)
-
+Bloch.coulomb = V_rabi_fock;
 
 % Hab ich schon
 Bloch.hbar = constAg.hbar;
 Bloch.wk = repmat( Data.wk.' * Para.BZsmall.area , [Para.nr.dipol,1] );     % Spaltenvektor
-% Bloch.wkentire = Data.wk.' * Para.BZsmall.area / 6;                         % Spaltenvektor
-Bloch.wkentire = Bloch.wk / 6; 
+Bloch.wkentire = Data.wk.' * Para.BZsmall.area / 6;                         % Spaltenvektor
+% Bloch.wkentire = Bloch.wk / 6; 
 
 
 
 Bloch.Esum = zeros(Para.nr.k * Para.nr.dipol , 1 );
 Bloch.dipol = zeros(Para.nr.k * Para.nr.dipol , 1 );
 Bloch.feff = zeros(Para.nr.k * Para.nr.dipol , 1 );                         % In the linear regime. feff const.
-Bloch.coulomb = zeros(Para.nr.k * Para.nr.dipol);
 
 for ii = 1:Para.nr.dipol
     Bloch.Esum( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = ( Prep.Eks(Para.dipol_trans(ii,1),:) + Prep.Eks(Para.dipol_trans(ii,2),:) ).';
     
-    Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
+    dipolnr = dipolmap(Para.dipol_trans(ii,1),Para.dipol_trans(ii,2));
+    Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 / sqrt(2) * abs( Data.dipol{dipolnr}(1,:) - 1i * Data.dipol{dipolnr}(2,:) ).'; 
     
     Bloch.feff( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';
     
-    Bloch.coulomb((ii-1) * Para.nr.k + 1 : ii * Para.nr.k  ,  (ii-1) * Para.nr.k + 1 : ii * Para.nr.k) = V_rabi_fock(:,:,ii);   
 end
 
 % Bloch.dipol = 5e4 * ones(Para.nr.k,Para.nr.dipol);                % ? 1-3 too strong.
-
-% Bloch.coulomb = V_rabi_fock;
-% Bloch.coulomb = COULD12rmat;
 
 
 Bloch.gamma = 10;
@@ -197,9 +206,9 @@ Bloch.nrk = Para.nr.k;
 
 
 % Kommt noch dazu
-Emin = -500;
+Emin = -1000;
 Emax = 0;
-E = linspace(Emin,Emax,500)';
+E = linspace(Emin,Emax,1001)';
 
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
 

@@ -91,14 +91,7 @@ for tri_idx = 1:tri
         H(2,1) = conj(H(1,2));
         H(3,1) = conj(H(1,3));
         H(3,2) = conj(H(2,3));
-        
-%         if kk == 35 && tri_idx == 1
-%             disp(V1)
-%             %             H2
-%         end
-       H
-        
-
+               
         
         % SOC
         % H_soc = kron(H,eye(2)) + lambda/2*kron(LS,[1 0;0 -1]);
@@ -106,6 +99,12 @@ for tri_idx = 1:tri
         H1 = H + lambda/2.*LS;
         [V1, D1] = eig(H1*1e3);
         Ek1 = (real(diag(D1)));
+        
+        
+        if kk == 1 && tri_idx == 1
+            V1
+            %             H2
+        end
         
         
         H2 = H - lambda/2.*LS;

@@ -24,14 +24,14 @@ u_22 = Parameter(21);
 
 
 
-a = k(1) / 2 * a;
-ca = cos(a);
-c2a = cos(2 * a);
-c3a = cos(3 * a);
-c4a = cos(4 * a);
-sa = sin(a);
-s2a = sin(2 * a);
-s3a = sin(3 * a);
+alpha = k(1) / 2 * a;
+ca = cos(alpha);
+c2a = cos(2 * alpha);
+c3a = cos(3 * alpha);
+c4a = cos(4 * alpha);
+sa = sin(alpha);
+s2a = sin(2 * alpha);
+s3a = sin(3 * alpha);
 
 b = sqrt(3) * k(2) / 2 * a;
 cb = cos(b);
@@ -75,4 +75,3 @@ v_22 = eps_2 + ( 3 * t_11 + t_22 ) * ca * cb + 2 * t_22 * c2a ...
     + ( 3 * u_11 + u_22 ) * c2a * c2b + 2 * u_22 * c4a;
 
 H_TNN = [v_0, v_1, v_2; v_1', v_11, v_12; v_2', v_12', v_22];
-
