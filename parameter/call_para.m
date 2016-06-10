@@ -37,7 +37,7 @@ Para.coul_indices = call_coul_indices;
 
 Para.vorf.dipol = constAg.ec;
 
-eps_r = 1;
+eps_r = 12;
 Para.vorf.coul = constAg.ec^2 / ( 2 * constAg.eps_0 * eps_r);
 
 

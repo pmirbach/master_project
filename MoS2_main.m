@@ -59,7 +59,7 @@ constAg.hbar = 0.6582119514;
 
 % [Data.k, Data.wk] = k_mesh_mp(Ctrl, Para);
 % Para.nr.k = size(Data.k,2);
-%
+% 
 % Para.symm_indices = find( Data.wk == 1 );
 
 
@@ -126,11 +126,9 @@ fprintf('Coulomb matrix:       Start'); tic
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
-
 %% Coulomb Plots
 
 [fig.coulomb_up, fig.coulomb_down] = plot_coulomb( Ctrl , Para,Data.k , Data.V.f , Para.symm_indices(2) );
-
 
 %% Band renorm
 
@@ -143,7 +141,6 @@ fprintf('   -   Finished in %g seconds\n',toc)
 [fig.ren_bandstr_surf, fig.ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Para,Data.k,[Data.Ek(:,:,1);Data.Ek_h],[2 3]);
 
 % as1 = plot_path(Ctrl,Para,Data.k,Test.ren_h,200);      % Test der Hartree Renormierung
-
 
 %%
 % as2 = plot_path(Ctrl,Para,Data.k,Prep.Eks,200);
@@ -200,7 +197,7 @@ for ii = 1:Para.nr.dipol
     
 end
 
-% Bloch.dipol = 5e4 * ones(Para.nr.k * Para.nr.dipol,1);                % ? 1-3 too strong.
+Bloch.dipol = 5e4 * ones(Para.nr.k * Para.nr.dipol,1);                % ? 1-3 too strong.
 
 
 Bloch.gamma = 10;
@@ -212,9 +209,9 @@ Bloch.nrk = Para.nr.k;
 
 
 % Kommt noch dazu
-Emin = -500;
+Emin = -1000;
 Emax = 0;
-E = linspace(Emin,Emax,1001)';
+E = linspace(Emin,Emax,2001)';
 
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
 
@@ -246,6 +243,14 @@ chi_w = P_w ./ E_w;
 
 close all
 plot(E , imag(chi_w))
+
+hold on
+load('spec_V_dip.mat')
+% load ist_egal.mat
+plot(spec_21(:,1)*Bloch.hbar , spec_21(:,3))
+% plot(spec(:,1)*Bloch.hbar , spec(:,3))
+
+
 % xlim([-500 0])
 
 %%

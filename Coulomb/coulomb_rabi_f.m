@@ -22,8 +22,10 @@ for nll = 1:Para.nr.dipol
             for tri = 1:6
                 
                 V_rabi_fock(:,:,nll) = V_rabi_fock(:,:,nll) + ...
-                    ( Prep.CV(:,1,a+d,b+d,ee,hh) * Prep.CV(:,tri,b+d,a+d,hh,ee).' ) .* ...
-                    final_coul_scr(Prep.minq(:,:,tri),Para.coul.screened(para_map(a,b),:),Para.coul.pol);
+                    ( Prep.CV(:,1,a+d,b+d,ee,hh) * Prep.CV(:,tri,b+d,a+d,hh,ee).' );% .* ...
+                    %final_coul_scr(Prep.minq(:,:,tri),Para.coul.screened(para_map(a,b),:),Para.coul.pol);
+                    
+                
                 
             end
             
@@ -32,5 +34,5 @@ for nll = 1:Para.nr.dipol
     end
     
 end
-
-V_rabi_fock = Para.vorf.coul * abs( V_rabi_fock );
+% V_rabi_fock = Para.vorf.coul * abs( V_rabi_fock );
+V_rabi_fock = abs( V_rabi_fock );
