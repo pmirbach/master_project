@@ -31,7 +31,7 @@ dpsik = -1i / Bloch.hbar * ( Bloch.Esum .* psi_k - ( hbarOmega ) - 1i * Bloch.ga
 P_t = 1 / (2 * pi)^2 * sum( conj( Bloch.dipol ) .* psi_k .* Bloch.wk );
 
 % Berechnung der Fourier Transformation:
-fw = exp(1i * Bloch.w * t);
+fw = exp(1i * Bloch.w .* t);
 
 d_P_w = P_t * fw;
 d_E_w = E_t * fw;

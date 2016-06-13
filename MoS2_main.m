@@ -1,7 +1,8 @@
 %% Header
 clear variables
 clear global
-close all
+% close all
+
 % profile off
 % profile on
 % clc
@@ -20,7 +21,7 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 30;        % Unterteilungsgröße
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
@@ -54,6 +55,8 @@ Ctrl.plot.entireBZ = 0;         % 1 ganze BZ, 0 nur red. BZ
 Para = call_para(Ctrl, constAg);
 
 constAg.hbar = 0.6582119514;
+% load('Pfad.mat')
+load('Pfad_35.mat')
 
 %% Monkhorst-Pack
 
@@ -64,12 +67,12 @@ constAg.hbar = 0.6582119514;
 
 
 
-load kpts_11x11.mat
-k1 = permute(k_11x11,[2,1,3]);
-k1 = k1(:,1:66);
+% load kpts_11x11.mat
+% k1 = permute(k_11x11,[2,1,3]);
+% k1 = k1(:,1:66);
 
-% load kpts_35x35.mat
-% k1 = permute(kpts_35x35,[2,1,3]);
+load kpts_35x35.mat
+k1 = permute(kpts_35x35,[2,1,3]);
 
 k2 = k1(1:2,:);
 Data.wk = round( k1(3,:) / min(k1(3,:)) );
@@ -80,13 +83,22 @@ Para.symm_indices = find( Data.wk == 1 );
 Para.nr.k = size(Data.k,2);
 
 
-Para.BZsmall.area = min(k1(3,:));
-% Para.coul.pol = 1.27287195103197  / Para.BZsmall.area;        % 35 x 35
-Para.coul.pol = 4.32776463350871  / Para.BZsmall.area;          % 11 x 11
- 
-% Para.k.qmin = 0.193102996717152;                                % 35 x 35
-Para.k.qmin = 0.656550188837845;                                % 11 x 11
+% load kpts_11x11(2).mat
+% k3 = permute(kpts,[2,1,3]);
+% Data.k = k3(1:2,:,:);
 
+Para.BZsmall.area = min(k1(3,:));
+Para.coul.pol = 1.27287195103197  / Para.BZsmall.area;        % 35 x 35
+% Para.coul.pol = 4.32776463350871  / Para.BZsmall.area;          % 11 x 11
+ 
+Para.k.qmin = 0.193102996717152;                                % 35 x 35
+% Para.k.qmin = 0.656550188837845;                                % 11 x 11
+
+
+%%
+
+kx = Data.k(1,:,1);
+ky = Data.k(2,:,1);
 
 %% Tight-Binding
 fprintf('Tight-binding:        Start'); tic
@@ -97,6 +109,16 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
 
+%% Daniels Eigenvektoren
+% load('CVec (2).mat')
+% Data.Ev = CVec;
+% Data.Ev = abs(real(Data.Ev)) + 1i * abs(imag(Data.Ev));
+
+% load('CVec_35.mat')
+
+% load test_eig_chol.mat
+% Data.Ek = ENERGY;
+% Data.Ev = coeff;
 
 %% Simulation-preperations
 fprintf('Preperations:         Start'); tic
@@ -107,6 +129,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 %%
 % Prep.CV = ones(size(Prep.CV));
+% Prep.CV = call_CV( Ev )
 
 
 %% Thermische Anregung
@@ -148,7 +171,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 %% structure für Variablen für Blochgleichungen
 
 % Para.dipol_trans = [1, 2 ; 1 , 3 ; 4 , 5 ; 4 , 6 ];
-Para.dipol_trans = [1 2];
+Para.dipol_trans = [1 2; 4 5];
 Para.nr.dipol = size(Para.dipol_trans,1);
 
 dipolmap = zeros(6);
@@ -172,7 +195,7 @@ clear titlestr
 Bloch.nrd = Para.nr.dipol;
 
 
-[V_rabi_fock] = coulomb_rabi_f(Ctrl, Para, Prep);                           % All coulomb matrices. (in 3rd dimension)
+[V_rabi_fock] = coulomb_rabi_f(Ctrl, Para, Prep, Data.Ev);                           % All coulomb matrices. (in 3rd dimension)
 Bloch.coulomb = V_rabi_fock;
 
 % Hab ich schon
@@ -197,7 +220,7 @@ for ii = 1:Para.nr.dipol
     
 end
 
-Bloch.dipol = 5e4 * ones(Para.nr.k * Para.nr.dipol,1);                % ? 1-3 too strong.
+% Bloch.dipol = 5e4 * ones(Para.nr.k * Para.nr.dipol,1);                % ? 1-3 too strong.
 
 
 Bloch.gamma = 10;
@@ -209,7 +232,7 @@ Bloch.nrk = Para.nr.k;
 
 
 % Kommt noch dazu
-Emin = -1000;
+Emin = -500;
 Emax = 0;
 E = linspace(Emin,Emax,2001)';
 
@@ -223,14 +246,14 @@ Para.nr.w = numel(Bloch.w);
 Bloch.coul_ctrl = 1;                    % Coulomb Interaktion
 
 
-tspan = [0 2];
-% tspan = linspace(0, 2, 15000);
+tspan = [0 1];
+% tspan = linspace(0, 0.5, 30000);
 psik_E_ini = zeros(1,Para.nr.dipol * Para.nr.k + size(Bloch.w,1) * 2);
 
 % options=odeset('OutputFcn',@odeprog,'Events',@odeabort);
-options=odeset('OutputFcn',@odeprog,'Events',@odeabort,'RelTol',1e-8,'AbsTol',1e-8);
+options=odeset('OutputFcn',@odeprog,'Events',@odeabort,'RelTol',1e-6,'AbsTol',1e-8);
 % opts = odeset('RelTol',1e-1,'AbsTol',1e-3);
-[t,psik_E] = ode45(@(t,psik_E) dgl_bloch(t,psik_E,Bloch), tspan, psik_E_ini, options);
+[t,psik_E] = ode113(@(t,psik_E) dgl_bloch(t,psik_E,Bloch), tspan, psik_E_ini, options);
 
 
 %
@@ -241,26 +264,32 @@ E_w = psik_E(end,( end - 1 * Para.nr.w + 1 ):end);
 
 chi_w = P_w ./ E_w;
 
-close all
+% close all
+
+% figure
 plot(E , imag(chi_w))
 
 hold on
-load('spec_V_dip.mat')
-% load ist_egal.mat
-plot(spec_21(:,1)*Bloch.hbar , spec_21(:,3))
-% plot(spec(:,1)*Bloch.hbar , spec(:,3))
+% load('spec_V_dip.mat')
+% % load ist_egal.mat
+% plot(spec_21(:,1)*Bloch.hbar , spec_21(:,3),'--')
+% % plot(spec(:,1)*Bloch.hbar , spec(:,3))
 
 
 % xlim([-500 0])
 
 %%
 % P_t2 = zeros(1,numel(t));
-% % psik = psik_E(1:Bloch.nrk);
-%
+% 
 % for ii = 1:numel(t)
 %     P_t2(ii) = 1 / (2 * pi)^2 * Data.wk * (conj(Bloch.dipol) .*  psik_E(ii,1:Bloch.nrk).' );
 % end
-%
+% 
+% figure
+% plot(real(P_t2))
+% hold on
+% plot(imag(P_t2))
+
 % E_t2 = Bloch.E0 * exp(-1/2 * ( ( t.' - Bloch.t_peak ) / Bloch.sigma ).^2 * 4 * log(2) );
 %
 % P_w2 = fft(P_t2);
