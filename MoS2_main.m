@@ -21,7 +21,7 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 30;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
@@ -56,7 +56,7 @@ Para = call_para(Ctrl, constAg);
 
 constAg.hbar = 0.6582119514;
 % load('Pfad.mat')
-load('Pfad_35.mat')
+% load('Pfad_35.mat')
 
 %% Monkhorst-Pack
 
@@ -67,32 +67,33 @@ load('Pfad_35.mat')
 
 
 
-% load kpts_11x11.mat
-% k1 = permute(k_11x11,[2,1,3]);
-% k1 = k1(:,1:66);
+load kpts_11x11.mat
+k1 = permute(k_11x11,[2,1,3]);
+k1 = k1(:,1:66);
 
-load kpts_35x35.mat
-k1 = permute(kpts_35x35,[2,1,3]);
+% load kpts_35x35.mat
+% k1 = permute(kpts_35x35,[2,1,3]);
 
 k2 = k1(1:2,:);
 Data.wk = round( k1(3,:) / min(k1(3,:)) );
-Para.BZsmall.area = 1;
+% Para.BZsmall.area = 1;
 Para.symm_indices = find( Data.wk == 1 );
 
 [Data.k] = red_to_BZ(k2);
 Para.nr.k = size(Data.k,2);
 
-
 % load kpts_11x11(2).mat
 % k3 = permute(kpts,[2,1,3]);
 % Data.k = k3(1:2,:,:);
+% Para.nr.k = size(Data.k,2);
 
 Para.BZsmall.area = min(k1(3,:));
-Para.coul.pol = 1.27287195103197  / Para.BZsmall.area;        % 35 x 35
-% Para.coul.pol = 4.32776463350871  / Para.BZsmall.area;          % 11 x 11
+% Para.BZsmall.area = min(k3(3,:));
+% Para.coul.pol = 1.27287195103197  / Para.BZsmall.area;        % 35 x 35
+Para.coul.pol = 4.32776463350871  / Para.BZsmall.area;          % 11 x 11
  
-Para.k.qmin = 0.193102996717152;                                % 35 x 35
-% Para.k.qmin = 0.656550188837845;                                % 11 x 11
+% Para.k.qmin = 0.193102996717152;                                % 35 x 35
+Para.k.qmin = 0.656550188837845;                                % 11 x 11
 
 
 %%
@@ -110,15 +111,33 @@ fprintf('   -   Finished in %g seconds\n',toc)
 [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
 
 %% Daniels Eigenvektoren
-% load('CVec (2).mat')
+load('CVec (2).mat')
 % Data.Ev = CVec;
 % Data.Ev = abs(real(Data.Ev)) + 1i * abs(imag(Data.Ev));
 
 % load('CVec_35.mat')
+% Data.Ev = CVec;
 
 % load test_eig_chol.mat
 % Data.Ek = ENERGY;
 % Data.Ev = coeff;
+
+% compa = Ev_comp(Data.Ev, CVec);
+% 
+% figure
+% set(gcf, 'Color', 'w');
+% for ii = 1:6
+%     subplot(2,3,ii)
+%     imagesc(squeeze(compa(ii,:,:)))
+% end
+
+% figure
+% set(gcf, 'Color', 'w');
+% for ii = 1:6
+%     subplot(2,3,ii)
+%     scatter3(kx,ky,imag(Data.Ev(1,2,:,ii)))
+% end
+
 
 %% Simulation-preperations
 fprintf('Preperations:         Start'); tic
@@ -174,10 +193,6 @@ fprintf('   -   Finished in %g seconds\n',toc)
 Para.dipol_trans = [1 2; 4 5];
 Para.nr.dipol = size(Para.dipol_trans,1);
 
-dipolmap = zeros(6);
-dipolmap(1,2:3) = 1:2;
-dipolmap(4,5:6) = 3:4;
-
 
 %% Dipolmatrix
 fprintf('Dipol:                Start'); tic
@@ -193,6 +208,7 @@ clear titlestr
 %%
 
 Bloch.nrd = Para.nr.dipol;
+Bloch.ind = reshape( 1 : Para.nr.dipol*Para.nr.k ,[], Para.nr.dipol);
 
 
 [V_rabi_fock] = coulomb_rabi_f(Ctrl, Para, Prep, Data.Ev);                           % All coulomb matrices. (in 3rd dimension)
@@ -211,12 +227,13 @@ Bloch.dipol = zeros(Para.nr.k * Para.nr.dipol , 1 );
 Bloch.feff = zeros(Para.nr.k * Para.nr.dipol , 1 );                         % In the linear regime. feff const.
 
 for ii = 1:Para.nr.dipol
-    Bloch.Esum( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = ( Prep.Eks(Para.dipol_trans(ii,1),:) + Prep.Eks(Para.dipol_trans(ii,2),:) ).';
+    Bloch.Esum( Bloch.ind(:,ii) ) = ( Prep.Eks( Para.dipol_trans(ii,1),: ) + Prep.Eks( Para.dipol_trans(ii,2),: ) ).';
     
-%     Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 / sqrt(2) * abs( Data.dipol{dipolnr}(1,:) - 1i * Data.dipol{dipolnr}(2,:) ).';
-    Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
+%     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{dipolnr}(1,:) - 1i * Data.dipol{dipolnr}(2,:) ).';
+    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
+%     Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = abs( Data.dipol{ii}(1,:) ).'; 
     
-    Bloch.feff( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';
+    Bloch.feff( Bloch.ind(:,ii) ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';
     
 end
 
@@ -232,7 +249,7 @@ Bloch.nrk = Para.nr.k;
 
 
 % Kommt noch dazu
-Emin = -500;
+Emin = -1000;
 Emax = 0;
 E = linspace(Emin,Emax,2001)';
 
@@ -246,9 +263,9 @@ Para.nr.w = numel(Bloch.w);
 Bloch.coul_ctrl = 1;                    % Coulomb Interaktion
 
 
-tspan = [0 1];
-% tspan = linspace(0, 0.5, 30000);
-psik_E_ini = zeros(1,Para.nr.dipol * Para.nr.k + size(Bloch.w,1) * 2);
+tspan = [0 0.4];
+% tspan = linspace(0, 0.4, 30000);
+psik_E_ini = zeros(1 , Para.nr.dipol * Para.nr.k + size(Bloch.w,1) * 2);
 
 % options=odeset('OutputFcn',@odeprog,'Events',@odeabort);
 options=odeset('OutputFcn',@odeprog,'Events',@odeabort,'RelTol',1e-6,'AbsTol',1e-8);
@@ -271,9 +288,9 @@ plot(E , imag(chi_w))
 
 hold on
 % load('spec_V_dip.mat')
-% % load ist_egal.mat
-% plot(spec_21(:,1)*Bloch.hbar , spec_21(:,3),'--')
-% % plot(spec(:,1)*Bloch.hbar , spec(:,3))
+% load ist_egal.mat
+% plot(spec_12(:,1)*Bloch.hbar , spec_12(:,3),'r--')
+% plot(spec(:,1)*Bloch.hbar , spec(:,3))
 
 
 % xlim([-500 0])
@@ -282,7 +299,7 @@ hold on
 % P_t2 = zeros(1,numel(t));
 % 
 % for ii = 1:numel(t)
-%     P_t2(ii) = 1 / (2 * pi)^2 * Data.wk * (conj(Bloch.dipol) .*  psik_E(ii,1:Bloch.nrk).' );
+%     P_t2(ii) = 1 / (2 * pi)^2 * Bloch.wk.' * (conj(Bloch.dipol) .*  psik_E(ii,1:Bloch.nrd*Bloch.nrk).' );
 % end
 % 
 % figure

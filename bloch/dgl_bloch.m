@@ -13,9 +13,8 @@ psi_k = psik_E(1:Bloch.nrd * Bloch.nrk);
 if Bloch.coul_ctrl == 1
     hbarOmega = E_t * conj( Bloch.dipol );
     for ii = 1:Bloch.nrd
-        hbarOmega( (ii-1) * Bloch.nrk + 1 : ii * Bloch.nrk ) = ...
-            hbarOmega( (ii-1) * Bloch.nrk + 1 : ii * Bloch.nrk ) + 1 / ( 2 * pi )^2 * Bloch.coulomb(:,:,ii) ...
-            * ( psi_k( (ii-1) * Bloch.nrk + 1 : ii * Bloch.nrk ) .* Bloch.wkentire ) ;
+        hbarOmega( Bloch.ind(:,ii) ) = hbarOmega( Bloch.ind(:,ii) ) ...
+            + 1 / ( 2 * pi )^2 * Bloch.coulomb(:,:,ii) * ( psi_k( Bloch.ind(:,ii) ) .* Bloch.wkentire ) ;
     end
 else 
     hbarOmega = E_t * conj( Bloch.dipol );
