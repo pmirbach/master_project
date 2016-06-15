@@ -21,8 +21,10 @@ for nk = 1:Para.nr.k
         
         [H_TB] = TB_Liu_TNN_fun(Data.k(1:2,nk,ni), Para.TB);
         
-        H_TB_SOC_up = (H_TB + H_SOC) * 1e3;         % Arbeiten in meV
-        H_TB_SOC_down = (H_TB - H_SOC) * 1e3;
+%         H_TB = H_TB + rand(3) * 1e-12;
+        
+        H_TB_SOC_up = (H_TB + H_SOC ) * 1e3;         % Arbeiten in meV
+        H_TB_SOC_down = (H_TB - H_SOC ) * 1e3;
             
         [Ev(1:3,1:3,nk,ni) , D_up] = eig(H_TB_SOC_up);
         [Ev(4:6,4:6,nk,ni) , D_down] = eig(H_TB_SOC_down);
