@@ -110,6 +110,13 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
 
+
+%%
+
+nEv = EV_ortho( Para, Data.k, Prep.Ek_noSOC , Prep.Ev_noSOC );
+
+% Prep.Ev_noSOC = nEv;
+
 %% Daniels Eigenvektoren
 % load('CVec (2).mat')
 % Data.Ev = CVec;
@@ -246,8 +253,8 @@ for ii = 1:Para.nr.dipol
     
 end
 
-% Bloch.dipol = 5e4 * ones(Para.nr.k * Para.nr.dipol,1);                % ? 1-3 too strong.
-% 
+Bloch.dipol = 5e4 * ones(Para.nr.k * Para.nr.dipol,1);                % ? 1-3 too strong.
+
 
 Bloch.gamma = 10;
 Bloch.E0 = 1e-7;
