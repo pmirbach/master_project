@@ -21,6 +21,13 @@ for nk = 1:Para.nr.k
         
         [H_TB] = TB_Liu_TNN_fun(Data.k(1:2,nk,ni), Para.TB);
         
+%         H_TB = round(real(H_TB),10) + 1i * round(imag(H_TB),10);
+%          H_TB = real(H_TB) + 1i * imag(H_TB);
+
+        H_TB(abs( H_TB ) < 1e-3) = 0;
+
+
+        
 %         H_TB = H_TB + rand(3) * 1e-12;
         
         H_TB_SOC_up = (H_TB + H_SOC ) * 1e3;         % Arbeiten in meV
