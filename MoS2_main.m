@@ -8,7 +8,7 @@ clear global
 % clc
 dbstop if error
 
-% Unterordner für Funktionsaufrufe:
+% Unterordner fuer Funktionsaufrufe:
 addpath(genpath(pwd))
 
 load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
@@ -21,7 +21,7 @@ Ctrl.method = 'TNN';      % Möglich:   NN , TNN
 Ctrl.SOC = 1;             % Spin-Orbit-Coupling
 
 % k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 120;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 6;        % Unterteilungsgröße
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
@@ -37,7 +37,7 @@ Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
 Ctrl.plot.path = {'K','M', 'K*', '\Gamma', 'K','M','\Gamma'};
 % Ctrl.plot.path = {'K' '\Gamma' 'K*'};
 
-Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
+Ctrl.plot.k_mesh = [1 , 1];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
 Ctrl.plot.tb = [0 , 0];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
@@ -60,15 +60,15 @@ constAg.hbar = 0.6582119514;
 
 %% Monkhorst-Pack
 
-[Data.k, Data.wk] = k_mesh_mp(Ctrl, Para);
+[ Data.k , Data.k_m , Data.wk ] = k_mesh_mp(Ctrl, Para);
 Para.nr.k = size(Data.k,2);
 
 Para.symm_indices = find( Data.wk == 1 );
 
 Data.k = round(Data.k,13);
 
-%%
-k_mesh2( Ctrl, Para )
+
+
 %%
 
 

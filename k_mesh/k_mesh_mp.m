@@ -1,4 +1,4 @@
-function [k, wk] = k_mesh_mp(Ctrl, Para)
+function [ k , k_m , wk ] = k_mesh_mp(Ctrl, Para)
 
 qr = Ctrl.k_mesh_mp.qr;             % Feinheit des meshes
 
@@ -27,6 +27,7 @@ end
 
 % Erzeugung aller red. Dreiecke mit Spiegelungen und Drehungen
 [k] = red_to_BZ(k);
+
 
 
 %% Plots
@@ -101,13 +102,13 @@ if Ctrl.plot.k_mesh(2) == 1     % Plot über BZ mit Gewichten und Indizierung
     
     set(gcf, 'Color', 'w');
     
-    ind = round(rand(1,4) * size(k,2));
-    for jj = 1:numel(ind)
-        for ii = 1:6
-            plot(k(1,ind(jj),ii),k(2,ind(jj),ii),'ko','markers',8)
-            text(k(1,ind(jj),ii) + 0.2, k(2,ind(jj),ii) + 0.2, num2str(jj))
-        end
-    end
+%     ind = round(rand(1,4) * size(k,2));
+%     for jj = 1:numel(ind)
+%         for ii = 1:6
+%             plot(k(1,ind(jj),ii),k(2,ind(jj),ii),'ko','markers',8)
+%             text(k(1,ind(jj),ii) + 0.2, k(2,ind(jj),ii) + 0.2, num2str(jj))
+%         end
+%     end
     
     if Ctrl.plot.save == 1
         export_fig(['/home/pmirbach/Masterarbeit/MoS2/Anlauf2/', ...
