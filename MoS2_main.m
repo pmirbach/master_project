@@ -40,7 +40,7 @@ Ctrl.plot.path = {'K','M', 'K*', '\Gamma', 'K','M','\Gamma'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [1 , 1];         % Bandstructure
+Ctrl.plot.tb = [0 , 0];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 Ctrl.plot.coul = 0;
@@ -121,20 +121,20 @@ kx = Data.k(1,:,1);
 ky = Data.k(2,:,1);
 
 %% Tight-Binding
-fprintf('Tight-binding:        Start'); tic
-
-[Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC] = tight_binding_liu(Ctrl, Para, Data);
-
-fprintf('   -   Finished in %g seconds\n',toc)
-
-[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
+% fprintf('Tight-binding:        Start'); tic
+% 
+% [Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC] = tight_binding_liu(Ctrl, Para, Data);
+% 
+% fprintf('   -   Finished in %g seconds\n',toc)
+% 
+% [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
 
 %% Tight-Binding - ab initio
 
-[Ek, Ev, Ek_noSOC, Ev_noSOC] = tight_binding_roesner(Ctrl, Para, Data);
+[Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC] = tight_binding_roesner(Ctrl, Para, Data);
 
 %%
-[fig.bandstr_surf2, fig.bandstr_path2] = plot_bandstr(Ctrl,Para,Data.k,Ek(:,:,1),[2 3]);
+% [fig.bandstr_surf2, fig.bandstr_path2] = plot_bandstr(Ctrl,Para,Data.k,Ek(:,:,1),[2 3]);
 
 
 %%
@@ -273,14 +273,14 @@ for ii = 1:Para.nr.dipol
     Bloch.Esum( Bloch.ind(:,ii) ) = ( Prep.Eks( Para.dipol_trans(ii,1),: ) + Prep.Eks( Para.dipol_trans(ii,2),: ) ).';
     
 %     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{dipolnr}(1,:) - 1i * Data.dipol{dipolnr}(2,:) ).';
-    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
+    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).'; 
 %     Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = abs( Data.dipol{ii}(1,:) ).'; 
     
     Bloch.feff( Bloch.ind(:,ii) ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';
     
 end
 
-% Bloch.dipol = 5e4 * ones(Para.nr.k * Para.nr.dipol,1);                % ? 1-3 too strong.
+Bloch.dipol = 5e4 * ones(Para.nr.k * Para.nr.dipol,1);                % ? 1-3 too strong.
 
 
 Bloch.gamma = 10;

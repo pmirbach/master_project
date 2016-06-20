@@ -9,7 +9,7 @@ mapping = reshape(1:9,[3,3]);
 % grad_H_kx(abs( grad_H_kx ) < 1e-3) = 0;
 % grad_H_ky(abs( grad_H_ky ) < 1e-3) = 0;
 
-grad_H_kx = ones( size(grad_H_kx) );
+% grad_H_kx = ones( size(grad_H_kx) );
 % grad_H_ky = ones( size(grad_H_ky) );
 
 % grad_H_ky = conj( grad_H_ky );
