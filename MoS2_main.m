@@ -16,12 +16,13 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 %% Steuerungsdatei
 
 % Allgemeines
-Ctrl.material = 'MoS2';   % Materialien: MoS2 WS2 MoSe2 WSe2 MoTe2 WTe2
-Ctrl.method = 'TNN';      % Möglich:   NN , TNN
-Ctrl.SOC = 1;             % Spin-Orbit-Coupling
+Ctrl.material = 'MoS2';         % Materialien: MoS2 WS2 MoSe2 WSe2 MoTe2 WTe2 
+Ctrl.lattice_constant = 0.318;  % ab initio TB: MoS2: .316, .318, .320
+% Calculations with Liu TB modell:  .319    !!
+
 
 % k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 6;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 30;        % Unterteilungsgröße
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
@@ -37,9 +38,9 @@ Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
 Ctrl.plot.path = {'K','M', 'K*', '\Gamma', 'K','M','\Gamma'};
 % Ctrl.plot.path = {'K' '\Gamma' 'K*'};
 
-Ctrl.plot.k_mesh = [1 , 1];     % Kontrollbilder
+Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 0];         % Bandstructure
+Ctrl.plot.tb = [1 , 1];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 Ctrl.plot.coul = 0;
@@ -60,7 +61,7 @@ constAg.hbar = 0.6582119514;
 
 %% Monkhorst-Pack
 
-[ Data.k , Data.k_m , Data.wk ] = k_mesh_mp(Ctrl, Para);
+[ Data.k , Data.wk ] = k_mesh_mp(Ctrl, Para);
 Para.nr.k = size(Data.k,2);
 
 Para.symm_indices = find( Data.wk == 1 );
@@ -127,6 +128,13 @@ fprintf('Tight-binding:        Start'); tic
 fprintf('   -   Finished in %g seconds\n',toc)
 
 [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
+
+%% Tight-Binding - ab initio
+
+[Ek, Ev, Ek_noSOC, Ev_noSOC] = tight_binding_roesner(Ctrl, Para, Data);
+
+%%
+[fig.bandstr_surf2, fig.bandstr_path2] = plot_bandstr(Ctrl,Para,Data.k,Ek(:,:,1),[2 3]);
 
 
 %%

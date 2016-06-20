@@ -1,12 +1,12 @@
 function Para = call_para(Ctrl, constAg)
 
 
-[Para.TB, Para.TB_names] = load_TB_parameter( Ctrl );
+[Para.TB, Para.TB_names] = load_TB_parameter( Ctrl );   % Liu parameter
 
 Para.TB_ind{1} = [1,4]; 
 Para.TB_ind{2} = [2,3,5,6];
 
-Para.real.a = Para.TB(1);
+Para.real.a = Ctrl.lattice_constant;
 Para.real.area = 3 * sqrt(3) / 2 * ( Para.real.a )^2;
 
 Para.BZred.symmpts{1} = {'\Gamma', 'K', 'K*', 'M'};

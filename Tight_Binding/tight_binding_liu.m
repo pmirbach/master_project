@@ -7,7 +7,7 @@ Ev = zeros(6, 6, Para.nr.k, 6);
 % SOC Hamiltonian
 lambda = Para.TB(end);
 L_z = [0 0 0; 0 0 2i; 0 -2i 0];
-H_SOC = Ctrl.SOC * lambda / 2 * L_z;
+H_SOC = lambda / 2 * L_z;
 
 % Berechnung der Tight Binding Bandstruktur ohne SOC für die Berechnung der
 % Coulomb Matrix Elemente:

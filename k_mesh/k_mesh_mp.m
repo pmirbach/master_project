@@ -1,4 +1,4 @@
-function [ k , k_m , wk ] = k_mesh_mp(Ctrl, Para)
+function [ k , wk ] = k_mesh_mp(Ctrl, Para)
 
 qr = Ctrl.k_mesh_mp.qr;             % Feinheit des meshes
 

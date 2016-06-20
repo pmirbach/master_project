@@ -9,7 +9,7 @@ mapping = reshape(1:9,[3,3]);
 % grad_H_kx(abs( grad_H_kx ) < 1e-3) = 0;
 % grad_H_ky(abs( grad_H_ky ) < 1e-3) = 0;
 
-% grad_H_kx = ones( size(grad_H_kx) );
+grad_H_kx = ones( size(grad_H_kx) );
 % grad_H_ky = ones( size(grad_H_ky) );
 
 % grad_H_ky = conj( grad_H_ky );
@@ -33,8 +33,7 @@ for nll = 1:Para.nr.dipol
         for b = 1:3
             
             dipol_k(1,:) = dipol_k(1,:) + grad_H_kx(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,hh,ee).';
-%             dipol_k(2,:) = dipol_k(2,:) + grad_H_ky(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,hh,ee).';
-            dipol_k(2,:) = dipol_k(2,:) + grad_H_ky(mapping(a,b),:) .* Prep.CV(:,1,b+d,a+d,ee,hh).';
+            dipol_k(2,:) = dipol_k(2,:) + grad_H_ky(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,hh,ee).';
             
 %             dipol_k(1,:) = dipol_k(1,:) + grad_H_kx(mapping(a,b),:) .* Prep.CV_noSOC(:,1,a,b,hh-d,ee-d).';
 %             dipol_k(2,:) = dipol_k(2,:) + grad_H_ky(mapping(a,b),:) .* Prep.CV_noSOC(:,1,a,b,hh-d,ee-d).';
