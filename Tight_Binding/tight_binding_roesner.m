@@ -32,7 +32,7 @@ Ev_noSOC = zeros(3, 3, Para.nr.k, 6);
 b_m = abs( Para.k.GV ) / Ctrl.k_mesh_mp.qr;    % Maltes GV / qr
 
 
-tmp = complex( zeros( 3 ) );
+H_TB = complex( zeros( 3 ) );
 for ni = 1:6
     tic
     k_m = [ round( b_m \ Data.k(:,:,ni) ).' , zeros(Para.nr.k,1) ];         % Basiswechsel in Vielfache von G / qr
@@ -44,10 +44,10 @@ for ni = 1:6
     tic
     for nk = 1:Para.nr.k
         
-        tmp(:,:) = HH(nk, :, :);
+        H_TB(:,:) = HH(nk, :, :);
        
-        H_TB_SOC_up = (tmp + H_SOC );         
-        H_TB_SOC_down = (tmp - H_SOC );
+        H_TB_SOC_up = (H_TB + H_SOC );         
+        H_TB_SOC_down = (H_TB - H_SOC );
             
 %         [Ev(1:3,1:3,nk,ni) , D_up] = eig(H_TB_SOC_up);
 %         [Ev(4:6,4:6,nk,ni) , D_down] = eig(H_TB_SOC_down);
@@ -76,7 +76,7 @@ for ni = 1:6
 %         [Ev_noSOC(:,:,nk,ni), D] = eig( tmp );
 %         Ek_noSOC(:,nk,ni) = diag(D);
         
-        [ef, ev] = eig( tmp );
+        [ef, ev] = eig( H_TB );
         
         [ev, I] = sort(diag(real(ev)));
         ef = ef(:, I);

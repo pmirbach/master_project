@@ -22,7 +22,7 @@ Ctrl.lattice_constant = 0.318;  % ab initio TB: MoS2: .316, .318, .320
 
 
 % k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 30;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 18;        % Unterteilungsgröße
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
@@ -292,8 +292,8 @@ Bloch.nrk = Para.nr.k;
 
 
 % Kommt noch dazu
-Emin = -1000;
-Emax = 0;
+Emin = -1400;
+Emax = -500;
 E = linspace(Emin,Emax,2001)';
 
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
