@@ -1,4 +1,4 @@
-function [Ek, Ev, Ek_noSOC, Ev_noSOC] = tight_binding_roesner(Ctrl, Para, Data)
+function [Ek, Ev, Ek_noSOC, Ev_noSOC, HH_grad_kx, HH_grad_ky] = tight_binding_roesner(Ctrl, Para, Data)
 
 
 a0_form = num2str( 10 * Ctrl.lattice_constant , '%.3f' );
@@ -27,66 +27,51 @@ Ek_noSOC = zeros(3, Para.nr.k, 6);
 Ev_noSOC = zeros(3, 3, Para.nr.k, 6);
 
 
-
 % Basiswechsel in Vielfache von den reziproken Gittervektoren:
 b_m = abs( Para.k.GV ) / Ctrl.k_mesh_mp.qr;    % Maltes GV / qr
 
 
 H_TB = complex( zeros( 3 ) );
 for ni = 1:6
-    tic
+    
     k_m = [ round( b_m \ Data.k(:,:,ni) ).' , zeros(Para.nr.k,1) ];         % Basiswechsel in Vielfache von G / qr
     
-    %get hamiltonian for every kk point
-    HH = getW90Hamiltonian(W90Data, k_m / Ctrl.k_mesh_mp.qr);
-    toc
+    if ni == 1
+        %get hamiltonian for every kk point
+        [HH, HH_grad_kx, HH_grad_ky] = getW90Hamiltonian(W90Data, k_m / Ctrl.k_mesh_mp.qr);
+    else
+        HH = getW90Hamiltonian(W90Data, k_m / Ctrl.k_mesh_mp.qr);
+    end
     
-    tic
     for nk = 1:Para.nr.k
         
         H_TB(:,:) = HH(nk, :, :);
-       
-        H_TB_SOC_up = (H_TB + H_SOC );         
-        H_TB_SOC_down = (H_TB - H_SOC );
-            
-%         [Ev(1:3,1:3,nk,ni) , D_up] = eig(H_TB_SOC_up);
-%         [Ev(4:6,4:6,nk,ni) , D_down] = eig(H_TB_SOC_down);
+        
+        [ef, ev] = eig( H_TB *1e3 );
+        
+        [Ek_noSOC(:,nk,ni), I] = sort(diag(real(ev)));
+        Ev_noSOC(:,:,nk,ni) = ef(:, I);
+        
+        
+        H_TB_SOC_up = (H_TB + H_SOC ) *1e3;
+        H_TB_SOC_down = (H_TB - H_SOC ) *1e3;
+        
         
         [ef_up, ev_up] = eig( H_TB_SOC_up );
         [ef_down, ev_down] = eig( H_TB_SOC_down );
         
-        [ev_up, I] = sort(diag(real(ev_up)));
-        ef_up = ef_up(:, I);
+        [Ek(1:3,nk,ni), I] = sort(diag(real(ev_up)));
+        Ev(1:3,1:3,nk,ni) = ef_up(:, I);
         
-        [ev_down, I] = sort(diag(real(ev_down)));
-        ef_down = ef_down(:, I);
-        
-        
-        Ev(1:3,1:3,nk,ni) = ef_up;
-        Ev(4:6,4:6,nk,ni) = ef_down;
-        
-
-        Ek(1:3,nk,ni) = ev_up;
-        Ek(4:6,nk,ni) = ev_down;
-        
-%         Ek(1:3,nk,ni) = real(diag(D_up));
-%         Ek(4:6,nk,ni) = real(diag(D_down));
-        
-        
-%         [Ev_noSOC(:,:,nk,ni), D] = eig( tmp );
-%         Ek_noSOC(:,nk,ni) = diag(D);
-        
-        [ef, ev] = eig( H_TB );
-        
-        [ev, I] = sort(diag(real(ev)));
-        ef = ef(:, I);
-        
-        Ev_noSOC(:,:,nk,ni) = ef;
-        Ek_noSOC(:,nk,ni) = ev;
+        [Ek(4:6,nk,ni), I] = sort(diag(real(ev_down)));
+        Ev(4:6,4:6,nk,ni) = ef_down(:, I);
         
     end
-    toc
     
 end
+
+
+% Ev = Ev( [1,3,2,6,5,4],:,:,: );
+
 
 Ek = Ek - max(Ek(1,:));

@@ -3,15 +3,19 @@ clear variables
 clear global
 % close all
 
-% profile off
-% profile on
-% clc
+
+profile off
+profile_flag = 0;
+if profile_flag == 1
+    profile on
+end
+
+
 dbstop if error
 
 % Unterordner fuer Funktionsaufrufe:
 addpath(genpath(pwd))
 
-load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 
 %% Steuerungsdatei
 
@@ -22,7 +26,7 @@ Ctrl.lattice_constant = 0.318;  % ab initio TB: MoS2: .316, .318, .320
 
 
 % k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 18;        % Unterteilungsgröße
+Ctrl.k_mesh_mp.qr = 30;        % Unterteilungsgröße
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
 % 60 -> 631 kpts; 120 -> 2461 kpts
@@ -53,9 +57,19 @@ Ctrl.plot.entireBZ = 0;         % 1 ganze BZ, 0 nur red. BZ
 
 %% Material & Tight-Binding Parameter & Hochsymmetriepunkte
 
+load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 Para = call_para(Ctrl, constAg);
 
-constAg.hbar = 0.6582119514;
+
+
+% Achtung: orbital order in Maltes TB modell different
+% Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
+
+
+
+
+
+
 % load('Pfad.mat')
 % load('Pfad_35.mat')
 
@@ -131,10 +145,10 @@ ky = Data.k(2,:,1);
 
 %% Tight-Binding - ab initio
 
-[Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC] = tight_binding_roesner(Ctrl, Para, Data);
+[Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC, Prep.H_grad_kx, Prep.H_grad_ky] = tight_binding_roesner(Ctrl, Para, Data);
 
 %%
-% [fig.bandstr_surf2, fig.bandstr_path2] = plot_bandstr(Ctrl,Para,Data.k,Ek(:,:,1),[2 3]);
+% [fig.bandstr_surf3, fig.bandstr_path3] = plot_bandstr(Ctrl,Para,Data.k,Prep.Ek_noSOC(:,:,1),[2 3]);
 
 
 %%
@@ -273,14 +287,14 @@ for ii = 1:Para.nr.dipol
     Bloch.Esum( Bloch.ind(:,ii) ) = ( Prep.Eks( Para.dipol_trans(ii,1),: ) + Prep.Eks( Para.dipol_trans(ii,2),: ) ).';
     
 %     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{dipolnr}(1,:) - 1i * Data.dipol{dipolnr}(2,:) ).';
-    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).'; 
+    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
 %     Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = abs( Data.dipol{ii}(1,:) ).'; 
     
     Bloch.feff( Bloch.ind(:,ii) ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';
     
 end
 
-Bloch.dipol = 5e4 * ones(Para.nr.k * Para.nr.dipol,1);                % ? 1-3 too strong.
+% Bloch.dipol = 5e4 * ones(Para.nr.k * Para.nr.dipol,1);                % ? 1-3 too strong.
 
 
 Bloch.gamma = 10;
@@ -292,8 +306,8 @@ Bloch.nrk = Para.nr.k;
 
 
 % Kommt noch dazu
-Emin = -1400;
-Emax = -500;
+Emin = -1000;
+Emax = 0;
 E = linspace(Emin,Emax,2001)';
 
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
@@ -371,7 +385,8 @@ hold on
 %%
 % plot_surf(Para,Data.k(:,:,1),Bloch.dipol,[1,1])
 
-
 %%
-% profile viewer
-% profile off
+if profile_flag == 1
+    profile viewer
+    profile off
+end

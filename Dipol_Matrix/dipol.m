@@ -2,9 +2,12 @@ function [dipol] = dipol(Para, Prep, Data)
 
 dipol = cell(1,4);
 
-[grad_H_kx , grad_H_ky] = grad_TB_Liu_TNN_fun(Data.k(1:2,:,1),Para.TB);
+% [grad_H_kx , grad_H_ky] = grad_TB_Liu_TNN_fun(Data.k(1:2,:,1),Para.TB);
 mapping = reshape(1:9,[3,3]);
 
+% grad_H_kx = Prep.H_grad_kx;
+grad_H_kx = permute(reshape(Prep.H_grad_kx,size(Prep.H_grad_kx,1),9),[2,1]) *1e3;
+grad_H_ky = permute(reshape(Prep.H_grad_ky,size(Prep.H_grad_ky,1),9),[2,1]) *1e3;
 
 % grad_H_kx(abs( grad_H_kx ) < 1e-3) = 0;
 % grad_H_ky(abs( grad_H_ky ) < 1e-3) = 0;
