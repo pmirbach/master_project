@@ -4,13 +4,8 @@ clear global
 % close all
 
 
+
 profile off
-profile_flag = 0;
-if profile_flag == 1
-    profile on
-end
-
-
 dbstop if error
 
 % Unterordner fuer Funktionsaufrufe:
@@ -19,184 +14,60 @@ addpath(genpath(pwd))
 
 %% Steuerungsdatei
 
-% Allgemeines
-Ctrl.material = 'MoS2';         % Materialien: MoS2 WS2 MoSe2 WSe2 MoTe2 WTe2 
-Ctrl.lattice_constant = 0.318;  % ab initio TB: MoS2: .316, .318, .320
-% Calculations with Liu TB modell:  .319    !!
+Ctrl = ctrl_settings;
 
-
-% k-mesh % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.k_mesh_mp.qr = 30;        % Unterteilungsgröße
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% muss durch 6 teilbar sein, damit Hochsymmetriepunkte mit im mesh sind
-% 60 -> 631 kpts; 120 -> 2461 kpts
-
-% Anregungsdichte
-Ctrl.temperature = 300;         % Temperatur in K
-% Ctrl.carrier_density = 1e13;    % Anregungsdichte in 1/cm^2
-Ctrl.carrier_density = 0;    % Anregungsdichte in 1/cm^2
-Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
-
-%% Plot Control
-
-Ctrl.plot.path = {'K','M', 'K*', '\Gamma', 'K','M','\Gamma'};
-% Ctrl.plot.path = {'K' '\Gamma' 'K*'};
-
-Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
-% 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 0];         % Bandstructure
-Ctrl.plot.exc = [0 , 0];         % Excitation
-Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
-Ctrl.plot.coul = 0;
-Ctrl.plot.ren_bs = [0 , 0];      % Dipol matrix elements
-
-Ctrl.plot.save = 0;             % 1 Speichern, 0 nicht
-Ctrl.plot.entireBZ = 0;         % 1 ganze BZ, 0 nur red. BZ
-
-%% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+if Ctrl.profile_flag == 1
+    profile on
+end
 
 %% Material & Tight-Binding Parameter & Hochsymmetriepunkte
 
+
 load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
-Para = call_para(Ctrl, constAg);
-
-
+[ Para , W90Data ] = call_para(Ctrl, constAg);
 
 % Achtung: orbital order in Maltes TB modell different
 % Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
 
 
 
-
-
-
-% load('Pfad.mat')
-% load('Pfad_35.mat')
-
 %% Monkhorst-Pack
 
-[ Data.k , Data.wk ] = k_mesh_mp(Ctrl, Para);
-Para.nr.k = size(Data.k,2);
+[ Data.k , Data.wk , Para.nr.k , Para.symm_indices ] = k_mesh_mp(Ctrl, Para);
 
-Para.symm_indices = find( Data.wk == 1 );
+% [Para, Data] = load_daniel_kpts(Ctrl, Para, Data); % overwrites k, wk, coul_pol, wk_area, nr_k
 
-Data.k = round(Data.k,13);
-
-
-
-%%
-
-
-
-% kround = reshape( Data.k , 1, [] );
-% for ii = 1:size(kround,2)
-% %     disp(ii)
-%     kstr = num2str( kround(ii) );
-%     kstr(end) = '0';
-%     kround(ii) = str2double( kstr );
-% end
-% knew = reshape( kround, size( Data.k ) );
-% 
-% Data.k = knew;
-
-
-% % load kpts_11x11.mat
-% % k1 = permute(k_11x11,[2,1,3]);
-% % k1 = k1(:,1:66);
-% 
-% load kpts_35x35.mat
-% k1 = permute(kpts_35x35,[2,1,3]);
-% 
-% k2 = k1(1:2,:);
-% Data.wk = round( k1(3,:) / min(k1(3,:)) );
-% Para.BZsmall.area = 1;
-% Para.symm_indices = find( Data.wk == 1 );
-% 
-% [Data.k] = red_to_BZ(k2);
-% Para.nr.k = size(Data.k,2);
-% 
-% % load kpts_11x11(2).mat
-% % k3 = permute(kpts,[2,1,3]);
-% % Data.k = k3(1:2,:,:);
-% % Para.nr.k = size(Data.k,2);
-% 
-% Para.BZsmall.area = min(k1(3,:));
-% % Para.BZsmall.area = min(k3(3,:));
-% Para.coul.pol = 1.27287195103197  / Para.BZsmall.area;        % 35 x 35
-% % Para.coul.pol = 4.32776463350871  / Para.BZsmall.area;          % 11 x 11
-%  
-% Para.k.qmin = 0.193102996717152;                                % 35 x 35
-% % Para.k.qmin = 0.656550188837845;                                % 11 x 11
-
-
-%%
-
+% Fast kx, ky for scatter3 plots:
 kx = Data.k(1,:,1);
 ky = Data.k(2,:,1);
 
+
 %% Tight-Binding
-% fprintf('Tight-binding:        Start'); tic
-% 
-% [Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC] = tight_binding_liu(Ctrl, Para, Data);
-% 
-% fprintf('   -   Finished in %g seconds\n',toc)
-% 
-% [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
 
-%% Tight-Binding - ab initio
+if strcmp(Ctrl.TB_modell,'ab_initio') 
+    
+    fprintf('Tight-binding (ab initio): Start'); tic 
+    
+    [Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC, Prep.H_grad_kx, Prep.H_grad_ky] = tight_binding_roesner(Ctrl, Para, Data, W90Data);  
+    
+elseif strcmp(Ctrl.TB_modell,'liu')
+    
+    fprintf('Tight-binding (liu):       Start'); tic 
+    
+    [Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC, Prep.H_grad_kx, Prep.H_grad_ky] = tight_binding_liu(Ctrl, Para, Data);
+    
+else
+    error('TB-modell must be ab_initio or liu!')
+end
 
-[Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC, Prep.H_grad_kx, Prep.H_grad_ky] = tight_binding_roesner(Ctrl, Para, Data);
+fprintf('   -   Finished in %g seconds\n',toc)
 
-%%
-% [fig.bandstr_surf3, fig.bandstr_path3] = plot_bandstr(Ctrl,Para,Data.k,Prep.Ek_noSOC(:,:,1),[2 3]);
+[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
 
-
-%%
-
-% nEv = EV_ortho( Para, Data.k, Prep.Ek_noSOC , Prep.Ev_noSOC );
-
-% Prep.Ev_noSOC = nEv;
-
-%% Daniels Eigenvektoren
-% load('CVec (2).mat')
-% Data.Ev = CVec;
-% Data.Ev = abs(real(Data.Ev)) + 1i * abs(imag(Data.Ev));
-
-% load('CVec_35.mat')
-% Data.Ev = CVec;
-
-% load test_eig_chol.mat
-% Data.Ek = ENERGY;
-% Data.Ev = coeff;
-
-% load('CVec_35_noSOC.mat')
-% 
-% compa = Ev_comp(Prep.Ev_noSOC, CVec(1:3,1:3,:,:));
-% 
-% figure
-% set(gcf, 'Color', 'w');
-% for ii = 1:3
-%     subplot(1,3,ii)
-%     imagesc(squeeze(sum(real(compa(ii,:,:)),3)))
-%     colorbar
-% end
-
-% figure
-% set(gcf, 'Color', 'w');
-% for ii = 1:6
-%     subplot(2,3,ii)
-%     scatter3(kx,ky,imag(Data.Ev(1,2,:,ii)))
-% end
-
-
-
-% load('CVec_35_noSOC.mat')
-
-% Prep.Ev_noSOC(:,1,:,:) = - Prep.Ev_noSOC(:,1,:,:);
 
 
 %% Simulation-preperations
-fprintf('Preperations:         Start'); tic
+fprintf('Preperations:              Start'); tic
 
 [Prep.Eks, Prep.CV, Prep.CV_noSOC, Prep.minq] = prep(Para, Data, Prep.Ev_noSOC);
 
@@ -208,7 +79,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 
 %% Thermische Anregung
-fprintf('Excitation:           Start'); tic
+fprintf('Excitation:                Start'); tic
 
 [Data.fk, Para.mu] = excitation(Ctrl,constAg,Para,Data.wk,Prep.Eks);
 
@@ -218,7 +89,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 
 %% Coulomb WW
-fprintf('Coulomb matrix:       Start'); tic
+fprintf('Coulomb matrix:            Start'); tic
 
 [Data.V.f, Data.V.h, Data.V.h_off] = coulomb_hf( Ctrl , Para , Prep );
 
@@ -230,7 +101,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 %% Band renorm
 
-fprintf('Band renormalization: Start'); tic
+fprintf('Band renormalization:      Start'); tic
 
 [Data.Ek_hf, Data.Ek_h, Data.Ek_f, Test.ren_h] = renorm2(Para, Data.Ek, Data.V, Data.fk, Data.wk);
 
@@ -246,13 +117,13 @@ fprintf('   -   Finished in %g seconds\n',toc)
 %% structure für Variablen für Blochgleichungen
 
 % Para.dipol_trans = [1, 2 ; 1 , 3 ; 4 , 5 ; 4 , 6 ];
-Para.dipol_trans = [1 2; 4 5];
+% Para.dipol_trans = [1 2; 4 5];
 % Para.dipol_trans = [4 5];
 Para.nr.dipol = size(Para.dipol_trans,1);
 
 
 %% Dipolmatrix
-fprintf('Dipol:                Start'); tic
+fprintf('Dipol:                     Start'); tic
 
 Data.dipol = dipol(Para, Prep, Data);
 
@@ -386,7 +257,7 @@ hold on
 % plot_surf(Para,Data.k(:,:,1),Bloch.dipol,[1,1])
 
 %%
-if profile_flag == 1
+if Ctrl.profile_flag == 1
     profile viewer
     profile off
 end

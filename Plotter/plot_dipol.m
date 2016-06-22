@@ -5,7 +5,7 @@ if any(Ctrl.plot.dipol)
     Daten_plot = zeros(size(Para.dipol_trans,1) , Para.nr.k);
     
     for ii = 1:size(Para.dipol_trans,1)   
-        Daten_plot(ii,:) = abs( 1 / sqrt(2) * (Daten{ii}(1,:) + 1i * Daten{ii}(2,:)) );
+        Daten_plot(ii,:) = abs( 1 / sqrt(2) * (Daten{ii}(1,:) - 1i * Daten{ii}(2,:)) );
     end
         
 end

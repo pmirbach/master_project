@@ -1,4 +1,4 @@
-function [ k , wk ] = k_mesh_mp(Ctrl, Para)
+function [ k , wk , nr_k , symm_indices ] = k_mesh_mp(Ctrl, Para)
 
 qr = Ctrl.k_mesh_mp.qr;             % Feinheit des meshes
 
@@ -26,8 +26,12 @@ if round ( sum(wk) * Para.BZsmall.area * 1e3 ) ~= round( Para.BZ.area * 1e3 )
 end
 
 % Erzeugung aller red. Dreiecke mit Spiegelungen und Drehungen
-[k] = red_to_BZ(k);
+k = red_to_BZ(k);
 
+k = round(k, 13);
+
+symm_indices = find( wk == 1 );
+nr_k = size(k,2);
 
 
 %% Plots

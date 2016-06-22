@@ -1,7 +1,18 @@
-function Para = call_para(Ctrl, constAg)
+function [ Para , W90Data ] = call_para(Ctrl, constAg)
 
 
-[Para.TB, Para.TB_names] = load_TB_parameter( Ctrl );   % Liu parameter
+
+if strcmp(Ctrl.TB_modell,'ab_initio') 
+    a0_form = num2str( 10 * Ctrl.lattice_constant , '%.3f' );
+    seed = [ './Tight_Binding/ab_initio/02_Materials/', Ctrl.material, '/a0_', a0_form, 'A/01_WannierTB/02_G0W0/02_Mo3d/wannier90' ];
+    SOCSettings.type  = 'none'; % 'first' or 'second' or 'none'
+    % load wannier90 Data
+    W90Data = loadW90Data(seed, SOCSettings);
+elseif strcmp(Ctrl.TB_modell,'liu')
+    [Para.TB, Para.TB_names] = load_TB_parameter( Ctrl );   % Liu parameter
+    Ctrl.lattice_constant = Para.TB(1);
+    W90Data = [];
+end
 
 Para.TB_ind{1} = [1,4]; 
 Para.TB_ind{2} = [2,3,5,6];
@@ -19,7 +30,7 @@ Para.BZsmall.a = Para.BZ.a / Ctrl.k_mesh_mp.qr;
 Para.BZsmall.area = 3 * sqrt(3) / 2 * Para.BZsmall.a^2;
 
 Para.k.GV = 2 * pi / Para.real.a * [1, -1 / sqrt(3); 0, 2 / sqrt(3)]';
-Para.k.qmin = Para.BZsmall.a * sqrt(3);
+Para.k.qmin = Para.BZsmall.a * sqrt(3);                                                 % Halbe???
 
 Para.k.b = call_bnn( Para.k.GV );
 Para.nr.b = size(Para.k.b,2);
@@ -37,8 +48,7 @@ Para.coul_indices = call_coul_indices;
 
 Para.vorf.dipol = constAg.ec;
 
-eps_r = 1;
-Para.vorf.coul = constAg.ec^2 / ( 2 * constAg.eps_0 * eps_r);
+Para.vorf.coul = constAg.ec^2 / ( 2 * constAg.eps_0 * Ctrl.eps_r);
 
 
 

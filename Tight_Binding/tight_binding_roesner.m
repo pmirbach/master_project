@@ -1,18 +1,13 @@
-function [Ek, Ev, Ek_noSOC, Ev_noSOC, HH_grad_kx, HH_grad_ky] = tight_binding_roesner(Ctrl, Para, Data)
-
-
-a0_form = num2str( 10 * Ctrl.lattice_constant , '%.3f' );
-seed = [ './Tight_Binding/ab_initio/02_Materials/', Ctrl.material, '/a0_', a0_form, 'A/01_WannierTB/02_G0W0/02_Mo3d/wannier90' ];
-
-SOCSettings.type  = 'none'; % 'first' or 'second' or 'none'
-
-% load wannier90 Data
-W90Data = loadW90Data(seed, SOCSettings);
+function [Ek, Ev, Ek_noSOC, Ev_noSOC, H_grad_kx, H_grad_ky] = tight_binding_roesner(Ctrl, Para, Data, W90Data)
 
 
 % Vorläufiger SOC Ansatz:
 % SOC Hamiltonian
-lambda = Para.TB(end);
+if strcmp(Ctrl.TB_modell,'ab_initio') 
+    lambda = 0.073;                                     % ???
+elseif strcmp(Ctrl.TB_modell,'liu')
+    lambda = Para.TB(end);
+end 
 L_z = [0 0 0; 0 0 2i; 0 -2i 0];
 H_SOC = lambda / 2 * L_z;
 
@@ -38,7 +33,7 @@ for ni = 1:6
     
     if ni == 1
         %get hamiltonian for every kk point
-        [HH, HH_grad_kx, HH_grad_ky] = getW90Hamiltonian(W90Data, k_m / Ctrl.k_mesh_mp.qr);
+        [HH, H_grad_kx, H_grad_ky] = getW90Hamiltonian(W90Data, k_m / Ctrl.k_mesh_mp.qr);
     else
         HH = getW90Hamiltonian(W90Data, k_m / Ctrl.k_mesh_mp.qr);
     end
@@ -73,5 +68,12 @@ end
 
 % Ev = Ev( [1,3,2,6,5,4],:,:,: );
 
-
 Ek = Ek - max(Ek(1,:));
+Ek_noSOC = Ek_noSOC - max(Ek_noSOC(1,:));
+
+
+
+
+
+H_grad_kx = permute(reshape(H_grad_kx,Para.nr.k,9),[2,1]) *1e3;
+H_grad_ky = permute(reshape(H_grad_ky,Para.nr.k,9),[2,1]) *1e3;

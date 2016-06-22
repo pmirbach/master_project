@@ -1,4 +1,4 @@
-function [Ek, Ev, Ek_noSOC, Ev_noSOC] = tight_binding_liu(Ctrl, Para, Data)
+function [Ek, Ev, Ek_noSOC, Ev_noSOC, H_grad_kx , H_grad_ky] = tight_binding_liu(Ctrl, Para, Data)
 
 % Berechnung der Eigenwerte und Eigenvektoren über das k-mesh
 Ek = zeros(6, Para.nr.k, 6);
@@ -56,3 +56,10 @@ for nk = 1:Para.nr.k
 end
 
 Ek = Ek - max(Ek(1,:));
+Ek_noSOC = Ek_noSOC - max(Ek_noSOC(1,:));
+
+
+
+[H_grad_kx , H_grad_ky] = grad_TB_Liu_TNN_fun(Data.k(1:2,:,1),Para.TB);
+% H_grad_kx = H_grad_kx * 1e3;
+% H_grad_ky = H_grad_ky * 1e3;

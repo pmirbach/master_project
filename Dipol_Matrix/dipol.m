@@ -1,21 +1,8 @@
 function [dipol] = dipol(Para, Prep, Data)
 
-dipol = cell(1,4);
+dipol = cell(1,Para.nr.dipol);
 
-% [grad_H_kx , grad_H_ky] = grad_TB_Liu_TNN_fun(Data.k(1:2,:,1),Para.TB);
 mapping = reshape(1:9,[3,3]);
-
-% grad_H_kx = Prep.H_grad_kx;
-grad_H_kx = permute(reshape(Prep.H_grad_kx,size(Prep.H_grad_kx,1),9),[2,1]) *1e3;
-grad_H_ky = permute(reshape(Prep.H_grad_ky,size(Prep.H_grad_ky,1),9),[2,1]) *1e3;
-
-% grad_H_kx(abs( grad_H_kx ) < 1e-3) = 0;
-% grad_H_ky(abs( grad_H_ky ) < 1e-3) = 0;
-
-% grad_H_kx = ones( size(grad_H_kx) );
-% grad_H_ky = ones( size(grad_H_ky) );
-
-% grad_H_ky = conj( grad_H_ky );
 
 
 for nll = 1:Para.nr.dipol
@@ -35,8 +22,8 @@ for nll = 1:Para.nr.dipol
         
         for b = 1:3
             
-            dipol_k(1,:) = dipol_k(1,:) + grad_H_kx(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,hh,ee).';
-            dipol_k(2,:) = dipol_k(2,:) + grad_H_ky(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,hh,ee).';
+            dipol_k(1,:) = dipol_k(1,:) + Prep.H_grad_kx(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,hh,ee).';
+            dipol_k(2,:) = dipol_k(2,:) + Prep.H_grad_ky(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,hh,ee).';
             
 %             dipol_k(1,:) = dipol_k(1,:) + grad_H_kx(mapping(a,b),:) .* Prep.CV_noSOC(:,1,a,b,hh-d,ee-d).';
 %             dipol_k(2,:) = dipol_k(2,:) + grad_H_ky(mapping(a,b),:) .* Prep.CV_noSOC(:,1,a,b,hh-d,ee-d).';
