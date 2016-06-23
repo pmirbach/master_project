@@ -40,7 +40,7 @@ Ctrl.plot.path = {'K','M', 'K*', '\Gamma', 'K','M','\Gamma'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 0];         % Bandstructure
+Ctrl.plot.tb = [0 , 1];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [1 , 0];      % Dipol matrix elements
 Ctrl.plot.coul = 0;

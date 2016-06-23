@@ -1,7 +1,7 @@
 function [bandstr_surf, bandstr_path] = plot_bandstr(Ctrl,Para,k,Daten,layout)
 
 if any(Ctrl.plot.tb)
-    Daten_plot = Daten * 1e-3;
+    Daten_plot = Daten;
     titlestr = {'V \uparrow','L1 \uparrow','L2 \uparrow',...
         'V \downarrow','L1 \downarrow','L2 \downarrow'};
 end

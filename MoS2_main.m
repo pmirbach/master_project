@@ -22,8 +22,11 @@ end
 
 %% Material & Tight-Binding Parameter & Hochsymmetriepunkte
 
+% Einheitensystem:  mEv,  Ang,  ps,  pA
+
 
 load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
+% constAg.hbar = constAg.hbar*1e-3;
 [ Para , W90Data ] = call_para(Ctrl, constAg);
 
 % Achtung: orbital order in Maltes TB modell different
@@ -62,7 +65,7 @@ end
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
-[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
+[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[1 2]);
 
 
 
@@ -72,10 +75,6 @@ fprintf('Preperations:              Start'); tic
 [Prep.Eks, Prep.CV, Prep.CV_noSOC, Prep.minq] = prep(Para, Data, Prep.Ev_noSOC);
 
 fprintf('   -   Finished in %g seconds\n',toc)
-
-%%
-% Prep.CV = ones(size(Prep.CV));
-% Prep.CV = call_CV( Ev )
 
 
 %% Thermische Anregung
@@ -155,7 +154,7 @@ Bloch.dipol = zeros(Para.nr.k * Para.nr.dipol , 1 );
 Bloch.feff = zeros(Para.nr.k * Para.nr.dipol , 1 );                         % In the linear regime. feff const.
 
 for ii = 1:Para.nr.dipol
-    Bloch.Esum( Bloch.ind(:,ii) ) = ( Prep.Eks( Para.dipol_trans(ii,1),: ) + Prep.Eks( Para.dipol_trans(ii,2),: ) ).';
+    Bloch.Esum( Bloch.ind(:,ii) ) = ( Prep.Eks( Para.dipol_trans(ii,1),: ) + Prep.Eks( Para.dipol_trans(ii,2),: ) ).' *1e3 ;
     
 %     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{dipolnr}(1,:) - 1i * Data.dipol{dipolnr}(2,:) ).';
     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
@@ -192,7 +191,7 @@ Bloch.coul_ctrl = 1;                    % Coulomb Interaktion
 
 
 tspan = [0 0.4];
-% tspan = linspace(0, 0.4, 30000);
+% tspan = linspace(0, 0.4, 10000);
 psik_E_ini = zeros(1 , Para.nr.dipol * Para.nr.k + size(Bloch.w,1) * 2);
 
 % options=odeset('OutputFcn',@odeprog,'Events',@odeabort);
@@ -211,7 +210,7 @@ chi_w = P_w ./ E_w;
 
 % close all
 
-% figure
+figure
 plot(E , imag(chi_w))
 
 hold on

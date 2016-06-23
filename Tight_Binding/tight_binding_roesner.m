@@ -2,14 +2,9 @@ function [Ek, Ev, Ek_noSOC, Ev_noSOC, H_grad_kx, H_grad_ky] = tight_binding_roes
 
 
 % Vorläufiger SOC Ansatz:
-% SOC Hamiltonian
-if strcmp(Ctrl.TB_modell,'ab_initio') 
-    lambda = 0.073;                                     % ???
-elseif strcmp(Ctrl.TB_modell,'liu')
-    lambda = Para.TB(end);
-end 
+lambda = 0.073;                                     % ???  Daniel: 0.074 ??
 L_z = [0 0 0; 0 0 2i; 0 -2i 0];
-H_SOC = lambda / 2 * L_z;
+H_SOC = lambda / 2 * L_z * Para.energy_conversion;
 
 
 % Berechnung der Eigenwerte und Eigenvektoren ueber das k-mesh
@@ -25,7 +20,7 @@ Ev_noSOC = zeros(3, 3, Para.nr.k, 6);
 % Basiswechsel in Vielfache von den reziproken Gittervektoren:
 b_m = abs( Para.k.GV ) / Ctrl.k_mesh_mp.qr;    % Maltes GV / qr
 
-
+% HH_TB = zeros(3, 3, Para.nr.k ,6);
 H_TB = complex( zeros( 3 ) );
 for ni = 1:6
     
@@ -37,19 +32,20 @@ for ni = 1:6
     else
         HH = getW90Hamiltonian(W90Data, k_m / Ctrl.k_mesh_mp.qr);
     end
+    HH = HH * Para.energy_conversion;
     
     for nk = 1:Para.nr.k
         
         H_TB(:,:) = HH(nk, :, :);
         
-        [ef, ev] = eig( H_TB *1e3 );
+        [ef, ev] = eig( H_TB );
         
         [Ek_noSOC(:,nk,ni), I] = sort(diag(real(ev)));
         Ev_noSOC(:,:,nk,ni) = ef(:, I);
         
         
-        H_TB_SOC_up = (H_TB + H_SOC ) *1e3;
-        H_TB_SOC_down = (H_TB - H_SOC ) *1e3;
+        H_TB_SOC_up = (H_TB + H_SOC );
+        H_TB_SOC_down = (H_TB - H_SOC );
         
         
         [ef_up, ev_up] = eig( H_TB_SOC_up );
@@ -75,5 +71,5 @@ Ek_noSOC = Ek_noSOC - max(Ek_noSOC(1,:));
 
 
 
-H_grad_kx = permute(reshape(H_grad_kx,Para.nr.k,9),[2,1]) *1e3;
-H_grad_ky = permute(reshape(H_grad_ky,Para.nr.k,9),[2,1]) *1e3;
+H_grad_kx = permute(reshape(H_grad_kx,Para.nr.k,9),[2,1]);
+H_grad_ky = permute(reshape(H_grad_ky,Para.nr.k,9),[2,1]);

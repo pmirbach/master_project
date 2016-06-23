@@ -1,4 +1,4 @@
-function W90Hamiltonian = getW90Hamiltonian(W90Data, kk)
+function [ W90Hamiltonian , varargout ]= getW90Hamiltonian(W90Data, kk)
 
 % reconstruct H(k)_mn for every height
 %
@@ -6,6 +6,7 @@ function W90Hamiltonian = getW90Hamiltonian(W90Data, kk)
 %
 %       with: R_i = hamiltonianRaw(i, 1:3) * rlat
 %
+
 
 W90HamiltonianTmp = zeros(size(kk, 1), W90Data(1).numWann, W90Data(1).numWann);
 W90HamiltonianGradKx = zeros(size(kk, 1), W90Data(1).numWann, W90Data(1).numWann);
@@ -21,12 +22,28 @@ for nn = 1 : length(W90Data.hamiltonianRaw)
         * exp(1i * 2*pi * kk(:, 1:3) * W90Data.hamiltonianRaw(nn, 1:3)') ...
         * 1 / W90Data.degeneracy( indDegen(nn) ) );
     
-    
-    
+    if nargout > 1
+        
+        W90HamiltonianGradKx(:, W90Data.hamiltonianRaw(nn, 4), W90Data.hamiltonianRaw(nn, 5)) = ...
+            W90HamiltonianGradKx(:, W90Data.hamiltonianRaw(nn, 4), W90Data.hamiltonianRaw(nn, 5)) ...
+            + ( 1i* ( W90Data.hamiltonianRaw(nn, 1:3) * W90Data.rLat(:,1) ) ...   % i*Rx  out  of  dx e(ikR) = iRx * e(ikR)
+            * W90Data.hamiltonianRaw(nn, 6)  ...
+            * exp(1i * 2*pi * kk(:, 1:3) * W90Data.hamiltonianRaw(nn, 1:3)') ...
+            * 1 / W90Data.degeneracy( indDegen(nn) ) );
+        
+        W90HamiltonianGradKy(:, W90Data.hamiltonianRaw(nn, 4), W90Data.hamiltonianRaw(nn, 5)) = ...
+            W90HamiltonianGradKy(:, W90Data.hamiltonianRaw(nn, 4), W90Data.hamiltonianRaw(nn, 5)) ...
+            + ( 1i* ( W90Data.hamiltonianRaw(nn, 1:3) * W90Data.rLat(:,2) ) ...   % i*Ry  out  of  dy e(ikR) = iRy * e(ikR)
+            * W90Data.hamiltonianRaw(nn, 6)  ...
+            * exp(1i * 2*pi * kk(:, 1:3) * W90Data.hamiltonianRaw(nn, 1:3)') ...
+            * 1 / W90Data.degeneracy( indDegen(nn) ) );
+        
+    end
     
 end
 
-
+varargout{1} = W90HamiltonianGradKx;
+varargout{2} = W90HamiltonianGradKy;
 
 
 
