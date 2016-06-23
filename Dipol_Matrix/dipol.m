@@ -25,8 +25,8 @@ for nll = 1:Para.nr.dipol
             dipol_k(1,:) = dipol_k(1,:) + Prep.H_grad_kx(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,hh,ee).';
             dipol_k(2,:) = dipol_k(2,:) + Prep.H_grad_ky(mapping(a,b),:) .* Prep.CV(:,1,a+d,b+d,hh,ee).';
             
-%             dipol_k(1,:) = dipol_k(1,:) + grad_H_kx(mapping(a,b),:) .* Prep.CV_noSOC(:,1,a,b,hh-d,ee-d).';
-%             dipol_k(2,:) = dipol_k(2,:) + grad_H_ky(mapping(a,b),:) .* Prep.CV_noSOC(:,1,a,b,hh-d,ee-d).';
+%             dipol_k(1,:) = dipol_k(1,:) + Prep.H_grad_kx(mapping(a,b),:) .* Prep.CV_noSOC(:,1,a,b,hh-d,ee-d).';
+%             dipol_k(2,:) = dipol_k(2,:) + Prep.H_grad_ky(mapping(a,b),:) .* Prep.CV_noSOC(:,1,a,b,hh-d,ee-d).';
             
         end
         

@@ -4,7 +4,6 @@ clear global
 % close all
 
 
-
 profile off
 dbstop if error
 
@@ -26,7 +25,6 @@ end
 
 
 load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
-% constAg.hbar = constAg.hbar*1e-3;
 [ Para , W90Data ] = call_para(Ctrl, constAg);
 
 % Achtung: orbital order in Maltes TB modell different

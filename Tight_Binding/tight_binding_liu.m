@@ -47,15 +47,20 @@ for ni = 1:6
     
 end
 
-% % Tests
-% k_test_ind = [ Para.symm_indices, round(rand(1,7) * ( Para.nr.k - 1 ) ) + 1 ];   % 10 test kpts including high symmetrie points.
-% for ii = 1:size( k_test_ind , 2 )
-%     tri = round(rand(1,2) * ( 6 - 1 )) + 1;
-%     for ni = 1:size( tri , 2 )
-%         [H_TB] = TB_Liu_TNN_fun(Data.k(:,nk,ni), Para.TB);
-%         
-%     end
-% end
+% Tests
+k_test_ind = [ Para.symm_indices, round(rand(1,7) * ( Para.nr.k - 1 ) ) + 1 ];   % 10 test kpts including high symmetrie points.
+for nk = 1:size( k_test_ind , 2 )
+    tri = round(rand(1,2) * ( 6 - 1 )) + 1;
+    for ni = 1:size( tri , 2 )       
+        error_tol = 10 * eps * norm( HH_TB(:,:,nk,ni) , 2 );
+        ev_test = HH_TB(:,:,nk,ni) * Ev_noSOC(:,:,nk,ni) - Ev_noSOC(:,:,nk,ni) * diag( Ek_noSOC(:,nk,ni) );     
+        if any( ev_test(ev_test>error_tol) )
+            warning off backtrace
+            warning('Eigenvectors or Eigenvalues poorly calculated!')
+            warning on backtrace
+        end     
+    end
+end
 
 
 
