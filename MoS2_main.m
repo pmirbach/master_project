@@ -36,7 +36,8 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 
 [ Data.k , Data.wk , Para.nr.k , Para.symm_indices ] = k_mesh_mp(Ctrl, Para);
 
-% [Para, Data] = load_daniel_kpts(Ctrl, Para, Data); % overwrites k, wk, coul_pol, wk_area, nr_k
+file = 'MoS2 (1).mat';
+[Para, Data, Daniel] = load_daniel_data(Ctrl, Para, Data, file); % overwrites k, wk, coul_pol, wk_area, nr_k
 
 % Fast kx, ky for scatter3 plots:
 kx = Data.k(1,:,1);
@@ -114,7 +115,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 %% structure für Variablen für Blochgleichungen
 
 % Para.dipol_trans = [1, 2 ; 1 , 3 ; 4 , 5 ; 4 , 6 ];
-% Para.dipol_trans = [1 2; 4 5];
+Para.dipol_trans = [1 2; 4 5];
 % Para.dipol_trans = [4 5];
 Para.nr.dipol = size(Para.dipol_trans,1);
 
@@ -152,10 +153,10 @@ Bloch.dipol = zeros(Para.nr.k * Para.nr.dipol , 1 );
 Bloch.feff = zeros(Para.nr.k * Para.nr.dipol , 1 );                         % In the linear regime. feff const.
 
 for ii = 1:Para.nr.dipol
-    Bloch.Esum( Bloch.ind(:,ii) ) = ( Prep.Eks( Para.dipol_trans(ii,1),: ) + Prep.Eks( Para.dipol_trans(ii,2),: ) ).' *1e3 ;
+    Bloch.Esum( Bloch.ind(:,ii) ) = ( Prep.Eks( Para.dipol_trans(ii,1),: ) + Prep.Eks( Para.dipol_trans(ii,2),: ) ).' ;
     
 %     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{dipolnr}(1,:) - 1i * Data.dipol{dipolnr}(2,:) ).';
-    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
+    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).'; 
 %     Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = abs( Data.dipol{ii}(1,:) ).'; 
     
     Bloch.feff( Bloch.ind(:,ii) ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';
@@ -208,7 +209,7 @@ chi_w = P_w ./ E_w;
 
 % close all
 
-figure
+% figure
 plot(E , imag(chi_w))
 
 hold on

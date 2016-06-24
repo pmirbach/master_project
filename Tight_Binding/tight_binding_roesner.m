@@ -17,20 +17,33 @@ Ek_noSOC = zeros(3, Para.nr.k, 6);
 Ev_noSOC = zeros(3, 3, Para.nr.k, 6);
 
 
-% Basiswechsel in Vielfache von den reziproken Gittervektoren:
-b_m = abs( Para.k.GV ) / Ctrl.k_mesh_mp.qr;    % Maltes GV / qr
+k_m = zeros( Para.nr.k , 3 , 6 );
+
+if ~Ctrl.cmp.use_k
+    % Basiswechsel in Vielfache von den reziproken Gittervektoren:
+    b_m = abs( Para.k.GV ) / Ctrl.k_mesh_mp.qr;                                 % Maltes GV / qr
+    for ni = 1:6
+        k_m(:,1:2,ni) = round( b_m \ Data.k(:,:,ni) ).' / Ctrl.k_mesh_mp.qr;    % Basiswechsel in Vielfache von G (hohe Genauigkeit)
+    end
+elseif Ctrl.cmp.use_k
+    b_m = abs( Para.k.GV );                         % Maltes GV 
+    for ni = 1:6
+        k_m(:,1:2,ni) = ( b_m \ Data.k(:,:,ni) ).' ;         % Basiswechsel in Vielfache von G
+    end
+else
+    error('Something strange with kpts compare in TB_ab_initio')
+end
+
 
 HH_TB = zeros(Para.nr.k ,3, 3, 6);
 H_TB = complex( zeros( 3 ) );
 for ni = 1:6
-    
-    k_m = [ round( b_m \ Data.k(:,:,ni) ).' , zeros(Para.nr.k,1) ];         % Basiswechsel in Vielfache von G / qr
-    
+        
     if ni == 1
         %get hamiltonian for every kk point
-        [HH_TB(:,:,:,ni), H_grad_kx, H_grad_ky] = getW90Hamiltonian(W90Data, k_m / Ctrl.k_mesh_mp.qr);
+        [HH_TB(:,:,:,ni), H_grad_kx, H_grad_ky] = getW90Hamiltonian(W90Data, k_m(:,:,ni) );
     else
-        HH_TB(:,:,:,ni) = getW90Hamiltonian(W90Data, k_m / Ctrl.k_mesh_mp.qr);
+        HH_TB(:,:,:,ni) = getW90Hamiltonian(W90Data, k_m(:,:,ni) );
     end
     HH_TB(:,:,:,ni) = HH_TB(:,:,:,ni) * Para.energy_conversion;
     
@@ -62,19 +75,17 @@ for ni = 1:6
 end
 
 % Tests
-k_test_ind = [ Para.symm_indices, round(rand(1,7) * ( Para.nr.k - 1 ) ) + 1 ];   % 10 test kpts including high symmetrie points.
-for nk = 1:size( k_test_ind , 2 )
-    tri = round(rand(1,2) * ( 6 - 1 )) + 1;
-    for ni = 1:size( tri , 2 )       
-        error_tol = 10 * eps * norm( squeeze( HH_TB(nk,:,:,ni) ) , 2 );
-        ev_test = squeeze( HH_TB(nk,:,:,ni) ) * Ev_noSOC(:,:,nk,ni) - Ev_noSOC(:,:,nk,ni) * diag( Ek_noSOC(:,nk,ni) );     
-        if any( ev_test(ev_test>error_tol) )
-            warning off backtrace
-            warning('Eigenvectors or Eigenvalues poorly calculated!')
-            warning on backtrace
-        end     
+sample = get_sample( [ Para.nr.k, Para.nr.tri ] , 10 );
+for ii = 1:size( sample , 1 )
+    nk = sample( ii , 1 );
+    ni = sample( ii , 2 );
+    error_tol = 10 * eps * norm( squeeze( HH_TB(nk,:,:,ni) ) , 2 );
+    ev_test = squeeze( HH_TB(nk,:,:,ni) ) * Ev_noSOC(:,:,nk,ni) - Ev_noSOC(:,:,nk,ni) * diag( Ek_noSOC(:,nk,ni) );
+    if any( ev_test(ev_test>error_tol) )
+        warning('Eigenvectors or Eigenvalues poorly calculated!')
     end
 end
+
 
 
 % Ev = Ev( [1,3,2,6,5,4],:,:,: );
@@ -86,5 +97,5 @@ Ek_noSOC = Ek_noSOC - max(Ek_noSOC(1,:));
 
 
 
-H_grad_kx = permute(reshape(H_grad_kx,Para.nr.k,9),[2,1]);
-H_grad_ky = permute(reshape(H_grad_ky,Para.nr.k,9),[2,1]);
+H_grad_kx = permute(reshape(H_grad_kx,Para.nr.k,9),[2,1]) * 1e3;
+H_grad_ky = permute(reshape(H_grad_ky,Para.nr.k,9),[2,1]) * 1e3;

@@ -52,6 +52,8 @@ Para.vorf.dipol = constAg.ec;
 
 Para.vorf.coul = constAg.ec^2 / ( 2 * constAg.eps_0 * Ctrl.eps_r);
 
+Para.nr.tri = 6;
+
 
 
 

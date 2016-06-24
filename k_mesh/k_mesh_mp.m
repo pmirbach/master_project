@@ -20,9 +20,7 @@ k = pts_triangle_fun(k0, Para.BZred.symmpts{2}(:,1:3), 30 * eps);
 wk = pts_weight(k, Para.BZred.symmpts{2}(:,1:3), 30 * eps);
 
 if round ( sum(wk) * Para.BZsmall.area * 1e3 ) ~= round( Para.BZ.area * 1e3 )
-    warning off backtrace
     warning('Integrated weights do not agree with area of BZ!')
-    warning on backtrace
 end
 
 % Erzeugung aller red. Dreiecke mit Spiegelungen und Drehungen
