@@ -20,7 +20,7 @@ Ev_noSOC = zeros(3, 3, Para.nr.k, 6);
 % Basiswechsel in Vielfache von den reziproken Gittervektoren:
 b_m = abs( Para.k.GV ) / Ctrl.k_mesh_mp.qr;    % Maltes GV / qr
 
-% HH_TB = zeros(3, 3, Para.nr.k ,6);
+HH_TB = zeros(Para.nr.k ,3, 3, 6);
 H_TB = complex( zeros( 3 ) );
 for ni = 1:6
     
@@ -28,15 +28,15 @@ for ni = 1:6
     
     if ni == 1
         %get hamiltonian for every kk point
-        [HH, H_grad_kx, H_grad_ky] = getW90Hamiltonian(W90Data, k_m / Ctrl.k_mesh_mp.qr);
+        [HH_TB(:,:,:,ni), H_grad_kx, H_grad_ky] = getW90Hamiltonian(W90Data, k_m / Ctrl.k_mesh_mp.qr);
     else
-        HH = getW90Hamiltonian(W90Data, k_m / Ctrl.k_mesh_mp.qr);
+        HH_TB(:,:,:,ni) = getW90Hamiltonian(W90Data, k_m / Ctrl.k_mesh_mp.qr);
     end
-    HH = HH * Para.energy_conversion;
+    HH_TB(:,:,:,ni) = HH_TB(:,:,:,ni) * Para.energy_conversion;
     
     for nk = 1:Para.nr.k
         
-        H_TB(:,:) = HH(nk, :, :);
+        H_TB(:,:) = HH_TB(nk,:,:,ni);
         
         [ef, ev] = eig( H_TB );
         
@@ -59,6 +59,21 @@ for ni = 1:6
         
     end
     
+end
+
+% Tests
+k_test_ind = [ Para.symm_indices, round(rand(1,7) * ( Para.nr.k - 1 ) ) + 1 ];   % 10 test kpts including high symmetrie points.
+for nk = 1:size( k_test_ind , 2 )
+    tri = round(rand(1,2) * ( 6 - 1 )) + 1;
+    for ni = 1:size( tri , 2 )       
+        error_tol = 10 * eps * norm( squeeze( HH_TB(nk,:,:,ni) ) , 2 );
+        ev_test = squeeze( HH_TB(nk,:,:,ni) ) * Ev_noSOC(:,:,nk,ni) - Ev_noSOC(:,:,nk,ni) * diag( Ek_noSOC(:,nk,ni) );     
+        if any( ev_test(ev_test>error_tol) )
+            warning off backtrace
+            warning('Eigenvectors or Eigenvalues poorly calculated!')
+            warning on backtrace
+        end     
+    end
 end
 
 
