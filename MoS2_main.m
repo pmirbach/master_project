@@ -49,7 +49,7 @@ ky = Data.k(2,:,1);
 %% Vergleich Alexander #1
 % close all
 
-Dipol_Alex = importdata('Alexander/dip.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
+Dipol_Alex = importdata('Alexander/dip_60.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
 Akx = Dipol_Alex(:,1);
 Aky = Dipol_Alex(:,2);
 % 
@@ -101,7 +101,7 @@ Kpind = find(all(kf == Kp,1));
 % 
 % k = red_to_BZ(k0);
 
-Energy_Alex = importdata('Alexander/disp.dat');
+Energy_Alex = importdata('Alexander/disp_120.dat');
 
 
 %% Tight-Binding
@@ -293,7 +293,7 @@ Para.nr.w = numel(Bloch.w);
 
 %% Vergleich der Coulomb Matrixelemente mit Alex
 
-Coul_Alex = importdata('Alexander/test_1.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
+Coul_Alex = importdata('Alexander/Coul_Fock_60.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
 nrkt = size(Coul_Alex,1) / 5;
 ACk = Coul_Alex(:,1:2);
 % 

@@ -3,7 +3,8 @@ Send/
 *~
 *.mat
 *.fig
-COUL_D_12_rmat.txt
+*.asv
+COUL_D_11_rmat.txt
 Daniel/COUL_*
 Daniel/CV_*
 Daniel/dip*
