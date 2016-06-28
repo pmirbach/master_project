@@ -22,8 +22,15 @@ Para.TB_ind{2} = [2,3,5,6];
 Para.real.a = Ctrl.lattice_constant;
 Para.real.area = 3 * sqrt(3) / 2 * ( Para.real.a )^2;
 
-Para.BZred.symmpts{1} = {'\Gamma', 'K', 'K*', 'M'};
 Para.BZred.symmpts{2} = 2 * pi / ( 3 * Para.real.a ) * [0, 0 ; 2, 0 ; 1, sqrt(3) ; 3 / 2, sqrt(3) / 2 ]';
+
+if strcmp(Ctrl.TB_modell,'ab_initio') 
+    Para.BZred.symmpts{1} = {'\Gamma', 'K*', 'K', 'M'};
+elseif strcmp(Ctrl.TB_modell,'liu')
+    Para.BZred.symmpts{1} = {'\Gamma', 'K', 'K*', 'M'};
+end
+
+
 
 Para.BZ.a = norm(Para.BZred.symmpts{2}(:,2));
 Para.BZ.area = 3 * sqrt(3) / 2 * Para.BZ.a^2;

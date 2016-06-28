@@ -2,8 +2,8 @@ function [Ek, Ev, Ek_noSOC, Ev_noSOC, H_grad_kx, H_grad_ky] = tight_binding_roes
 
 
 % Vorläufiger SOC Ansatz:
-lambda = 0.073;                                     % ???  Daniel: 0.074 ??
-L_z = [0 0 0; 0 0 2i; 0 -2i 0];
+lambda = 0.074;                                     % ???  Daniel: 0.074 ??
+L_z = -[0 0 0; 0 0 2i; 0 -2i 0];
 H_SOC = lambda / 2 * L_z * Para.energy_conversion;
 
 
@@ -74,6 +74,19 @@ for ni = 1:6
     
 end
 
+% for ni = 1:6
+%     b_m = abs( Para.k.GV ) / Ctrl.k_mesh_mp.qr;    
+%     k_m(:,1:2,ni) = round( b_m \ Data.k(:,:,ni) ).'; 
+% end
+% 
+% for nk = 1:Para.nr.k
+%     for ni = 4:6
+%         find(  )
+%     end
+% end
+% 1
+
+
 % Tests
 sample = get_sample( [ Para.nr.k, Para.nr.tri ] , 10 );
 for ii = 1:size( sample , 1 )
@@ -82,7 +95,7 @@ for ii = 1:size( sample , 1 )
     error_tol = 10 * eps * norm( squeeze( HH_TB(nk,:,:,ni) ) , 2 );
     ev_test = squeeze( HH_TB(nk,:,:,ni) ) * Ev_noSOC(:,:,nk,ni) - Ev_noSOC(:,:,nk,ni) * diag( Ek_noSOC(:,nk,ni) );
     if any( ev_test(ev_test>error_tol) )
-        warning('Eigenvectors or Eigenvalues poorly calculated!')
+        warning('Eigenvectors and Eigenvalues do not solve eigenvalue problem!')
     end
 end
 

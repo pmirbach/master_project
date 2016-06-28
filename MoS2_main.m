@@ -32,6 +32,9 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 
 
 
+
+
+
 %% Monkhorst-Pack
 
 [ Data.k , Data.wk , Para.nr.k , Para.symm_indices ] = k_mesh_mp(Ctrl, Para);
@@ -42,6 +45,63 @@ file = 'MoS2 (1).mat';
 % Fast kx, ky for scatter3 plots:
 kx = Data.k(1,:,1);
 ky = Data.k(2,:,1);
+
+%% Vergleich Alexander #1
+% close all
+
+Dipol_Alex = importdata('Alexander/dip.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
+Akx = Dipol_Alex(:,1);
+Aky = Dipol_Alex(:,2);
+% 
+k0 = [Akx.'; Aky.'];
+
+k1 = [ Akx , Aky ];
+D = [cos(pi/6) -sin(pi/6) ; sin(pi/6) cos(pi/6)];
+
+k2 = D * k1.';
+
+% plot(kx,ky,'bx')
+% hold on
+% plot(k2(1,:),k2(2,:),'rx')
+
+
+% Lokalisierung der Hochsymmetriepunkte bei Alex:
+% K+ = (11.4075; -6.5861), K- = (11.4075; 6.5861)
+kf = round(k0,4);
+
+G = repmat([0; 0],1,size(kf,2));
+Kp = repmat([11.4075; -6.5861],1,size(kf,2));
+Km = repmat([11.4075;  6.5861],1,size(kf,2));
+
+Gind = find(all(kf == G,1));
+Kmind = find(all(kf == Km,1));
+Kpind = find(all(kf == Kp,1));
+
+% plot( k2(1,Gind),k2(2,Gind), 'ko' )
+% plot( k2(1,Kmind),k2(2,Kmind), 'k^' )
+% plot( k2(1,Kpind),k2(2,Kpind), 'ks' )
+
+
+% figure;
+% plot(Akx,Aky,'Color', 0.8 * [1 1 1])
+% hold on
+% plot(k2(1,:),k2(2,:),'Color', 0.8 * [0 1 1])
+
+
+
+
+
+
+% Data.k = zeros(size(Data.k));
+% Data.k(:,:,1) = k0;
+
+% symmneu = Para.BZred.symmpts{2}(:,[1,3]);
+% symmneu = [symmneu , [ -symmneu(1,2); symmneu(2,2) ]];
+% wk = pts_weight(k0, symmneu, 30 * eps);
+% 
+% k = red_to_BZ(k0);
+
+Energy_Alex = importdata('Alexander/disp.dat');
 
 
 %% Tight-Binding
@@ -74,6 +134,55 @@ fprintf('Preperations:              Start'); tic
 [Prep.Eks, Prep.CV, Prep.CV_noSOC, Prep.minq] = prep(Para, Data, Prep.Ev_noSOC);
 
 fprintf('   -   Finished in %g seconds\n',toc)
+
+
+
+
+
+%% Dipolmatrix
+fprintf('Dipol:                     Start'); tic
+
+Data.dipol = dipol(Para, Prep, Data);
+
+fprintf('   -   Finished in %g seconds\n',toc)
+
+titlestr = {'1 \rightarrow 2 \uparrow','1 \rightarrow 3 \uparrow','1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow'};
+[fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,Data.dipol,[2 2],titlestr);
+clear titlestr
+
+Ploter.dipol = zeros( Para.nr.k, Para.nr.dipol );
+for ii = 1:Para.nr.dipol
+    Ploter.dipol_l(:,ii) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).'; 
+    Ploter.dipol_r(:,ii) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
+end
+
+
+%% Vergleich mit Alexander
+% % Vergleich Dipol Matrixelemente mit qr = 60 oder qr = 120
+% figure
+% for ii = 1:4
+%     subplot(2,2,ii)
+%     scatter3(kx,ky,Ploter.dipol_l(:,ii)/10)
+%     hold on
+%     scatter3(k2(1,:),k2(2,:),Dipol_Alex(:,ii+2))
+% end
+% 
+% 
+% figure
+% for ii = 1:4
+%     subplot(2,2,ii)
+%     scatter3(kx,ky,Ploter.dipol_r(:,ii)/10)
+%     hold on
+%     scatter3(k2(1,:),k2(2,:),Dipol_Alex(:,ii+6))
+% end
+
+% % Vergleich Dispersion mit qr = 120 !
+% figure
+% figure
+% scatter3(kx,ky,Data.Ek(2,:,ii))
+% hold on
+% scatter3(k2(1,:),k2(2,:),Energy_Alex(:,5))
+
 
 
 %% Thermische Anregung
@@ -115,21 +224,16 @@ fprintf('   -   Finished in %g seconds\n',toc)
 %% structure für Variablen für Blochgleichungen
 
 % Para.dipol_trans = [1, 2 ; 1 , 3 ; 4 , 5 ; 4 , 6 ];
-Para.dipol_trans = [1 2; 4 5];
+% Para.dipol_trans = [1 2; 4 5];
 % Para.dipol_trans = [4 5];
 Para.nr.dipol = size(Para.dipol_trans,1);
 
 
-%% Dipolmatrix
-fprintf('Dipol:                     Start'); tic
 
-Data.dipol = dipol(Para, Prep, Data);
+%% Vergleich Alexander #2
 
-fprintf('   -   Finished in %g seconds\n',toc)
+% Dipol_Alex = importdata('Alexander/dip.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
 
-titlestr = {'1 \rightarrow 2 \uparrow','1 \rightarrow 3 \uparrow','1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow'};
-[fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,Data.dipol,[2 2],titlestr);
-clear titlestr
 
 %%
 
@@ -156,7 +260,7 @@ for ii = 1:Para.nr.dipol
     Bloch.Esum( Bloch.ind(:,ii) ) = ( Prep.Eks( Para.dipol_trans(ii,1),: ) + Prep.Eks( Para.dipol_trans(ii,2),: ) ).' ;
     
 %     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{dipolnr}(1,:) - 1i * Data.dipol{dipolnr}(2,:) ).';
-    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).'; 
+    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
 %     Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = abs( Data.dipol{ii}(1,:) ).'; 
     
     Bloch.feff( Bloch.ind(:,ii) ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';
@@ -183,6 +287,35 @@ Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
 
 Para.nr.w = numel(Bloch.w);
 
+
+
+
+
+%% Vergleich der Coulomb Matrixelemente mit Alex
+
+Coul_Alex = importdata('Alexander/test_1.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
+nrkt = size(Coul_Alex,1) / 5;
+ACk = Coul_Alex(:,1:2);
+% 
+D = [cos(pi/6) -sin(pi/6) ; sin(pi/6) cos(pi/6)];
+
+ACk2 = D * ACk.';
+
+ACkn = reshape(ACk',2,[],5);
+ACknt = reshape(ACkn,2,[],5,6);
+% ACkt(:,:,1) = [ACk(1:6:end,1),ACk(1:6:end,2)];
+
+
+% plot(ACknt(1,:,1),ACknt(2,:,1),'rx')
+
+% plot(ACk(1:6:end,1),ACk(1:6:end,2),'rx')
+% plot(ACk2(1,:),ACk2(2,:),'rx')
+
+% figure; scatter3(ACk(:,1),ACk(:,2),Coul_Alex(:,3))
+% figure; scatter3(ACk2(1,:),ACk2(2,:),Coul_Alex(:,3))
+
+
+figure; scatter3(ACk(1:nrkt,1),ACk(1:nrkt,2),Coul_Alex(1:nrkt,3))
 
 %% Zeitentwicklung
 
