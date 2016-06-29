@@ -39,7 +39,7 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 
 [ Data.k , Data.wk , Para.nr.k , Para.symm_indices ] = k_mesh_mp(Ctrl, Para);
 
-file = 'MoS2 (1).mat';
+file = 'Daniel/MoS2_gradtest.mat';
 [Para, Data, Daniel] = load_daniel_data(Ctrl, Para, Data, file); % overwrites k, wk, coul_pol, wk_area, nr_k
 
 % Fast kx, ky for scatter3 plots:
@@ -178,7 +178,6 @@ end
 
 % % Vergleich Dispersion mit qr = 120 !
 % figure
-% figure
 % scatter3(kx,ky,Data.Ek(2,:,ii))
 % hold on
 % scatter3(k2(1,:),k2(2,:),Energy_Alex(:,5))
@@ -257,7 +256,8 @@ Bloch.dipol = zeros(Para.nr.k * Para.nr.dipol , 1 );
 Bloch.feff = zeros(Para.nr.k * Para.nr.dipol , 1 );                         % In the linear regime. feff const.
 
 for ii = 1:Para.nr.dipol
-    Bloch.Esum( Bloch.ind(:,ii) ) = ( Prep.Eks( Para.dipol_trans(ii,1),: ) + Prep.Eks( Para.dipol_trans(ii,2),: ) ).' ;
+%     Bloch.Esum( Bloch.ind(:,ii) ) = ( Prep.Eks( Para.dipol_trans(ii,1),: ) + Prep.Eks( Para.dipol_trans(ii,2),: ) ).' ;
+    Bloch.Esum( Bloch.ind(:,ii) ) = ( - Data.Ek( Para.dipol_trans(ii,1),: , 1 ) + Data.Ek( Para.dipol_trans(ii,2),: , 1 ) ).' ;
     
 %     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{dipolnr}(1,:) - 1i * Data.dipol{dipolnr}(2,:) ).';
     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
@@ -279,9 +279,9 @@ Bloch.nrk = Para.nr.k;
 
 
 % Kommt noch dazu
-Emin = -1000;
-Emax = 0;
-E = linspace(Emin,Emax,2001)';
+Emin = 1500;
+Emax = 2600;
+E = linspace(Emin,Emax,1001)';
 
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
 
@@ -296,13 +296,85 @@ Para.nr.w = numel(Bloch.w);
 Coul_Alex = importdata('Alexander/Coul_Fock_60.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
 nrkt = size(Coul_Alex,1) / 5;
 ACk = Coul_Alex(:,1:2);
+ACC = Coul_Alex(:,3);
 % 
 D = [cos(pi/6) -sin(pi/6) ; sin(pi/6) cos(pi/6)];
 
 ACk2 = D * ACk.';
 
-ACkn = reshape(ACk',2,[],5);
-ACknt = reshape(ACkn,2,[],5,6);
+B1 = reshape( ACk2 , 2 , [] , 5 );
+ACC2 = reshape(ACC,[],5);
+
+% color_sc = ( ACC2(:,4) / max( ACC2(:,4) ) );       
+% C = [ zeros(Para.nr.k*6,1) , color_sc , zeros(Para.nr.k*6,1) ];     % green
+% C = color_sc * [ zeros(Para.nr.k*6,1) , color_sc , zeros(Para.nr.k*6,1) ];     % green
+
+
+Para.dipol_trans = [1 2];
+% Para.dipol_trans = [4 5];
+Para.nr.dipol = size(Para.dipol_trans,1);
+
+[Para.coul.screened, Para.coul.names] = load_coul_parameter( Ctrl );
+
+[V_rabi_fock] = coulomb_rabi_f_2(Ctrl, Para, Prep);  
+
+Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
+
+[V_rabi_fock2] = coulomb_rabi_f_2(Ctrl, Para, Prep);  
+
+% scatter3(Data.k(1,:),Data.k(2,:),V_rabi_fock(Para.symm_indices(2),:)-V_rabi_fock2(Para.symm_indices(2),:),10,'r+')
+
+
+figure; scatter3(B1(1,:,1),B1(2,:,1),ACC2(:,2),10,'bx')
+hold on
+scatter3(Data.k(1,:),Data.k(2,:),V_rabi_fock2(Para.symm_indices(2),:),10,'r+')
+
+
+
+
+%%
+
+
+Pkall = [Data.k(1,:);Data.k(2,:)].';
+Akall = [B1(1,:,1);B1(2,:,1)].';
+
+
+[Pkalls, Pindex] = sortrows(Pkall);
+[Akalls, Aindex] = sortrows(Akall);
+
+PV = V_rabi_fock2(Para.symm_indices(2),:);
+AV = ACC2(:,2);
+
+PVs = PV(Pindex);
+AVs = AV(Aindex);
+
+
+figure; scatter3( Akalls(:,1),Akalls(:,2),AVs,10,'bx' )
+hold on
+scatter3( Pkalls(:,1),Pkalls(:,2),PVs,10,'r+' )
+
+
+figure
+scatter3( Pkalls(:,1),Pkalls(:,2),PVs-AVs.',10,'r+' )
+
+% plot( Data.k(1,:),Data.k(2,:),'rx' )
+
+
+
+
+
+
+
+% figure
+% hold on
+% for ii = 1:6
+%     plot(B1(1,ii:6:end,1),B1(2,ii:6:end,1),'x')
+% end
+
+
+% ACkn = reshape( ACk' , 2 , [] , 6 , 5 );
+% plot(ACkn(1,:,1,1),ACkn(2,:,1,1),'rx')
+
 % ACkt(:,:,1) = [ACk(1:6:end,1),ACk(1:6:end,2)];
 
 
@@ -315,7 +387,7 @@ ACknt = reshape(ACkn,2,[],5,6);
 % figure; scatter3(ACk2(1,:),ACk2(2,:),Coul_Alex(:,3))
 
 
-figure; scatter3(ACk(1:nrkt,1),ACk(1:nrkt,2),Coul_Alex(1:nrkt,3))
+% figure; scatter3(ACk(1:nrkt,1),ACk(1:nrkt,2),Coul_Alex(1:nrkt,3))
 
 %% Zeitentwicklung
 

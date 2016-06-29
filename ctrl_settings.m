@@ -27,8 +27,8 @@ Ctrl.carrier_density = 0;    % Anregungsdichte in 1/cm^2
 Ctrl.carrier_density_tol = Ctrl.carrier_density * 1e-8;
 
 
-Ctrl.cmp.load = 0;
-Ctrl.cmp.use_k = 1;
+Ctrl.cmp.load = 1;
+Ctrl.cmp.use_k = 0;
 % Ctrl.cmp.use_ev = 1;
 
 Ctrl.profile_flag = 0;
