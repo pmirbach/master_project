@@ -74,40 +74,44 @@ for ni = 1:6
     
 end
 
-% for ni = 1:6
-%     b_m = abs( Para.k.GV ) / Ctrl.k_mesh_mp.qr;    
-%     k_m(:,1:2,ni) = round( b_m \ Data.k(:,:,ni) ).'; 
-% end
-% 
-% for nk = 1:Para.nr.k
-%     for ni = 4:6
-%         find(  )
-%     end
-% end
-% 1
+% Symmetrisierung der Bandstruktur (zeitumkehr)
 
 
-% Tests
-sample = get_sample( [ Para.nr.k, Para.nr.tri ] , 10 );
-for ii = 1:size( sample , 1 )
-    nk = sample( ii , 1 );
-    ni = sample( ii , 2 );
-    error_tol = 10 * eps * norm( squeeze( HH_TB(nk,:,:,ni) ) , 2 );
-    ev_test = squeeze( HH_TB(nk,:,:,ni) ) * Ev_noSOC(:,:,nk,ni) - Ev_noSOC(:,:,nk,ni) * diag( Ek_noSOC(:,nk,ni) );
-    if any( ev_test(ev_test>error_tol) )
-        warning('Eigenvectors and Eigenvalues do not solve eigenvalue problem!')
-    end
+k_int = round( b_m \ Data.k(:,:,1) ).';
+sk = size(k_int,1);
+
+as = k_int(:,2);
+df = 1:size(k_int,1);
+
+for ii = df(as < 0)
+        
+    k_find = [ k_int(ii,1) + k_int(ii,2) , -k_int(ii,2) ];
+    k_find = repmat( k_find, sk,1 );
+%     ind = find( all( k_int == k_find , 2) );
+        
+
+    Ek( 1:3 , ii , 1 ) = Ek( 4:6 , all( k_int == k_find , 2) , 1 );
+    Ek( 4:6 , ii , 1 ) = Ek( 1:3 , all( k_int == k_find , 2) , 1 );
 end
 
 
 
-% Ev = Ev( [1,3,2,6,5,4],:,:,: );
+% Tests
+% sample = get_sample( [ Para.nr.k, Para.nr.tri ] , 10 );
+% for ii = 1:size( sample , 1 )
+%     nk = sample( ii , 1 );
+%     ni = sample( ii , 2 );
+%     error_tol = 10 * eps * norm( squeeze( HH_TB(nk,:,:,ni) ) , 2 );
+%     ev_test = squeeze( HH_TB(nk,:,:,ni) ) * Ev_noSOC(:,:,nk,ni) - Ev_noSOC(:,:,nk,ni) * diag( Ek_noSOC(:,nk,ni) );
+%     if any( ev_test(ev_test>error_tol) )
+%         warning('Eigenvectors and Eigenvalues do not solve eigenvalue problem!')
+%     end
+% end
+
+
 
 Ek = Ek - max(Ek(1,:));
 Ek_noSOC = Ek_noSOC - max(Ek_noSOC(1,:));
-
-
-
 
 
 H_grad_kx = permute(reshape(H_grad_kx,Para.nr.k,9),[2,1]) * 1e3;
