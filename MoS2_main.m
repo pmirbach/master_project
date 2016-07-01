@@ -40,7 +40,7 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 [ Data.k , Data.wk , Para.nr.k , Para.symm_indices ] = k_mesh_mp(Ctrl, Para);
 
 
-k_mesh_AG(Ctrl, Para)
+% k_mesh_AG(Ctrl, Para)
 
 
 file = 'Daniel/MoS2_gradtest.mat';
@@ -160,19 +160,19 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 
 %%
-close all
+% close all
 
-% Prep.Eks(Para.TB_ind{2},:) = Prep.Eks(Para.TB_ind{2},:) - 0.1516 * 1e3;
-% Eks_corr = Prep.Eks;
-% Eks_corr(Para.TB_ind{2},:) = Eks_corr(Para.TB_ind{2},:) - 0.1516 * 1e3;
-
-index = [3 5 7 4 6 8];
-figure
-for ii = 1:6
-    subplot(2,3,ii)
-    
-    compare_alex( Data.k(:,:,1), Ak2 , Prep.Eks(ii,:), Energy_Alex(:,index(ii)) , 'abs' )
-end
+% % Prep.Eks(Para.TB_ind{2},:) = Prep.Eks(Para.TB_ind{2},:) - 0.1516 * 1e3;
+% % Eks_corr = Prep.Eks;
+% % Eks_corr(Para.TB_ind{2},:) = Eks_corr(Para.TB_ind{2},:) - 0.1516 * 1e3;
+% 
+% index = [3 5 7 4 6 8];
+% figure
+% for ii = 1:6
+%     subplot(2,3,ii)
+%     
+%     compare_alex( Data.k(:,:,1), Ak2 , Prep.Eks(ii,:), Energy_Alex(:,index(ii)) , 'rel' )
+% end
 
 %% Dipolmatrix
 fprintf('Dipol:                     Start'); tic
@@ -216,14 +216,13 @@ end
 % figure
 % for ii = 1:4
 %     subplot(2,2,ii)
-%     compare_alex( Data.k(:,:,1), k2 , Ploter.dipol_l(:,ii)/10, Dipol_Alex(:,ii+2) )
+%     compare_alex( Data.k(:,:,1), k2 , Ploter.dipol_l(:,ii)/10, Dipol_Alex(:,ii+2),'rel' )
 % end
-% 
 % 
 % figure
 % for ii = 1:4
 %     subplot(2,2,ii)
-%     compare_alex( Data.k(:,:,1), k2 , Ploter.dipol_r(:,ii)/10, Dipol_Alex(:,ii+6) )
+%     compare_alex( Data.k(:,:,1), k2 , Ploter.dipol_r(:,ii)/10, Dipol_Alex(:,ii+6),'rel' )
 % end
 
 
@@ -303,7 +302,7 @@ for ii = 1:Para.nr.dipol
 %     Bloch.Esum( Bloch.ind(:,ii) ) = ( - Data.Ek( Para.dipol_trans(ii,1),: , 1 ) + Data.Ek( Para.dipol_trans(ii,2),: , 1 ) ).' ;
     
 %     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{dipolnr}(1,:) - 1i * Data.dipol{dipolnr}(2,:) ).';
-    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
+    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).' / 10; 
 %     Bloch.dipol( (ii-1) * Para.nr.k + 1 : ii * Para.nr.k ) = abs( Data.dipol{ii}(1,:) ).'; 
     
     Bloch.feff( Bloch.ind(:,ii) ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';
@@ -315,15 +314,15 @@ end
 
 Bloch.gamma = 10;
 Bloch.E0 = 1e-7;
-Bloch.t_peak = 0.003;
-Bloch.sigma = 0.001;
+Bloch.t_peak = 2.038 * 1e-3;
+Bloch.sigma = 1e-3;
 Bloch.nrk = Para.nr.k;
 
 
 
 % Kommt noch dazu
-Emin = -800;
-Emax = 0;
+Emin = -1000;
+Emax = 200;
 E = linspace(Emin,Emax,1001)';
 
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
@@ -384,7 +383,7 @@ Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);
 
 %%
 % close all
-
+% 
 % Pkall = [Data.k(1,:);Data.k(2,:)];
 % Akall = [B1(1,:,1);B1(2,:,1)];
 % 
@@ -393,13 +392,13 @@ Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);
 % PVw = V_rabi_fock2(Para.symm_indices(2),:,:,1);
 % PV = PVw(:);
 % AV = ACC2(:,2);
-% compare_alex( Pkall, Akall , PV, AV )
+% compare_alex( Pkall, Akall , PV, AV, 'abs' )
 % 
 % subplot(1,2,2)
 % PVw = V_rabi_fock2(Para.symm_indices(2),:,:,2);
 % PV = PVw(:);
 % AV = ACC2(:,4);
-% compare_alex( Pkall, Akall , PV, AV )
+% compare_alex( Pkall, Akall , PV, AV, 'abs' )
 
 
 %%
@@ -494,6 +493,116 @@ hold on
 
 
 % xlim([-500 0])
+
+%%
+close all
+file = 'abs_spec_0.000E+00_0.000E+00_3.000E+02_2_2_3.18_1.000E+00_1.000E+00cR_1.400E+01_60_30_1.000E-07_1.000E-03_+0.000E+00_HF_self_g0w0-tb_3_r_c_me_soc_1.519E+01_2.dat';
+Aspec = ...
+    importdata(file);
+
+figure
+plot(E + 2640.47 , imag(chi_w))
+hold on
+plot(Aspec(:,1),Aspec(:,5))
+
+
+%%
+Aint = importdata('test_1.dat');
+
+Akx = Aint(:,1);
+Aky = Aint(:,2);
+% 
+
+k1 = [ Akx , Aky ];
+D = [cos(pi/6) -sin(pi/6) ; sin(pi/6) cos(pi/6)];
+
+k2 = D * k1.';
+
+
+
+Pint = 1 / ( 2 * pi )^2 * Bloch.coulomb(:,:,1) * ( Bloch.wkentire );
+
+close all
+figure
+scatter3( k2(1,:), k2(2,:), Aint(:,3)  )
+hold on
+scatter3(kx,ky,Pint)
+
+
+Pint_n = zeros(Para.nr.k,1);
+for nk = 1:Para.nr.k
+    
+    for nks = 1:Para.nr.k
+        
+        for tri = 1:6
+        
+            Pint_n(nk) = Pint_n(nk) + 1 / ( 2 * pi )^2 * Data.wk(nks) / 6 * Para.BZsmall.area * V_rabi_fock2(nk,nks,tri,1) * Para.vorf.coul;
+        
+        end
+        
+    end
+    
+end
+
+figure
+scatter3( k2(1,:), k2(2,:), Aint(:,3)  )
+hold on
+scatter3(kx,ky,Pint_n)
+
+
+
+
+
+%%
+
+RenKs = 0;
+Ev = Prep.Ev_noSOC;
+para_map = [1 2 3 ; 2 4 5 ; 3 5 6];
+
+k0x = Data.k(1,end,1);
+k0y = Data.k(2,end,1);
+
+for nks = 1:Para.nr.k
+    for tri = 1:6
+        
+        ksx = Data.k(1,nks,tri);
+        ksy = Data.k(2,nks,tri);
+        
+        qb = zeros(1,Para.nr.b);
+        
+        for nb = 1:Para.nr.b
+            
+            qb(nb) = sqrt( ( k0x - ksx + Para.k.b(1,nb) )^2 + ( k0y - ksy + Para.k.b(1,nb) )^2 );
+            
+        end
+        
+        q = min( qb );
+        
+        if q < 1e-4
+            q = 0;
+        end
+        
+        
+        Coul = 0;
+        for a = 1:3
+            for b = 1:3
+                
+                V = final_coul_scr(Prep.minq(end,nks,tri),Para.coul.screened(para_map(a,b),:),Para.coul.pol);
+                               
+                Coul = conj( Ev(a,2,end,1) ) * conj( Ev(b,1,nks,tri) ) * Ev(b,1,end,1) * Ev(a,2,nks,tri) * V;
+                
+            end
+        end
+        
+        Coul = Para.vorf.coul * abs( Coul );
+        
+        RenKs = RenKs + 1 / ( 2 * pi )^2 * Data.wk(nks) / 6 * Para.BZsmall.area * Coul;
+        
+    end
+end
+
+
+
 
 %%
 % P_t2 = zeros(1,numel(t));

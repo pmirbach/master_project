@@ -19,19 +19,40 @@ for nll = 1:Para.nr.dipol
         d = 3;
     end
     
-    for a = 1:3
+    for tri = 1:6
         
-        for b = 1:3
+        Coul = 0;
+        
+        for a = 1:3
             
-            for tri = 1:6
+            for b = 1:3
+                
+                
+                
+                %                 V_rabi_fock(:,:,nll) = V_rabi_fock(:,:,nll) + ...
+                %                     ( Prep.CV(:,1,a+d,b+d,ee,hh) * Prep.CV(:,tri,b+d,a+d,hh,ee).' ) .* ...
+                %                     final_coul_scr(Prep.minq(:,:,tri),Para.coul.screened(para_map(a,b),:),Para.coul.pol);
                 
 %                 V_rabi_fock(:,:,nll) = V_rabi_fock(:,:,nll) + ...
-%                     ( Prep.CV(:,1,a+d,b+d,ee,hh) * Prep.CV(:,tri,b+d,a+d,hh,ee).' ) .* ...
+%                     ( Prep.CV_noSOC(:,1,a,b,ee-d,hh-d) * Prep.CV_noSOC(:,tri,b,a,hh-d,ee-d).' ) .* ...
 %                     final_coul_scr(Prep.minq(:,:,tri),Para.coul.screened(para_map(a,b),:),Para.coul.pol);
                 
-                V_rabi_fock(:,:,nll) = V_rabi_fock(:,:,nll) + ...
-                    ( Prep.CV_noSOC(:,1,a,b,ee-d,hh-d) * Prep.CV_noSOC(:,tri,b,a,hh-d,ee-d).' ) .* ...
+                
+                
+                
+                
+                Coul = Coul + ( Prep.CV_noSOC(:,1,a,b,ee-d,hh-d) * Prep.CV_noSOC(:,tri,b,a,hh-d,ee-d).' ) .* ...
                     final_coul_scr(Prep.minq(:,:,tri),Para.coul.screened(para_map(a,b),:),Para.coul.pol);
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
                 
                 %                 V_rabi_fock(:,:,nll) = V_rabi_fock(:,:,nll) + ...
                 %                     final_coul_scr(Prep.minq(:,:,tri),Para.coul.screened(para_map(a,b),:),Para.coul.pol);
@@ -45,25 +66,27 @@ for nll = 1:Para.nr.dipol
                 % %                             Prep.CV(nk,1,a+d,b+d,ee,hh) * Prep.CV(nks,tri,b+d,a+d,hh,ee) .* ...
                 % %                             final_coul_scr(Prep.minq(nk,nks,tri),Para.coul.screened(para_map(a,b),:),Para.coul.pol);
                 % %
-%                         V_rabi_fock3(nk,nks,nll) = V_rabi_fock3(nk,nks,nll) + ...
-%                             conj( Ev(a,ee,nk,1) ) * conj( Ev(b,hh,nks,tri) ) * Ev(b,hh,nk,1) * Ev(a,ee,nks,tri) * ...
-%                             final_coul_scr(Prep.minq(nk,nks,tri),Para.coul.screened(para_map(a,b),:),Para.coul.pol);
-%                         
-%                     end
-%                     
-%                 end
+                %                         V_rabi_fock3(nk,nks,nll) = V_rabi_fock3(nk,nks,nll) + ...
+                %                             conj( Ev(a,ee,nk,1) ) * conj( Ev(b,hh,nks,tri) ) * Ev(b,hh,nk,1) * Ev(a,ee,nks,tri) * ...
+                %                             final_coul_scr(Prep.minq(nk,nks,tri),Para.coul.screened(para_map(a,b),:),Para.coul.pol);
+                %
+                %                     end
+                %
+                %                 end
                 
                 
             end
             
         end
         
+        V_rabi_fock(:,:,nll) = V_rabi_fock(:,:,nll) + abs( Coul );
+        
     end
     
 end
 % % max(max(real(V_rabi_fock(:,:,1)-V_rabi_fock2(:,:,1))))
 % % max(max(imag(V_rabi_fock(:,:,1)-V_rabi_fock2(:,:,1))))
-% % 
+% %
 % % max(max(real(V_rabi_fock(:,:,1)-V_rabi_fock3(:,:,1))))
 % % max(max(imag(V_rabi_fock(:,:,1)-V_rabi_fock3(:,:,1))))
 

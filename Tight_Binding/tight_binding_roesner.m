@@ -77,22 +77,22 @@ end
 % Symmetrisierung der Bandstruktur (zeitumkehr)
 
 
-% k_int = round( b_m \ Data.k(:,:,1) ).';
-% sk = size(k_int,1);
-% 
-% as = k_int(:,2);
-% df = 1:size(k_int,1);
-% 
-% for ii = df(as < 0)
-%         
-%     k_find = [ k_int(ii,1) + k_int(ii,2) , -k_int(ii,2) ];
-%     k_find = repmat( k_find, sk,1 );
-% %     ind = find( all( k_int == k_find , 2) );
-%         
-% 
-%     Ek( 1:3 , ii , 1 ) = Ek( 4:6 , all( k_int == k_find , 2) , 1 );
-%     Ek( 4:6 , ii , 1 ) = Ek( 1:3 , all( k_int == k_find , 2) , 1 );
-% end
+k_int = round( b_m \ Data.k(:,:,1) ).';
+sk = size(k_int,1);
+
+as = k_int(:,2);
+df = 1:size(k_int,1);
+
+for ii = df(as < 0)
+        
+    k_find = [ k_int(ii,1) + k_int(ii,2) , -k_int(ii,2) ];
+    k_find = repmat( k_find, sk,1 );
+%     ind = find( all( k_int == k_find , 2) );
+        
+
+    Ek( 1:3 , ii , 1 ) = Ek( 4:6 , all( k_int == k_find , 2) , 1 );
+    Ek( 4:6 , ii , 1 ) = Ek( 1:3 , all( k_int == k_find , 2) , 1 );
+end
 
 
 
