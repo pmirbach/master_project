@@ -39,6 +39,10 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 
 [ Data.k , Data.wk , Para.nr.k , Para.symm_indices ] = k_mesh_mp(Ctrl, Para);
 
+
+k_mesh_AG(Ctrl, Para)
+
+
 file = 'Daniel/MoS2_gradtest.mat';
 [Para, Data, Daniel] = load_daniel_data(Ctrl, Para, Data, file); % overwrites k, wk, coul_pol, wk_area, nr_k
 
