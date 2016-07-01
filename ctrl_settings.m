@@ -7,7 +7,7 @@ Ctrl.lattice_constant = 0.318;  % ab initio TB: MoS2: .316, .318, .320   (in liu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%% k-mesh %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%       
-Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße (Vielfaches von 6!). 60 -> 631 kpts; 120 -> 2461 kpts
+Ctrl.k_mesh_mp.qr = 120;        % Unterteilungsgröße (Vielfaches von 6!). 60 -> 631 kpts; 120 -> 2461 kpts
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%% Tight-Binding modell %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%      
@@ -40,7 +40,7 @@ Ctrl.plot.path = {'K','M', 'K*', '\Gamma', 'K','M','\Gamma'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 0];         % Bandstructure
+Ctrl.plot.tb = [0 , 1];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 Ctrl.plot.coul = 0;

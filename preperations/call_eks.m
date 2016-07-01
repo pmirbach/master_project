@@ -12,7 +12,7 @@ band_ind{2} = [2,3,5,6];
 % band_ind{3} = [5,6];    % Indizes der Leitungsbänder mit Spin down
 
 Eks(band_ind{1},:) = - Ek(band_ind{1},:,1);
-Eks(band_ind{2},:) = Ek(band_ind{2},:,1) - min(min(Ek(band_ind{2},:,1)));
+Eks(band_ind{2},:) = Ek(band_ind{2},:,1) - min(min(Ek(band_ind{2},end,1)));
 
 % Eks(band_ind{2},:) = Ek(band_ind{2},:,1) - min(min(Ek(band_ind{2},:,1)));
 % Eks(band_ind{3},:) = Ek(band_ind{3},:,1) - min(min(Ek(band_ind{3},:,1)));

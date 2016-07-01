@@ -1,4 +1,4 @@
-function [] = compare_alex( k_P, k_A, Data_P, Data_A )
+function [] = compare_alex( k_P, k_A, Data_P, Data_A , art )
 
 % k size in 1st dim, kx ky in columns
 if size( k_P , 1 ) < size( k_P , 2 )
@@ -19,9 +19,6 @@ end
 
 
 
-
-
-
 k_P = round( k_P , 6 ) ;
 k_A = round( k_A , 6 ) ;
 
@@ -35,11 +32,15 @@ end
 Data_P_sort = Data_P( index_P );
 Data_A_sort = Data_A( index_A );
 
-Gamma = 1;
-difference = ( Data_P_sort - Data_A_sort ).^Gamma;
+if strcmp(art,'rel')
+    plotdata = Data_P_sort ./ Data_A_sort - 1;   
+elseif strcmp(art,'abs')
+    plotdata = ( Data_P_sort - Data_A_sort );
+else
+    error('Use abs or rel!')
+end
 
-color_sc =  ( (difference - min(difference)) / max(difference - min(difference) )  ) ;       
+color_sc =  ( (plotdata - min(plotdata)) / max(plotdata - min(plotdata) )  ) ;
 C = [ zeros( length(color_sc) ,1) , color_sc , zeros(length(color_sc),1) ];                 % green
 
-
-scatter3( k_P_sort(:,1),k_P_sort(:,2), Data_P_sort - Data_A_sort , 80, C , 'filled' )
+scatter3( k_P_sort(:,1),k_P_sort(:,2), plotdata , 80, C , 'filled' )

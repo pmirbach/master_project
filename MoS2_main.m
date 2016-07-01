@@ -83,11 +83,13 @@ Kpind = find(all(kf == Kp,1));
 
 
 % figure;
-% plot(Akx,Aky,'Color', 0.8 * [1 1 1])
-% hold on
-% plot(k2(1,:),k2(2,:),'Color', 0.8 * [0 1 1])
-
-
+% set(gcf,'color','w');
+% plot(Akx,Aky,'-x','Color', 0 * [1 1 1])
+% axis equal
+% % hold on
+% % plot(k2(1,:),k2(2,:),'Color', 0.8 * [0 1 1])
+% grid off
+% axis off
 
 
 
@@ -154,12 +156,19 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 
 %%
-% close all
-% 
-% index = [3 5 7 4 6 8];
-% for ii = 1:6
-%     figure; compare_alex( Data.k(:,:,1), Ak2 , Prep.Eks(ii,:), Energy_Alex(:,index(ii)) )
-% end
+close all
+
+% Prep.Eks(Para.TB_ind{2},:) = Prep.Eks(Para.TB_ind{2},:) - 0.1516 * 1e3;
+% Eks_corr = Prep.Eks;
+% Eks_corr(Para.TB_ind{2},:) = Eks_corr(Para.TB_ind{2},:) - 0.1516 * 1e3;
+
+index = [3 5 7 4 6 8];
+figure
+for ii = 1:6
+    subplot(2,3,ii)
+    
+    compare_alex( Data.k(:,:,1), Ak2 , Prep.Eks(ii,:), Energy_Alex(:,index(ii)) , 'abs' )
+end
 
 %% Dipolmatrix
 fprintf('Dipol:                     Start'); tic
@@ -199,6 +208,19 @@ end
 % end
 
 % figure; compare_alex( Data.k(:,:,1), k2 , Ploter.dipol_l(:,1)/10, Dipol_Alex(:,1+2) )
+
+% figure
+% for ii = 1:4
+%     subplot(2,2,ii)
+%     compare_alex( Data.k(:,:,1), k2 , Ploter.dipol_l(:,ii)/10, Dipol_Alex(:,ii+2) )
+% end
+% 
+% 
+% figure
+% for ii = 1:4
+%     subplot(2,2,ii)
+%     compare_alex( Data.k(:,:,1), k2 , Ploter.dipol_r(:,ii)/10, Dipol_Alex(:,ii+6) )
+% end
 
 
 %% Thermische Anregung
@@ -310,38 +332,38 @@ Para.nr.w = numel(Bloch.w);
 
 %% Vergleich der Coulomb Matrixelemente mit Alex
 
-% Coul_Alex = importdata('Alexander/Coul_Fock_60.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
-% nrkt = size(Coul_Alex,1) / 5;
-% ACk = Coul_Alex(:,1:2);
-% ACC = Coul_Alex(:,3);
-% % 
-% D = [cos(pi/6) -sin(pi/6) ; sin(pi/6) cos(pi/6)];
+Coul_Alex = importdata('Alexander/Coul_Fock_60.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
+nrkt = size(Coul_Alex,1) / 5;
+ACk = Coul_Alex(:,1:2);
+ACC = Coul_Alex(:,3);
 % 
-% ACk2 = D * ACk.';
-% 
-% B1 = reshape( ACk2 , 2 , [] , 5 );
-% ACC2 = reshape(ACC,[],5);
-% 
-% % color_sc = ( ACC2(:,4) / max( ACC2(:,4) ) );       
-% % C = [ zeros(Para.nr.k*6,1) , color_sc , zeros(Para.nr.k*6,1) ];     % green
-% % C = color_sc * [ zeros(Para.nr.k*6,1) , color_sc , zeros(Para.nr.k*6,1) ];     % green
-% 
-% 
+D = [cos(pi/6) -sin(pi/6) ; sin(pi/6) cos(pi/6)];
+
+ACk2 = D * ACk.';
+
+B1 = reshape( ACk2 , 2 , [] , 5 );
+ACC2 = reshape(ACC,[],5);
+
+% color_sc = ( ACC2(:,4) / max( ACC2(:,4) ) );       
+% C = [ zeros(Para.nr.k*6,1) , color_sc , zeros(Para.nr.k*6,1) ];     % green
+% C = color_sc * [ zeros(Para.nr.k*6,1) , color_sc , zeros(Para.nr.k*6,1) ];     % green
+
+
 % Para.dipol_trans = [1 2];
-% % Para.dipol_trans = [4 5];
+% Para.dipol_trans = [4 5];
 % Para.nr.dipol = size(Para.dipol_trans,1);
-% 
-% [Para.coul.screened, Para.coul.names] = load_coul_parameter( Ctrl );
-% 
+
+[Para.coul.screened, Para.coul.names] = load_coul_parameter( Ctrl );
+
 % [V_rabi_fock] = coulomb_rabi_f_2(Ctrl, Para, Prep);  
-% 
-% Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
-% 
-% [V_rabi_fock2] = coulomb_rabi_f_2(Ctrl, Para, Prep);  
-% 
-% % scatter3(Data.k(1,:),Data.k(2,:),V_rabi_fock(Para.symm_indices(2),:)-V_rabi_fock2(Para.symm_indices(2),:),10,'r+')
-% 
-% 
+
+Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
+
+[V_rabi_fock2] = coulomb_rabi_f_2(Ctrl, Para, Prep);  
+
+% scatter3(Data.k(1,:),Data.k(2,:),V_rabi_fock(Para.symm_indices(2),:)-V_rabi_fock2(Para.symm_indices(2),:),10,'r+')
+
+
 % figure; scatter3(B1(1,:,1),B1(2,:,1),ACC2(:,2),10,'bx')
 % hold on
 % scatter3(Data.k(1,:),Data.k(2,:),V_rabi_fock2(Para.symm_indices(2),:),10,'r+')
@@ -351,13 +373,30 @@ Para.nr.w = numel(Bloch.w);
 
 %%
 
+Para.dipol_trans = [1, 2 ; 1 , 3 ; 4 , 5 ; 4 , 6 ];
+[Para.coul.screened, Para.coul.names] = load_coul_parameter( Ctrl );
+Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);  
+[V_rabi_fock2] = coulomb_rabi_f_2(Ctrl, Para, Prep);  
+
+%%
+% close all
+
 % Pkall = [Data.k(1,:);Data.k(2,:)];
 % Akall = [B1(1,:,1);B1(2,:,1)];
 % 
-% PV = V_rabi_fock2(Para.symm_indices(2),:);
+% figure
+% subplot(1,2,1)
+% PVw = V_rabi_fock2(Para.symm_indices(2),:,:,1);
+% PV = PVw(:);
 % AV = ACC2(:,2);
-% 
 % compare_alex( Pkall, Akall , PV, AV )
+% 
+% subplot(1,2,2)
+% PVw = V_rabi_fock2(Para.symm_indices(2),:,:,2);
+% PV = PVw(:);
+% AV = ACC2(:,4);
+% compare_alex( Pkall, Akall , PV, AV )
+
 
 %%
 
