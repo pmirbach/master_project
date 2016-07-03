@@ -66,3 +66,10 @@ Ek = Ek - max(Ek(1,:));
 Ek_noSOC = Ek_noSOC - max(Ek_noSOC(1,:));
 
 [H_grad_kx , H_grad_ky] = grad_TB_Liu_TNN_fun(Data.k(1:2,:,1),Para.TB);
+
+
+H_grad_kx = Para.energy_conversion * H_grad_kx;
+H_grad_ky = Para.energy_conversion * H_grad_ky;
+
+
+
