@@ -74,6 +74,9 @@ kall(:,:,6) = C3 * kall(:,:,4);
 kall(:,:,2) = C3 * kall(:,:,6);
 
 
+
+
+
 % ind = 30;
 % figure; hold on
 % for ii = 1:6
@@ -130,17 +133,40 @@ kall(:,:,2) = C3 * kall(:,:,6);
 % plot(kall(1,ind,1),kall(2,ind,1),'ko')
 % plot(kall(1,ind_eq,1),kall(2,ind_eq,1),'bo')
 
-colors = {'b','r','y','g','c','m'};
 % Test Plot: Indizierung 3 - Indizes unten, mitte, oben
+
+color_matrix = [ 160 82 45 ; 205 133 63 ; 222 184 135 ; 85 107 47 ; 107 142 35 ; 189 183 107] / 255;
+opac = 1/10;
+
 figure; hold on
-for ii = 1:6
-    stro = [colors{ii},'x'];
-    strm = [colors{ii},'^'];
-    stru = [colors{ii},'s'];
-    plot(kall(1,ind_oben,ii),kall(2,ind_oben,ii),stro)
-    plot(kall(1,ind_mitte,ii),kall(2,ind_mitte,ii),strm)
-    plot(kall(1,ind_unten,ii),kall(2,ind_unten,ii),stru)
+for ni = 1:6
+    scatter(kall(1,ind_oben,ni),kall(2,ind_oben,ni),'^','MarkerEdgeColor',color_matrix(ni,:),'MarkerFaceColor',color_matrix(ni,:),'MarkerFaceAlpha',opac)
+    scatter(kall(1,ind_mitte,ni),kall(2,ind_mitte,ni),'s','MarkerEdgeColor',color_matrix(ni,:),'MarkerFaceColor',color_matrix(ni,:),'MarkerFaceAlpha',opac)
+    scatter(kall(1,ind_unten,ni),kall(2,ind_unten,ni),'v','MarkerEdgeColor',color_matrix(ni,:),'MarkerFaceColor',color_matrix(ni,:),'MarkerFaceAlpha',opac)
 end
+
+testinds = [121, 250];
+
+for ii = 1:length(testinds)
+    
+    for ni = 1:6
+        
+        indup = ind_oben( testinds( ii ) );
+        inddwn = ind_unten( testinds( ii ) );
+        
+        plot(kall(1,indup,ni),kall(2,indup,ni),'ko')
+        plot(kall(1,inddwn,ni),kall(2,inddwn,ni),'ro')
+        
+    end
+    
+end
+
+
+
+
+
+
+1
 
 % % Test Plot: Entire BZ
 % figure; hold on
