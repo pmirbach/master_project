@@ -34,6 +34,10 @@ kobenn = koben(: , end:-1:1);
 
 k1 = [ kobenn , kmitte , kuntenn ];
 
+
+
+
+
 % figure
 % plot(k1(1,:),k1(2,:),'-x')
 
@@ -42,16 +46,107 @@ newsymmpts = 2 * pi / ( 3 * a ) * [ [ sqrt(3); 1 ] , [ 0; 0 ], [ sqrt(3); -1 ] ]
 
 k = pts_triangle_fun_new(k1 , newsymmpts , 30 * eps);
 
-% figure
-% plot(k(1,:),k(2,:),'-x')
-wk = pts_weight_new(k, newsymmpts, 30 * eps);
-kall = red_to_BZ(k);
+Nrk = size(k,2);
+Nrmitte = sum( k(2,:) == 0 );
+NrSide = ( Nrk - Nrmitte ) / 2;
 
-figure
-hold on
+ind_oben = 1 : NrSide;
+ind_mitte = NrSide + 1 : NrSide + Nrmitte;
+ind_unten = Nrk : -1 : Nrk - NrSide + 1;
+
+
+wk = pts_weight_new(k, newsymmpts, 30 * eps);
+
+
+
+kall = zeros( [size(k),6] );
+
+kall(:,:,1) = k;
+kall(:,:,4) = kall(:,:,1);
+kall(1,:,4) = - kall(1,:,4);
+
+C3 = [ cos(2 * pi / 3), -sin(2 * pi / 3); ...
+    sin(2 * pi / 3) cos(2 * pi / 3) ];
+
+kall(:,:,3) = C3 * kall(:,:,1);
+kall(:,:,5) = C3 * kall(:,:,3);
+kall(:,:,6) = C3 * kall(:,:,4);
+kall(:,:,2) = C3 * kall(:,:,6);
+
+
+% ind = 30;
+% figure; hold on
+% for ii = 1:6
+%     plot(kall(1,:,ii),kall(2,:,ii),'x')
+%     plot(kall(1,ind,ii),kall(2,ind,ii),'ko')
+% end
+
+
+
+% % Test Plot: All in One
+% 
+% kind = 1:Nrk;
+% 
+% bool_or = false(3, Nrk);
+% bool_or(1,:) = kind <= max( ind_oben );
+% bool_or(2,:) = kind > max( ind_oben ) & kind < min( ind_unten );
+% bool_or(3,:) = kind >= min( ind_unten );
+% 
+% bool_w = false(3, Nrk);
+% bool_w(1,:) = wk == 6;
+% bool_w(2,:) = wk == 3;
+% bool_w(3,:) = wk == 1;
+% 
+% colors = {'b','r','g','c','m'};
+% marker = {'h','x','^','+','v'};
+% figure; hold on
+% for ni = 1:3
+%     for nj = 1:3
+%         asdf = [ colors{nj}, marker{ni} ];
+%         plot(k(1,bool_w(ni,:) & bool_or(nj,:),1),k(2,bool_w(ni,:) & bool_or(nj,:),1),asdf)
+%     end
+% end
+
+
+
+% % Test Plot: Gewichtung
+% in = wk == 6;
+% on = wk == 3;
+% symm = wk == 1;
+% figure; hold on
+% plot(kall(1,in,2),kall(2,in,2),'rx')
+% plot(kall(1,on,2),kall(2,on,2),'r^')
+% plot(kall(1,symm,2),kall(2,symm,2),'rs')
+
+% % Test Plot: Indizierung 1.1 - Speicherordnung
+% figure; hold on
+% for ii = 1:6
+%     plot(kall(1,:,ii),kall(2,:,ii),'x')
+% end
+% % Test Plot: Indizierung 1.2 - aequivalente Punkte
+% hold on
+% ind = 1;
+% ind_eq = Nrk - ind + 1;
+% plot(kall(1,ind,1),kall(2,ind,1),'ko')
+% plot(kall(1,ind_eq,1),kall(2,ind_eq,1),'bo')
+
+colors = {'b','r','y','g','c','m'};
+% Test Plot: Indizierung 3 - Indizes unten, mitte, oben
+figure; hold on
 for ii = 1:6
-    plot(kall(1,:,ii),kall(2,:,ii),'x')
+    stro = [colors{ii},'x'];
+    strm = [colors{ii},'^'];
+    stru = [colors{ii},'s'];
+    plot(kall(1,ind_oben,ii),kall(2,ind_oben,ii),stro)
+    plot(kall(1,ind_mitte,ii),kall(2,ind_mitte,ii),strm)
+    plot(kall(1,ind_unten,ii),kall(2,ind_unten,ii),stru)
 end
+
+% % Test Plot: Entire BZ
+% figure; hold on
+% for ii = 1:6
+%     plot(kall(1,:,ii),kall(2,:,ii),'x')
+% end
 
 
 1

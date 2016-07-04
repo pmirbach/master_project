@@ -11,8 +11,8 @@ Ctrl.k_mesh_mp.qr = 60;        % Unterteilungsgröße (Vielfaches von 6!). 60 ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%% Tight-Binding modell %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%      
-% Ctrl.TB_modell = 'ab_initio';   % Tight-Binding modell: Roesner ab initio or liu
-Ctrl.TB_modell = 'liu';
+Ctrl.TB_modell = 'ab_initio';   % Tight-Binding modell: Roesner ab initio or liu
+% Ctrl.TB_modell = 'liu';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

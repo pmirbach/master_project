@@ -40,7 +40,13 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 [ Data.k , Data.wk , Para.nr.k , Para.symm_indices ] = k_mesh_mp(Ctrl, Para);
 
 
-% k_mesh_AG(Ctrl, Para)
+
+%%
+% 
+k_mesh_AG(Ctrl, Para)
+
+
+%%
 
 
 file = 'Daniel/MoS2_gradtest.mat';
@@ -179,7 +185,7 @@ for ii = 1:Para.nr.dipol
     Bloch.Esum( Bloch.ind(:,ii) ) = ( Prep.Eks( Para.dipol_trans(ii,1),: ) + Prep.Eks( Para.dipol_trans(ii,2),: ) ).' ;
 %     Bloch.Esum( Bloch.ind(:,ii) ) = ( - Data.Ek( Para.dipol_trans(ii,1),: , 1 ) + Data.Ek( Para.dipol_trans(ii,2),: , 1 ) ).' ;
     
-    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).' / 10; 
+    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).' / 10; 
 %     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).';
     
     Bloch.feff( Bloch.ind(:,ii) ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';
@@ -205,6 +211,90 @@ E = linspace(Emin,Emax,1001)';
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
 
 Para.nr.w = numel(Bloch.w);
+
+%%
+
+% load('MoS2_631.mat')
+% % load( 'MoS2_35x35.mat' ) ;
+% 
+% 
+% 
+% 
+% Aint = importdata('test_1.dat');
+% 
+% Akx = Aint(:,1);
+% Aky = Aint(:,2);
+% % 
+% 
+% k1 = [ Akx , Aky ];
+% D = [cos(pi/6) -sin(pi/6) ; sin(pi/6) cos(pi/6)];
+% 
+% k2 = D * k1.';
+% 
+% 
+% 
+% Pint = 1 / ( 2 * pi )^2 * Bloch.coulomb(:,:,1) * ( Bloch.wkentire );
+% Pint2 = 1 / ( 2 * pi )^2 * Bloch.coulomb(:,:,2) * ( Bloch.wkentire );
+% 
+% % scatter3( MoS2.kpts(:,1,1) , MoS2.kpts(:,2,1) , sum( squeeze( MoS2.COUL.D(1,:,:) ) , 2 )  )
+% % hold on
+% % scatter3(kx,ky,Pint )
+% 
+% 
+% % scatter3(kx,ky,Pint-  sum( squeeze( MoS2.COUL.D(1,:,:) ) , 2 ))
+% % 
+% % 
+% % plot(kx(1:10),ky(1:10),'bx-')
+% % hold on
+% % plot(MoS2.kpts(1:10,1,1),MoS2.kpts(1:10,2,1),'rx-')
+% 
+% A = sum( squeeze( MoS2.COUL.D(1,:,:) ) , 2 );
+% B = sum( squeeze( MoS2.COUL.D(3,:,:) ) , 2 );
+% 
+% 
+% Pkall = round( [ Data.k(1,:,1) ; Data.k(2,:,1) ] , 7 );
+% Dkall = round(MoS2.kpts(:,1:2,1),7);
+% % figure
+% % compare_alex( Pkall, Dkall , Pint, A, 'abs' )
+% % figure
+% % compare_alex( Pkall, Dkall , Pint2, B, 'abs' )
+% 
+% 
+% 
+% compare_alex( Pkall, Dkall , Ploter.dipol_r(:,1)/10, abs(MoS2.d_k(3,:)), 'abs' )
+% % 
+% % figure; scatter3( Dkall(:,1,1), Dkall(:,2,1), abs(MoS2.d_k(1,:)) )
+% % figure; scatter3(kx,ky,Ploter.dipol_r(:,1)/10)
+% 
+% % % close all
+% % % figure
+% % % scatter3( k2(1,:), k2(2,:), Aint(:,3)  )
+% % % hold on
+% % % scatter3(kx,ky,Pint)
+% % 
+% % Pkall = round( [ Data.k(1,:,1) ; Data.k(2,:,1) ] , 7 );
+% % Akall = round( k2 , 7 );
+% % 
+% % compare_alex( Pkall, Akall , Pint, Aint(:,3), 'rel' )
+% 
+% 
+% % Dipol_Alex = importdata('Alexander/dip_60.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
+% % Akx = Dipol_Alex(:,1);
+% % Aky = Dipol_Alex(:,2);
+% % 
+% % k0 = [Akx.'; Aky.'];
+% % 
+% % k1 = [ Akx , Aky ];
+% % D = [cos(pi/6) -sin(pi/6) ; sin(pi/6) cos(pi/6)];
+% % 
+% % k2 = D * k1.';
+% % 
+% % close all
+% % scatter3(kx,ky,Ploter.dipol_r(:,1)/10, 'b')
+% % hold on
+% % scatter3(k2(1,:),k2(2,:),Dipol_Alex(:,7) , 'g')
+% % scatter3( MoS2.kpts(:,1,1) , MoS2.kpts(:,2,1) , abs(MoS2.d_k(3,:)) , 'r' )
+
 
 
 
@@ -251,7 +341,7 @@ hold on
 % Aspec = ...
 %     importdata( file );
 % 
-% figurew
+% figure
 % plot(E + 2640.47 , imag(chi_w))
 % hold on
 % plot(Aspec(:,1),Aspec(:,5))
