@@ -12,7 +12,7 @@ elseif strcmp(Ctrl.TB_modell,'liu')
     W90Data = [];
 end
 
-Para.energy_conversion = 1e3;                           % Umrechnung von ev in mev
+Para.energy_conversion = 1e3;                               % Umrechnung von ev in mev
 
 Para.TB_ind{1} = [1,4]; 
 Para.TB_ind{2} = [2,3,5,6];

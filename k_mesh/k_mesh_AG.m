@@ -1,5 +1,6 @@
 function k_mesh_AG(Ctrl, Para)
 
+Ctrl.plot.k_meshAG = [ 1 1 1 1 ];
 
 a = 0.318;
 
@@ -39,41 +40,20 @@ k_rhomboid_above = k_rhomboid_above(: , end:-1:1);
 k_rhomboid = [ k_rhomboid_above , k_rhomboid_bisec , k_rhomboid_below ];
 
 % Exclude all k points outside red. BZ
-[ k , wk ] = kpts_in_redBZ( k_rhomboid , newsymmpts );
+[ k_redBZ , wk ] = kpts_in_redBZ( k_rhomboid , newsymmpts );
 
-Nrk = size(k,2);
-Nrmitte = sum( k(2,:) == 0 );
-NrSide = ( Nrk - Nrmitte ) / 2;
+% Find equivalent indexes of upper, lower and middle k points
+[ Nrk , ind ] = identify_indexes( k_redBZ );
 
-ind_oben = 1 : NrSide;
-ind_mitte = NrSide + 1 : NrSide + Nrmitte;
-ind_unten = Nrk : -1 : Nrk - NrSide + 1;
+% Create k points in entire BZ
+[ k_BZ ] = create_k_in_BZ( k_redBZ );
 
 
-wk = pts_weight_new(k, newsymmpts, 30 * eps);
-
-
-
-kall = zeros( [size(k),6] );
-
-kall(:,:,1) = k;
-kall(:,:,4) = kall(:,:,1);
-kall(1,:,4) = - kall(1,:,4);
-
-C3 = [ cos(2 * pi / 3), -sin(2 * pi / 3); ...
-    sin(2 * pi / 3) cos(2 * pi / 3) ];
-
-kall(:,:,3) = C3 * kall(:,:,1);
-kall(:,:,5) = C3 * kall(:,:,3);
-kall(:,:,6) = C3 * kall(:,:,4);
-kall(:,:,2) = C3 * kall(:,:,6);
-
-
-
-
-% k_mesh_plots
+% Create k-mesh test plots if wanted
+% k_mesh_test_plots( Ctrl , k_redBZ , wk , ind , k_BZ )
 
 end
+
 
 function [ pts , weight ] = kpts_in_redBZ( pts , corners )
 
@@ -118,14 +98,65 @@ weight( counter == 2 ) = 1;
 end
 
 
+function [ Nrk , ind ] = identify_indexes( k_redBZ )
 
-function k_mesh_plots
+Nrk = size(k_redBZ,2);
+Nrmitte = sum( k_redBZ(2,:) == 0 );
+NrSide = ( Nrk - Nrmitte ) / 2;
+
+ind.up = 1 : NrSide;
+ind.mid = NrSide + 1 : NrSide + Nrmitte;
+ind.dwn = Nrk : -1 : Nrk - NrSide + 1;
+
+end
+
+
+function [ k_BZ ] = create_k_in_BZ( k_redBZ )
+
+k_BZ = zeros( [size(k_redBZ),6] );
+k_BZ(:,:,1) = k_redBZ;
+
+% Counterpart of tri 1 is tri 4: Same ky, mirrored kx
+k_BZ(:,:,4) = k_BZ(:,:,1);
+k_BZ(1,:,4) = - k_BZ(1,:,4);
+
+% Other triangles through Rotation by 60 degrees
+C3 = [ cos(2 * pi / 3), -sin(2 * pi / 3); ...
+    sin(2 * pi / 3) cos(2 * pi / 3) ];
+
+k_BZ(:,:,3) = C3 * k_BZ(:,:,1);
+k_BZ(:,:,5) = C3 * k_BZ(:,:,3);
+k_BZ(:,:,6) = C3 * k_BZ(:,:,4);
+k_BZ(:,:,2) = C3 * k_BZ(:,:,6);
+
+end
+
+
+function k_mesh_test_plots( Ctrl , k_redBZ , wk , ind , k_BZ )
+
+
+if Ctrl.plot.k_meshAG(1) == 1
+    a
+end
+
+if Ctrl.plot.k_meshAG(2) == 1
+    a
+end
+
+if Ctrl.plot.k_meshAG(3) == 1
+    a
+end
+
+if Ctrl.plot.k_meshAG(4) == 1
+    a
+end
+
 
 ind = 30;
 figure; hold on
 for ii = 1:6
-    plot(kall(1,:,ii),kall(2,:,ii),'x')
-    plot(kall(1,ind,ii),kall(2,ind,ii),'ko')
+    plot(k_BZ(1,:,ii),k_BZ(2,:,ii),'x')
+    plot(k_BZ(1,ind,ii),k_BZ(2,ind,ii),'ko')
 end
 
 
@@ -184,9 +215,12 @@ opac = 1/10;
 
 figure; hold on
 for ni = 1:6
-    scatter(kall(1,ind_oben,ni),kall(2,ind_oben,ni),'^','MarkerEdgeColor',color_matrix(ni,:),'MarkerFaceColor',color_matrix(ni,:),'MarkerFaceAlpha',opac)
-    scatter(kall(1,ind_mitte,ni),kall(2,ind_mitte,ni),'s','MarkerEdgeColor',color_matrix(ni,:),'MarkerFaceColor',color_matrix(ni,:),'MarkerFaceAlpha',opac)
-    scatter(kall(1,ind_unten,ni),kall(2,ind_unten,ni),'v','MarkerEdgeColor',color_matrix(ni,:),'MarkerFaceColor',color_matrix(ni,:),'MarkerFaceAlpha',opac)
+    scatter(kall(1,ind_oben,ni),kall(2,ind_oben,ni),'^','MarkerEdgeColor',color_matrix(ni,:),...
+        'MarkerFaceColor',color_matrix(ni,:),'MarkerFaceAlpha',opac)
+    scatter(kall(1,ind_mitte,ni),kall(2,ind_mitte,ni),'s','MarkerEdgeColor',color_matrix(ni,:),...
+        'MarkerFaceColor',color_matrix(ni,:),'MarkerFaceAlpha',opac)
+    scatter(kall(1,ind_unten,ni),kall(2,ind_unten,ni),'v','MarkerEdgeColor',color_matrix(ni,:),...
+        'MarkerFaceColor',color_matrix(ni,:),'MarkerFaceAlpha',opac)
 end
 
 testinds = [121, 250];
