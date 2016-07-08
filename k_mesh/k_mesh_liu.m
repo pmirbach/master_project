@@ -1,6 +1,6 @@
 function [ k , wk , nr_k , symm_indices ] = k_mesh_mp(Ctrl, Para)
 
-qr = Ctrl.k_mesh_mp.qr;             % Feinheit des meshes
+qr = Ctrl.k_mesh.qr;             % Feinheit des meshes
 
 b1 = Para.k.GV(:,1);          % Reziproke Gittervektoren
 b2 = Para.k.GV(:,2);

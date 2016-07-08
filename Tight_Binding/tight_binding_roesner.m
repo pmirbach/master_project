@@ -21,9 +21,9 @@ k_m = zeros( Para.nr.k , 3 , 6 );
 
 if ~Ctrl.cmp.use_k
     % Basiswechsel in Vielfache von den reziproken Gittervektoren:
-    b_m = abs( Para.k.GV ) / Ctrl.k_mesh_mp.qr;                                 % Maltes GV / qr
+    b_m = abs( Para.k.GV ) / Ctrl.k_mesh.qr;                                 % Maltes GV / qr
     for ni = 1:6
-        k_m(:,1:2,ni) = round( b_m \ Data.k(:,:,ni) ).' / Ctrl.k_mesh_mp.qr;    % Basiswechsel in Vielfache von G (hohe Genauigkeit)
+        k_m(:,1:2,ni) = round( b_m \ Data.k(:,:,ni) ).' / Ctrl.k_mesh.qr;    % Basiswechsel in Vielfache von G (hohe Genauigkeit)
     end
 elseif Ctrl.cmp.use_k
     b_m = abs( Para.k.GV );                         % Maltes GV 

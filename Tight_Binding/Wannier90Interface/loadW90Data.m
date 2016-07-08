@@ -14,8 +14,8 @@ function W90Data = loadW90Data(seed, SOCSettings)
     fid = fopen(wannier90File, 'r');
 
     %   read each line untile
-    %       - 'begin projections'
-    %       - 'begin unit_cell_cart' 
+    %       - 'begin projections'   
+    %       - 'begin unit_cell_cart'
     %   are found
     tline = fgetl(fid);
     while ischar(tline)

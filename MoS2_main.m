@@ -1,5 +1,5 @@
 %% Header
-% clear variables
+clear variables
 clear global
 % close all
 
@@ -42,8 +42,8 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 
 
 %%
-% 
-% k_mesh_AG(Ctrl, Para)
+
+[ k_BZ , wk , Nrk , ind ] = k_mesh_AG(Ctrl, Para);
 
 
 %%

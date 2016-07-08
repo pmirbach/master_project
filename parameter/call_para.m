@@ -33,7 +33,7 @@ end
 Para.BZ.a = norm(Para.BZred.symmpts{2}(:,2));
 Para.BZ.area = 3 * sqrt(3) / 2 * Para.BZ.a^2;
 
-Para.BZsmall.a = Para.BZ.a / Ctrl.k_mesh_mp.qr;
+Para.BZsmall.a = Para.BZ.a / Ctrl.k_mesh.qr;
 Para.BZsmall.area = 3 * sqrt(3) / 2 * Para.BZsmall.a^2;
 
 Para.k.GV = 2 * pi / Para.real.a * [1, -1 / sqrt(3); 0, 2 / sqrt(3)]';

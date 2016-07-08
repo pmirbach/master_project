@@ -1,4 +1,4 @@
-function k_mesh_AG(Ctrl, Para)
+function [ k_BZ , wk , Nrk , ind ] = k_mesh_AG(Ctrl, Para)
 
 Ctrl.plot.k_meshAG = [ 1 1 1 1 ];
 
@@ -10,7 +10,7 @@ b2 = 2 * pi / a * [ 1 / sqrt(3) ; 1 ];
 newsymmpts = 2 * pi / ( 3 * a ) * [ [ sqrt(3); 1 ] , [ 0; 0 ], [ sqrt(3); -1 ] ];
 
 % Density of k-mesh
-qr = Ctrl.k_mesh_mp.qr;
+qr = Ctrl.k_mesh.qr;
 
 % Ascending and descending matrices for rhomboid k-mesh including red. BZ
 ur = ( -2 * qr / 3 : 2 * qr / 3 ) / qr;
@@ -135,92 +135,129 @@ end
 function k_mesh_test_plots( Ctrl , k_redBZ , wk , ind , k_BZ )
 
 
-if Ctrl.plot.k_meshAG(1) == 1
-    a
-end
-
-if Ctrl.plot.k_meshAG(2) == 1
-    a
-end
-
-if Ctrl.plot.k_meshAG(3) == 1
-    a
-end
-
-if Ctrl.plot.k_meshAG(4) == 1
-    a
-end
-
-
-ind = 30;
-figure; hold on
-for ii = 1:6
-    plot(k_BZ(1,:,ii),k_BZ(2,:,ii),'x')
-    plot(k_BZ(1,ind,ii),k_BZ(2,ind,ii),'ko')
-end
+% if Ctrl.plot.k_meshAG(1) == 1
+%     a
+% end
+% 
+% if Ctrl.plot.k_meshAG(2) == 1
+%     a
+% end
+% 
+% if Ctrl.plot.k_meshAG(3) == 1
+%     a
+% end
+% 
+% if Ctrl.plot.k_meshAG(4) == 1
+%     a
+% end
 
 
+% ind = 30;
+% figure; hold on
+% for ii = 1:6
+%     plot(k_BZ(1,:,ii),k_BZ(2,:,ii),'x')
+%     plot(k_BZ(1,ind,ii),k_BZ(2,ind,ii),'ko')
+% end
 
-% Test Plot: All in One
+
+
+% % % Test Plot: All in One
+% % 
+% % Nrk = size(k_redBZ,2);
+% % 
+% % kind = 1:Nrk;
+% % 
+% % bool_or = false(3, Nrk);
+% % bool_or(1,:) = kind <= max( ind.up );
+% % bool_or(2,:) = kind > max( ind.up ) & kind < min( ind.dwn );
+% % bool_or(3,:) = kind >= min( ind.dwn );
+% % 
+% % bool_w = false(3, Nrk);
+% % bool_w(1,:) = wk == 6;
+% % bool_w(2,:) = wk == 3;
+% % bool_w(3,:) = wk == 1;
+% % 
+% % colors = {'b','r','g','c','m'};
+% % marker = {'h','x','^','+','v'};
+% % figure; hold on
+% % for ni = 1:3
+% %     for nj = 1:3
+% %         asdf = [ colors{nj}, marker{ni} ];
+% %         plot(k_redBZ(1,bool_w(ni,:) & bool_or(nj,:),1),k_redBZ(2,bool_w(ni,:) & bool_or(nj,:),1),asdf)
+% %     end
+% % end
+% % 
+% % 
+% % 
+% % Test Plot: Gewichtung
+% % in = wk == 6;
+% % on = wk == 3;
+% % symm = wk == 1;
+% % figure; hold on
+% % plot(kall(1,in,2),kall(2,in,2),'rx')
+% % plot(kall(1,on,2),kall(2,on,2),'r^')
+% % plot(kall(1,symm,2),kall(2,symm,2),'rs')
+% % 
+% % % Test Plot: Indizierung 1.1 - Speicherordnung
+% % figure; hold on
+% % for ii = 1:6
+% %     plot(kall(1,:,ii),kall(2,:,ii),'x')
+% % end
+% % Test Plot: Indizierung 1.2 - aequivalente Punkte
+% % hold on
+% % ind = 1;
+% % ind_eq = Nrk - ind + 1;
+% % plot(kall(1,ind,1),kall(2,ind,1),'ko')
+% % plot(kall(1,ind_eq,1),kall(2,ind_eq,1),'bo')
+
+
+
+
+% Test Plot: Indizierung 3 - Indizes unten, mitte, oben
+% color_matrix = [ 160 82 45 ; 205 133 63 ; 222 184 135 ; 85 107 47 ; 107 142 35 ; 189 183 107] / 255;
+
+color_matrix(:,:,1) = [128, 21, 21 ; 128, 92, 21 ; 128, 128, 21 ; 17, 102, 17 ; 22, 41, 85 ; 61, 18, 85] / 255;
+color_matrix(:,:,2) = [170, 57, 57 ; 170, 132, 57 ; 170, 170, 57 ; 45, 136, 45 ; 46, 65, 114 ; 88, 42, 114] / 255;
+color_matrix(:,:,3) = [212, 106, 106 ; 212, 177, 106 ; 212, 212, 106 ; 85, 170, 85 ; 79, 98, 142 ; 118, 75, 142] / 255;
+
+opac = 1/10;
+
+
+
+
+Nrk = size(k_redBZ,2);
 
 kind = 1:Nrk;
 
 bool_or = false(3, Nrk);
-bool_or(1,:) = kind <= max( ind_oben );
-bool_or(2,:) = kind > max( ind_oben ) & kind < min( ind_unten );
-bool_or(3,:) = kind >= min( ind_unten );
+bool_or(1,:) = kind <= max( ind.up );
+bool_or(2,:) = kind > max( ind.up ) & kind < min( ind.dwn );
+bool_or(3,:) = kind >= min( ind.dwn );
 
 bool_w = false(3, Nrk);
 bool_w(1,:) = wk == 6;
 bool_w(2,:) = wk == 3;
 bool_w(3,:) = wk == 1;
 
-colors = {'b','r','g','c','m'};
-marker = {'h','x','^','+','v'};
-figure; hold on
-for ni = 1:3
-    for nj = 1:3
-        asdf = [ colors{nj}, marker{ni} ];
-        plot(k(1,bool_w(ni,:) & bool_or(nj,:),1),k(2,bool_w(ni,:) & bool_or(nj,:),1),asdf)
-    end
-end
 
-
-
-% Test Plot: Gewichtung
-in = wk == 6;
-on = wk == 3;
-symm = wk == 1;
-figure; hold on
-plot(kall(1,in,2),kall(2,in,2),'rx')
-plot(kall(1,on,2),kall(2,on,2),'r^')
-plot(kall(1,symm,2),kall(2,symm,2),'rs')
-
-% Test Plot: Indizierung 1.1 - Speicherordnung
-figure; hold on
-for ii = 1:6
-    plot(kall(1,:,ii),kall(2,:,ii),'x')
-end
-% Test Plot: Indizierung 1.2 - aequivalente Punkte
-hold on
-ind = 1;
-ind_eq = Nrk - ind + 1;
-plot(kall(1,ind,1),kall(2,ind,1),'ko')
-plot(kall(1,ind_eq,1),kall(2,ind_eq,1),'bo')
-
-
-% Test Plot: Indizierung 3 - Indizes unten, mitte, oben
-color_matrix = [ 160 82 45 ; 205 133 63 ; 222 184 135 ; 85 107 47 ; 107 142 35 ; 189 183 107] / 255;
-opac = 1/10;
+marker = { '^' , 's' , 'v' ; '<' , 's' , '>' };
 
 figure; hold on
 for ni = 1:6
-    scatter(kall(1,ind_oben,ni),kall(2,ind_oben,ni),'^','MarkerEdgeColor',color_matrix(ni,:),...
-        'MarkerFaceColor',color_matrix(ni,:),'MarkerFaceAlpha',opac)
-    scatter(kall(1,ind_mitte,ni),kall(2,ind_mitte,ni),'s','MarkerEdgeColor',color_matrix(ni,:),...
-        'MarkerFaceColor',color_matrix(ni,:),'MarkerFaceAlpha',opac)
-    scatter(kall(1,ind_unten,ni),kall(2,ind_unten,ni),'v','MarkerEdgeColor',color_matrix(ni,:),...
-        'MarkerFaceColor',color_matrix(ni,:),'MarkerFaceAlpha',opac)
+    
+    mpos = mod( ni + 1 , 2 ) + 1;
+    
+    for n_w = 1:3
+        
+        for n_or = 1:3
+            
+            scatter( k_BZ(1 , bool_w(n_w,:) & bool_or(n_or,:) , ni) , k_BZ(2 , bool_w(n_w,:) & bool_or(n_or,:) , ni) , ...
+                marker{mpos,n_w} , 'MarkerEdgeColor' , color_matrix(ni,:,n_or) , 'MarkerFaceColor' , color_matrix(ni,:,n_or) , 'MarkerFaceAlpha' , opac)
+
+        end
+        
+    end
+    
 end
 
 testinds = [121, 250];
@@ -241,16 +278,11 @@ end
 
 
 
-
-
-
-
-
-% Test Plot: Entire BZ
-figure; hold on
-for ii = 1:6
-    plot(kall(1,:,ii),kall(2,:,ii),'x')
-end
+% % Test Plot: Entire BZ
+% figure; hold on
+% for ii = 1:6
+%     plot(kall(1,:,ii),kall(2,:,ii),'x')
+% end
 
 
 end
