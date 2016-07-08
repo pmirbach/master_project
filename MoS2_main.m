@@ -35,24 +35,31 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 
 
 
-%% Monkhorst-Pack
+%% k - mesh
 
-[ Data.k , Data.wk , Para.nr.k , Para.symm_indices ] = k_mesh_mp(Ctrl, Para);
+if strcmp( Ctrl.k_mesh.type , 'symm' )
+    
+    [ Data.k , Data.wk , Para.nr.k , Para.k_ind ] = k_mesh_AG(Ctrl, Para);
+    
+elseif strcmp( Ctrl.k_mesh.type , 'liu' )
+    
+    [ Data.k , Data.wk , Para.nr.k , Para.k_ind.symm ] = k_mesh_liu(Ctrl, Para);
+    
+end
+
+
+%%
+
 
 
 
 %%
 
-[ k_BZ , wk , Nrk , ind ] = k_mesh_AG(Ctrl, Para);
 
-
-%%
-
-
-file = 'Daniel/MoS2_gradtest.mat';
-[Para, Data, Daniel] = load_daniel_data(Ctrl, Para, Data, file); % overwrites k, wk, coul_pol, wk_area, nr_k
-
-% Fast kx, ky for scatter3 plots:
+% file = 'Daniel/MoS2_gradtest.mat';
+% [Para, Data, Daniel] = load_daniel_data(Ctrl, Para, Data, file); % overwrites k, wk, coul_pol, wk_area, nr_k
+% 
+% % Fast kx, ky for scatter3 plots:
 kx = Data.k(1,:,1);
 ky = Data.k(2,:,1);
 
@@ -65,13 +72,13 @@ if strcmp(Ctrl.TB_modell,'ab_initio')
     
     fprintf('Tight-binding (ab initio): Start'); tic 
     
-    [Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC, Prep.H_grad_kx, Prep.H_grad_ky] = tight_binding_roesner(Ctrl, Para, Data, W90Data);  
+    [Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC, Prep.H_grad_kx, Prep.H_grad_ky] = tight_binding_roesner(Ctrl, Para, Data.k, W90Data);  
     
 elseif strcmp(Ctrl.TB_modell,'liu')
     
     fprintf('Tight-binding (liu):       Start'); tic 
     
-    [Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC, Prep.H_grad_kx, Prep.H_grad_ky] = tight_binding_liu(Ctrl, Para, Data);
+    [Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC, Prep.H_grad_kx, Prep.H_grad_ky] = tight_binding_liu(Ctrl, Para, Data.k);
     
 else
     error('TB-modell must be ab_initio or liu!')
@@ -133,7 +140,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 %% Coulomb Plots
 
-[fig.coulomb_up, fig.coulomb_down] = plot_coulomb( Ctrl , Para,Data.k , Data.V.f , Para.symm_indices(2) );
+[fig.coulomb_up, fig.coulomb_down] = plot_coulomb( Ctrl , Para,Data.k , Data.V.f , Para.k_ind.symm(2) );
 
 %% Band renorm
 
@@ -325,8 +332,8 @@ chi_w = P_w ./ E_w;
 
 % figure
 plot(E , imag(chi_w))
-
-hold on
+% 
+% hold on
 % load('spec_V_dip.mat')
 % load ist_egal.mat
 % plot(spec_12(:,1)*Bloch.hbar , spec_12(:,3),'r--')
@@ -344,7 +351,7 @@ hold on
 % figure
 % plot(E + 2640.47 , imag(chi_w))
 % hold on
-% plot(Aspec(:,1),Aspec(:,5))
+% plot(Aspec(:,1),Aspec(:,5),'r--')
 
 
 %%

@@ -1,4 +1,11 @@
-function [Ek, Ev, Ek_noSOC, Ev_noSOC, H_grad_kx, H_grad_ky] = tight_binding_roesner(Ctrl, Para, Data, W90Data)
+function [Ek, Ev, Ek_noSOC, Ev_noSOC, H_grad_kx, H_grad_ky] = tight_binding_roesner(Ctrl, Para, k, W90Data)
+
+D = [cos( Para.k.alpha ) -sin( Para.k.alpha ) ; sin( Para.k.alpha ) cos( Para.k.alpha )];
+for ni = 1:6
+    k(:,:,ni) = D * k(:,:,ni);
+end
+
+TM = W90Data.kLat(1:2,1:2).' * 10;
 
 
 % Vorläufiger SOC Ansatz:
@@ -19,20 +26,20 @@ Ev_noSOC = zeros(3, 3, Para.nr.k, 6);
 
 k_m = zeros( Para.nr.k , 3 , 6 );
 
-if ~Ctrl.cmp.use_k
-    % Basiswechsel in Vielfache von den reziproken Gittervektoren:
-    b_m = abs( Para.k.GV ) / Ctrl.k_mesh.qr;                                 % Maltes GV / qr
-    for ni = 1:6
-        k_m(:,1:2,ni) = round( b_m \ Data.k(:,:,ni) ).' / Ctrl.k_mesh.qr;    % Basiswechsel in Vielfache von G (hohe Genauigkeit)
-    end
-elseif Ctrl.cmp.use_k
-    b_m = abs( Para.k.GV );                         % Maltes GV 
-    for ni = 1:6
-        k_m(:,1:2,ni) = ( b_m \ Data.k(:,:,ni) ).' ;         % Basiswechsel in Vielfache von G
-    end
-else
-    error('Something strange with kpts compare in TB_ab_initio')
+
+for ni = 1:6
+    k_m(:,1:2,ni) = ( TM \ k(:,:,ni) ).' ;         % Basiswechsel in Vielfache von G
 end
+
+if Ctrl.TB_t_symm == 1
+    
+    if ~strcmp( Ctrl.k_mesh.type , 'symm' )
+    	error(' Time symmetrization only possible with k-mesh "symm" ')
+    end
+    
+end
+
+
 
 
 HH_TB = zeros(Para.nr.k ,3, 3, 6);

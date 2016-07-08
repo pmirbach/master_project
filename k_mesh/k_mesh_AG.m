@@ -9,6 +9,8 @@ b2 = 2 * pi / a * [ 1 / sqrt(3) ; 1 ];
 
 newsymmpts = 2 * pi / ( 3 * a ) * [ [ sqrt(3); 1 ] , [ 0; 0 ], [ sqrt(3); -1 ] ];
 
+
+
 % Density of k-mesh
 qr = Ctrl.k_mesh.qr;
 
@@ -44,6 +46,8 @@ k_rhomboid = [ k_rhomboid_above , k_rhomboid_bisec , k_rhomboid_below ];
 
 % Find equivalent indexes of upper, lower and middle k points
 [ Nrk , ind ] = identify_indexes( k_redBZ );
+% Find highsymmetrie points
+ind.symm = find( wk == 1 );
 
 % Create k points in entire BZ
 [ k_BZ ] = create_k_in_BZ( k_redBZ );

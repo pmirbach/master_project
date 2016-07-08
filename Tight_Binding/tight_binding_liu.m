@@ -1,5 +1,9 @@
-function [Ek, Ev, Ek_noSOC, Ev_noSOC, H_grad_kx , H_grad_ky] = tight_binding_liu(Ctrl, Para, Data)
+function [Ek, Ev, Ek_noSOC, Ev_noSOC, H_grad_kx , H_grad_ky] = tight_binding_liu(Ctrl, Para, k)
 
+D = [cos( Para.k.alpha ) -sin( Para.k.alpha ) ; sin( Para.k.alpha ) cos( Para.k.alpha )];
+for ni = 1:6
+    k(:,:,ni) = D * k(:,:,ni);
+end
 
 % Vorläufiger SOC Ansatz:
 lambda = Para.TB(end);
@@ -19,7 +23,7 @@ Ev_noSOC = zeros(3, 3, Para.nr.k, 6);
 HH_TB = zeros(3, 3, Para.nr.k ,6);
 for ni = 1:6
     
-    HH_TB(:,:,:,ni) = TB_Liu_TNN_fun(Data.k(:,:,ni), Para.TB);
+    HH_TB(:,:,:,ni) = TB_Liu_TNN_fun(k(:,:,ni), Para.TB);
     HH_TB(:,:,:,ni) = Para.energy_conversion * HH_TB(:,:,:,ni);
     HH_TB(abs( HH_TB ) < 1e-8) = 0;
     
@@ -65,7 +69,7 @@ end
 Ek = Ek - max(Ek(1,:));
 Ek_noSOC = Ek_noSOC - max(Ek_noSOC(1,:));
 
-[H_grad_kx , H_grad_ky] = grad_TB_Liu_TNN_fun(Data.k(1:2,:,1),Para.TB);
+[H_grad_kx , H_grad_ky] = grad_TB_Liu_TNN_fun(k(1:2,:,1),Para.TB);
 
 
 H_grad_kx = Para.energy_conversion * H_grad_kx;
