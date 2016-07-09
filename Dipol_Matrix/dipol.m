@@ -32,7 +32,7 @@ for nll = 1:Para.nr.dipol
         
     end
     
-    dipol{1,nll} = Para.vorf.dipol / 1i  * dipol_k ./ repmat( Data.Ek(hh,:,1) - ( Data.Ek(ee,:,1) + 0.1516 * 1e3 ) ,2,1);
+    dipol{1,nll} = Para.vorf.dipol / 1i  * dipol_k ./ repmat( Data.Ek(hh,:,1) + Data.Ek(ee,:,1) + Data.EGap ,2,1);
     
 end
 

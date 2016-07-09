@@ -1,4 +1,4 @@
-function [Ek, Ev, Ek_noSOC, Ev_noSOC, H_grad_kx, H_grad_ky] = tight_binding_roesner(Ctrl, Para, k, W90Data)
+function [Ek, Ev, EGap, Ev_noSOC, H_grad_kx, H_grad_ky] = tight_binding_roesner(Ctrl, Para, k, W90Data)
 
 D = [cos( Para.k.alpha ) -sin( Para.k.alpha ) ; sin( Para.k.alpha ) cos( Para.k.alpha )];
 for ni = 1:6
@@ -85,6 +85,7 @@ for ni = 1:tri_max
     
 end
 
+%%
 % ???? Need rework
 % Tests
 % sample = get_sample( [ Para.nr.k, Para.nr.tri ] , 10 );
@@ -97,9 +98,16 @@ end
 %         warning('Eigenvectors and Eigenvalues do not solve eigenvalue problem!')
 %     end
 % end
+%%
 
+% Check band gap
+EGap_noSOC = min( Ek_noSOC( 2, : , 1 ) - Ek_noSOC( 1, : , 1 ) );
+if round( EGap_noSOC ) ~= W90Data.EGapAct * Para.energy_conversion
+    error( 'Calculated band gap does not agree with Malte!' )
+end
 
+EGap = min( min( Ek( [2 5], : , 1 ) - Ek( [1 4], : , 1 ) ) ) + W90Data.EGapCorr * Para.energy_conversion;
 
-Ek = Ek - max(Ek(1,:,1));
-Ek_noSOC = Ek_noSOC - max(Ek_noSOC(1,:,1));
+Ek( Para.TB_ind{1}, : , : ) = - Ek( Para.TB_ind{1}, : , : ) + max( max( Ek( Para.TB_ind{1}, : , 1 ) ) );
+Ek( Para.TB_ind{2}, : , : ) = Ek( Para.TB_ind{2}, : , : ) - min( min( Ek( Para.TB_ind{2}, Para.k_ind.symm , 1 ) ) );
 
