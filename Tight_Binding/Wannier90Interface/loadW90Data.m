@@ -2,14 +2,16 @@ function W90Data = loadW90Data(seed, SOCSettings)
 
 % settings ================================================================
 
+w90path = fullfile( seed , '01_WannierTB','02_G0W0','02_Mo3d' );
+
 % wannier90 input file (to get the basis labeling and lattice vectors)
-wannier90File = fullfile( seed , 'wannier90.win' );
+wannier90File = fullfile( w90path , 'wannier90.win' );
 
 % filename of Hamiltonian in Wannierbasis (wannier90 output)
-hamiltonianFile = fullfile( seed , 'wannier90_hr.dat' );
+hamiltonianFile = fullfile( w90path , 'wannier90_hr.dat' );
 
 % filename of details txt file for orbital order and band gap correction
-detailsFile = fullfile( seed , 'Details.txt' );
+detailsFile = fullfile( w90path , 'Details.txt' );
 
 
 % basis / EGap ============================================================

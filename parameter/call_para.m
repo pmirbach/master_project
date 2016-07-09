@@ -1,14 +1,14 @@
 function [ Para , W90Data ] = call_para(Ctrl, constAg)
 
-
+if strcmp( Ctrl.TB_modell , 'ab_initio' ) || Ctrl.coul
+    a0_form = num2str( 10 * Ctrl.lattice_constant , '%.3f' );
+    seed = fullfile('Tight_Binding','ab_initio','02_Materials',Ctrl.material,['a0_',a0_form, 'A']);
+end
+    
 if strcmp( Ctrl.TB_modell , 'ab_initio' ) 
     
-    a0_form = num2str( 10 * Ctrl.lattice_constant , '%.3f' );
-    seed = fullfile('Tight_Binding','ab_initio','02_Materials',Ctrl.material,['a0_',a0_form, 'A'],'01_WannierTB','02_G0W0','02_Mo3d');
-    SOCSettings.type  = 'none'; % 'first' or 'second' or 'none'
-  
-    % load wannier90 Data
-    W90Data = loadW90Data(seed, SOCSettings);
+    SOCSettings.type  = 'none';                 % 'first' or 'second' or 'none'
+    W90Data = loadW90Data(seed, SOCSettings);   % load wannier90 Data
     
 elseif strcmp( Ctrl.TB_modell , 'liu' )
     

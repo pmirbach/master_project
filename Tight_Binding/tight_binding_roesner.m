@@ -25,20 +25,15 @@ Ev_noSOC = zeros(3, 3, Para.nr.k, 6);
 
 
 
-if Ctrl.TB_t_symm == 1
-    
+if Ctrl.TB_t_symm == 1   
     if ~strcmp( Ctrl.k_mesh.type , 'symm' )
     	error(' Time symmetrization only possible with k-mesh "symm" ')
     end
-    
     tri_max = 3;
 else
     tri_max = 6;
 end
 
-
-% % % % % % % % % % % % % % % % % % % %     RAUS RAUS RAUS
-tri_max = 6;
 
 
 HH_TB = zeros(Para.nr.k ,3, 3, 6);
@@ -53,6 +48,9 @@ for ni = 1:tri_max
     end
     HH_TB(:,:,:,ni) = HH_TB(:,:,:,ni) * Para.energy_conversion;
 end
+
+H_grad_kx = permute( reshape( H_grad_kx,Para.nr.k,9 ),[2,1] ) * Para.energy_conversion;
+H_grad_ky = permute( reshape( H_grad_ky,Para.nr.k,9 ),[2,1] ) * Para.energy_conversion;
 
 HH_TB = permute( HH_TB, [2 3 1 4] );
 
@@ -89,7 +87,7 @@ for ni = 1:tri_max
     
 end
 
-
+% ???? Need rework
 % Tests
 % sample = get_sample( [ Para.nr.k, Para.nr.tri ] , 10 );
 % for ii = 1:size( sample , 1 )
@@ -107,6 +105,3 @@ end
 Ek = Ek - max(Ek(1,:));
 Ek_noSOC = Ek_noSOC - max(Ek_noSOC(1,:));
 
-
-H_grad_kx = permute(reshape(H_grad_kx,Para.nr.k,9),[2,1]) * 1e3;
-H_grad_ky = permute(reshape(H_grad_ky,Para.nr.k,9),[2,1]) * 1e3;
