@@ -24,12 +24,6 @@ Ek_noSOC = zeros(3, Para.nr.k, 6);
 Ev_noSOC = zeros(3, 3, Para.nr.k, 6);
 
 
-k_m = zeros( Para.nr.k , 3 , 6 );
-
-
-for ni = 1:6
-    k_m(:,1:2,ni) = ( TM \ k(:,:,ni) ).' ;         % Basiswechsel in Vielfache von G
-end
 
 if Ctrl.TB_t_symm == 1
     
@@ -37,69 +31,84 @@ if Ctrl.TB_t_symm == 1
     	error(' Time symmetrization only possible with k-mesh "symm" ')
     end
     
+    tri_max = 3;
+else
+    tri_max = 6;
 end
-
-
-
 
 HH_TB = zeros(Para.nr.k ,3, 3, 6);
-H_TB = complex( zeros( 3 ) );
-for ni = 1:6
-        
-    if ni == 1
-        %get hamiltonian for every kk point
-        [HH_TB(:,:,:,ni), H_grad_kx, H_grad_ky] = getW90Hamiltonian(W90Data, k_m(:,:,ni) );
+for ni = 1:tri_max
+    
+    k_m = ( TM \ k(:,:,ni) ).' ;         % Basiswechsel in Vielfache von G
+    
+    if ni == 1 
+        [HH_TB(:,:,:,ni), H_grad_kx, H_grad_ky] = getW90Hamiltonian(W90Data, k_m );     %get hamiltonian for every kk point
     else
-        HH_TB(:,:,:,ni) = getW90Hamiltonian(W90Data, k_m(:,:,ni) );
+        HH_TB(:,:,:,ni) = getW90Hamiltonian(W90Data, k_m );
     end
     HH_TB(:,:,:,ni) = HH_TB(:,:,:,ni) * Para.energy_conversion;
-    
+end
+
+HH_TB = permute( HH_TB, [2 3 1 4] );
+
+
+
+tri_max = 6;
+
+for ni = 1:tri_max
+
     for nk = 1:Para.nr.k
         
-        H_TB(:,:) = HH_TB(nk,:,:,ni);
+        [ Ek_noSOC(:,nk,ni) , Ev_noSOC(:,:,nk,ni) ] = solve_sort_eig( HH_TB(:,:,nk,ni) );
         
-        [ef, ev] = eig( H_TB );
+        [ Ek(1:3,nk,ni) , Ev(1:3,1:3,nk,ni) ] = solve_sort_eig( HH_TB(:,:,nk,ni) + H_SOC );
+        [ Ek(4:6,nk,ni) , Ev(4:6,4:6,nk,ni) ] = solve_sort_eig( HH_TB(:,:,nk,ni) - H_SOC );
         
-        [Ek_noSOC(:,nk,ni), I] = sort(diag(real(ev)));
-        Ev_noSOC(:,:,nk,ni) = ef(:, I);
+    end
+    
+    if Ctrl.TB_t_symm == 1
         
+%         Ek_noSOC(:,Para.k_ind.dwn,ni) = Ek_noSOC(:,Para.k_ind.up,ni);
+%         Ek(4:6,Para.k_ind.dwn,ni) = Ek(1:3,Para.k_ind.up,ni);
+%         Ek(1:3,Para.k_ind.dwn,ni) = Ek(4:6,Para.k_ind.up,ni);
         
-        H_TB_SOC_up = (H_TB + H_SOC );
-        H_TB_SOC_down = (H_TB - H_SOC );
-        
-        
-        [ef_up, ev_up] = eig( H_TB_SOC_up );
-        [ef_down, ev_down] = eig( H_TB_SOC_down );
-        
-        [Ek(1:3,nk,ni), I] = sort(diag(real(ev_up)));
-        Ev(1:3,1:3,nk,ni) = ef_up(:, I);
-        
-        [Ek(4:6,nk,ni), I] = sort(diag(real(ev_down)));
-        Ev(4:6,4:6,nk,ni) = ef_down(:, I);
+%         Ek(:,Para.k_ind.mid,ni) = repmat( ( Ek(1:3,Para.k_ind.mid,ni) + Ek(4:6,Para.k_ind.mid,ni) ) / 2 , 2 )
         
     end
     
 end
 
-% Symmetrisierung der Bandstruktur (zeitumkehr)
 
 
-% k_int = round( b_m \ Data.k(:,:,1) ).';
-% sk = size(k_int,1);
-% 
-% as = k_int(:,2);
-% df = 1:size(k_int,1);
-% 
-% for ii = df(as < 0)
+% for ni = 1:tri_max
+%             
+%     for nk = 1:Para.nr.k
 %         
-%     k_find = [ k_int(ii,1) + k_int(ii,2) , -k_int(ii,2) ];
-%     k_find = repmat( k_find, sk,1 );
-% %     ind = find( all( k_int == k_find , 2) );
+%         H_TB(:,:) = HH_TB(:,:,nk,ni);
+%         H_TB_SOC_up = (H_TB + H_SOC );
+%         H_TB_SOC_down = (H_TB - H_SOC );
 %         
-% 
-%     Ek( 1:3 , ii , 1 ) = Ek( 4:6 , all( k_int == k_find , 2) , 1 );
-%     Ek( 4:6 , ii , 1 ) = Ek( 1:3 , all( k_int == k_find , 2) , 1 );
+%         
+%         [ef, ev] = eig( H_TB );
+%         
+%         [Ek_noSOC(:,nk,ni), I] = sort(diag(real(ev)));
+%         Ev_noSOC(:,:,nk,ni) = ef(:, I);
+%         
+%         
+%         [ef_up, ev_up] = eig( H_TB_SOC_up );
+%         [ef_down, ev_down] = eig( H_TB_SOC_down );
+%         
+%         [Ek(1:3,nk,ni), I] = sort(diag(real(ev_up)));
+%         Ev(1:3,1:3,nk,ni) = ef_up(:, I);
+%         
+%         [Ek(4:6,nk,ni), I] = sort(diag(real(ev_down)));
+%         Ev(4:6,4:6,nk,ni) = ef_down(:, I);
+%         
+%     end
+%     
 % end
+
+
 
 
 

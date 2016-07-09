@@ -99,31 +99,6 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 [fig.bandstr_surf2, fig.bandstr_path2] = plot_bandstr(Ctrl,Para,Data.k,Prep.Eks,[1 2]);
 
-%%
-% figure; hold on
-% for ii = 1:6
-% scatter3( Data.k(1,:,ii) , Data.k(2,:,ii), Prep.minq(end,:,ii) )
-% end
-
-% figure; hold on
-% for ii = 1:Para.nr.b
-%     quiver(0,0,Para.k.b(1,ii),Para.k.b(2,ii),'MaxHeadSize',0.1,'AutoScaleFactor',0.89,'AutoScale','off')
-% end
-
-%%
-% Energy_Alex = importdata('Alexander/disp_120.dat');
-% % scatter3( kx,ky, Prep.Eks(1,:) )
-% % hold on
-% % scatter3( Energy_Alex(:,1), Energy_Alex(:,2), Energy_Alex(:,3) )
-% 
-% index = [3 5 7 4 6 8];
-% figure
-% for ii = 1:6
-%     subplot(2,3,ii)
-%     
-%     compare_alex( Data.k(:,:,1), Energy_Alex(:,1:2) , Prep.Eks(ii,:), Energy_Alex(:,index(ii)) , 'abs' )
-% end
-
 
 %% Dipolmatrix
 fprintf('Dipol:                     Start'); tic
@@ -142,30 +117,6 @@ for ii = 1:Para.nr.dipol
     Ploter.dipol_r(:,ii) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
 end
 
-%%
-
-% Dipol_Alex = importdata('Alexander/dip_60.dat');
-
-% figure
-% for ii = 1:4
-%     subplot(2,2,ii)
-%     scatter3(kx,ky,Ploter.dipol_l(:,ii)/10)
-%     hold on
-%     scatter3(Dipol_Alex(:,1),Dipol_Alex(:,2),Dipol_Alex(:,ii+2))
-% end
-
-
-% figure
-% for ii = 1:4
-%     subplot(2,2,ii)
-%     compare_alex( Data.k(:,:,1), Dipol_Alex(:,1:2) , Ploter.dipol_l(:,ii)/10, Dipol_Alex(:,ii+2),'abs' )
-% end
-% 
-% figure
-% for ii = 1:4
-%     subplot(2,2,ii)
-%     compare_alex( Data.k(:,:,1), Dipol_Alex(:,1:2) , Ploter.dipol_r(:,ii)/10, Dipol_Alex(:,ii+6),'abs' )
-% end
 
 %% Anregung, Bandrenormierung (Coulomb)     -   keine Zeit mehr
 % %% Thermische Anregung
@@ -203,16 +154,6 @@ end
 
 
 %% structure für Variablen für Blochgleichungen
-
-% Para.dipol_trans = [1, 2 ; 1 , 3 ; 4 , 5 ; 4 , 6 ];
-% Para.dipol_trans = [1 2; 4 5];
-% Para.dipol_trans = [4 5];
-Para.nr.dipol = size(Para.dipol_trans,1);
-
-
-
-
-%%
 
 Bloch.nrd = Para.nr.dipol;
 Bloch.ind = reshape( 1 : Para.nr.dipol*Para.nr.k ,[], Para.nr.dipol);
@@ -266,172 +207,6 @@ Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
 
 Para.nr.w = numel(Bloch.w);
 
-%%
-
-
-
-%%
-V_rabi_fock_2 = coulomb_rabi_f_2(Ctrl, Para, Prep);
-%%
-
-% V = V_rabi_fock_2(:,:,:,1);
-% % scatter3( Data.k(1,:) , Data.k(2,:), V(1,:) )
-% 
-% Coul_Alex = importdata('Alexander/Coul_Fock_60.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
-% nrkt = size(Coul_Alex,1) / 5;
-% 
-% 
-% ACk = Coul_Alex(1:nrkt,1:2);
-% ACC = Coul_Alex(:,3);
-% % 
-% D = [cos(pi/6) -sin(pi/6) ; sin(pi/6) cos(pi/6)];
-% 
-% ACk2 = D * ACk.';
-% 
-% Ak = round( ACk2 , 6 );
-% Pk = round( Data.k(1:2,:), 6 );
-% 
-% % hold on
-% % scatter3( Coul_Alex(1:nrkt,1), Coul_Alex(1:nrkt,2), Coul_Alex(1:nrkt,3) )
-% 
-% 
-% compare_alex( Pk, Ak , V(331,:), Coul_Alex(1:nrkt,3),'rel' )
-
-%%
-
-% load('MoS2_631.mat')
-% % load( 'MoS2_35x35.mat' ) ;
-% 
-% 
-% 
-% 
-% Aint = importdata('test_1.dat');
-% 
-% Akx = Aint(:,1);
-% Aky = Aint(:,2);
-% % 
-% 
-% k1 = [ Akx , Aky ];
-% D = [cos(pi/6) -sin(pi/6) ; sin(pi/6) cos(pi/6)];
-% 
-% k2 = D * k1.';
-% 
-% 
-% 
-% Pint = 1 / ( 2 * pi )^2 * Bloch.coulomb(:,:,1) * ( Bloch.wkentire );
-% Pint2 = 1 / ( 2 * pi )^2 * Bloch.coulomb(:,:,2) * ( Bloch.wkentire );
-% 
-% % scatter3( MoS2.kpts(:,1,1) , MoS2.kpts(:,2,1) , sum( squeeze( MoS2.COUL.D(1,:,:) ) , 2 )  )
-% % hold on
-% % scatter3(kx,ky,Pint )
-% 
-% 
-% % scatter3(kx,ky,Pint-  sum( squeeze( MoS2.COUL.D(1,:,:) ) , 2 ))
-% % 
-% % 
-% % plot(kx(1:10),ky(1:10),'bx-')
-% % hold on
-% % plot(MoS2.kpts(1:10,1,1),MoS2.kpts(1:10,2,1),'rx-')
-% 
-% A = sum( squeeze( MoS2.COUL.D(1,:,:) ) , 2 );
-% B = sum( squeeze( MoS2.COUL.D(3,:,:) ) , 2 );
-% 
-% 
-% Pkall = round( [ Data.k(1,:,1) ; Data.k(2,:,1) ] , 7 );
-% Dkall = round(MoS2.kpts(:,1:2,1),7);
-% % figure
-% % compare_alex( Pkall, Dkall , Pint, A, 'abs' )
-% % figure
-% % compare_alex( Pkall, Dkall , Pint2, B, 'abs' )
-% 
-% 
-% 
-% compare_alex( Pkall, Dkall , Ploter.dipol_r(:,1)/10, abs(MoS2.d_k(3,:)), 'abs' )
-% % 
-% % figure; scatter3( Dkall(:,1,1), Dkall(:,2,1), abs(MoS2.d_k(1,:)) )
-% % figure; scatter3(kx,ky,Ploter.dipol_r(:,1)/10)
-% 
-% % % close all
-% % % figure
-% % % scatter3( k2(1,:), k2(2,:), Aint(:,3)  )
-% % % hold on
-% % % scatter3(kx,ky,Pint)
-% % 
-% % Pkall = round( [ Data.k(1,:,1) ; Data.k(2,:,1) ] , 7 );
-% % Akall = round( k2 , 7 );
-% % 
-% % compare_alex( Pkall, Akall , Pint, Aint(:,3), 'rel' )
-% 
-% 
-% % Dipol_Alex = importdata('Alexander/dip_60.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
-% % Akx = Dipol_Alex(:,1);
-% % Aky = Dipol_Alex(:,2);
-% % 
-% % k0 = [Akx.'; Aky.'];
-% % 
-% % k1 = [ Akx , Aky ];
-% % D = [cos(pi/6) -sin(pi/6) ; sin(pi/6) cos(pi/6)];
-% % 
-% % k2 = D * k1.';
-% % 
-% % close all
-% % scatter3(kx,ky,Ploter.dipol_r(:,1)/10, 'b')
-% % hold on
-% % scatter3(k2(1,:),k2(2,:),Dipol_Alex(:,7) , 'g')
-% % scatter3( MoS2.kpts(:,1,1) , MoS2.kpts(:,2,1) , abs(MoS2.d_k(3,:)) , 'r' )
-
-%%
-% D = [cos(pi/6) +sin(pi/6) ; -sin(pi/6) cos(pi/6)];
-% 
-% for ii = 1:6
-%     kl_60 = DataCopy.k(1:2,:,ii);
-%     kl(:,:,ii) = D * kl_60;
-% end
-% 
-% % scatter3( kx, ky , Data.Ek(band,:,1) )
-% % hold on
-% % scatter3( kl(1,:), kl(2,:) , DataCopy.Ek(band,:,1) )
-% 
-% % figure
-% % for ii = 1:2
-% %     subplot(1,2,ii)
-% %     compare_alex( [kx; ky], kl , Ploter.dipol_r(:,ii) , PloterCopy.dipol_r(:,ii),'rel' )
-% % end
-% 
-% 
-% V = V_rabi_fock_2(:,:,:,2);
-% Vl = V_rabi_fock_2Copy(:,:,:,2);
-% 
-% 
-% scatter3( Data.k(1,:) , Data.k(2,:), V(end,:) )
-% hold on
-% scatter3( kl(1,:) , kl(2,:), Vl(end,:) )
-% 
-% 
-% 
-% % figure
-% % for ii = 1:2
-% %     
-% %     V = V_rabi_fock_2(:,:,:,ii);
-% %     Vl = V_rabi_fock_2Copy(:,:,:,ii);
-% %     
-% %     subplot(1,2,ii)
-% %     compare_alex( Data.k(:,:) , kl(:,:) , V(end,:) , Vl(301,:) ,'abs' )
-% % end
-%%
-% TInt = 1 / ( 2 * pi )^2 * Bloch.coulomb(:,:,1) *  Bloch.wkentire ;
-% TIntl = 1 / ( 2 * pi )^2 * BlochCopy.coulomb(:,:,1) *  BlochCopy.wkentire ;
-% 
-% D = [cos(pi/6) +sin(pi/6) ; -sin(pi/6) cos(pi/6)];
-% kl_60 = DataCopy.k(1:2,:,1);
-% kl = D * kl_60;
-% 
-% scatter3( kx,ky,TInt )
-% hold on
-% scatter3( kl(1,:), kl(2,:), TIntl )
-% 
-% figure
-% compare_alex( Data.k(:,:,1) , kl , TInt , TIntl ,'rel' )
 
 
 %% Zeitentwicklung
