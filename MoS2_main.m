@@ -97,7 +97,7 @@ fprintf('Preperations:              Start'); tic
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
-[fig.bandstr_surf2, fig.bandstr_path2] = plot_bandstr(Ctrl,Para,Data.k,Prep.Eks,[1 2]);
+% [fig.bandstr_surf2, fig.bandstr_path2] = plot_bandstr(Ctrl,Para,Data.k,Prep.Eks,[1 2]);
 
 
 %% Dipolmatrix
@@ -178,7 +178,7 @@ for ii = 1:Para.nr.dipol
     Bloch.Esum( Bloch.ind(:,ii) ) = ( Prep.Eks( Para.dipol_trans(ii,1),: ) + Prep.Eks( Para.dipol_trans(ii,2),: ) ).' ;
 %     Bloch.Esum( Bloch.ind(:,ii) ) = ( - Data.Ek( Para.dipol_trans(ii,1),: , 1 ) + Data.Ek( Para.dipol_trans(ii,2),: , 1 ) ).' ;
     
-    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).' / 10; 
+    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).' / 10; 
 %     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).';
     
 
@@ -201,7 +201,7 @@ Bloch.nrk = Para.nr.k;
 % Kommt noch dazu
 Emin = -1000;
 Emax = 0;
-E = linspace(Emin,Emax,1001)';
+E = linspace(Emin,Emax,3001)';
 
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
 
@@ -235,9 +235,9 @@ chi_w = P_w ./ E_w;
 % close all
 
 % figure
-% plot(E , imag(chi_w))
-% 
-% hold on
+plot(E , imag(chi_w))
+
+hold on
 % load('spec_V_dip.mat')
 % load ist_egal.mat
 % plot(spec_12(:,1)*Bloch.hbar , spec_12(:,3),'r--')

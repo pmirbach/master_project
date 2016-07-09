@@ -36,6 +36,11 @@ else
     tri_max = 6;
 end
 
+
+% % % % % % % % % % % % % % % % % % % %     RAUS RAUS RAUS
+tri_max = 6;
+
+
 HH_TB = zeros(Para.nr.k ,3, 3, 6);
 for ni = 1:tri_max
     
@@ -53,7 +58,7 @@ HH_TB = permute( HH_TB, [2 3 1 4] );
 
 
 
-tri_max = 6;
+
 
 for ni = 1:tri_max
 
@@ -68,11 +73,17 @@ for ni = 1:tri_max
     
     if Ctrl.TB_t_symm == 1
         
-%         Ek_noSOC(:,Para.k_ind.dwn,ni) = Ek_noSOC(:,Para.k_ind.up,ni);
-%         Ek(4:6,Para.k_ind.dwn,ni) = Ek(1:3,Para.k_ind.up,ni);
-%         Ek(1:3,Para.k_ind.dwn,ni) = Ek(4:6,Para.k_ind.up,ni);
+        Ek_noSOC(:,Para.k_ind.dwn,ni) = Ek_noSOC(:,Para.k_ind.up,ni);   % Unnecessary
         
-%         Ek(:,Para.k_ind.mid,ni) = repmat( ( Ek(1:3,Para.k_ind.mid,ni) + Ek(4:6,Para.k_ind.mid,ni) ) / 2 , 2 )
+        Ek(4:6,Para.k_ind.dwn,ni) = Ek(1:3,Para.k_ind.up,ni);           % Equivalence of spin bands in tri
+        Ek(1:3,Para.k_ind.dwn,ni) = Ek(4:6,Para.k_ind.up,ni);
+        
+        Ek(:,Para.k_ind.mid,ni) = ...                                                           % Mean value at middle of redBZ
+            repmat( ( Ek(1:3,Para.k_ind.mid,ni) + Ek(4:6,Para.k_ind.mid,ni) ) / 2 , 2 , 1 );    % Unnecessary with H_SOC(k)
+                                                                            
+        Ev_noSOC(:,:,Para.k_ind.dwn,ni+3) = conj( Ev_noSOC(:,:,Para.k_ind.up,ni) );
+        Ev_noSOC(:,:,Para.k_ind.up,ni+3) = conj( Ev_noSOC(:,:,Para.k_ind.dwn,ni) );
+        Ev_noSOC(:,:,Para.k_ind.mid,ni+3) = conj( Ev_noSOC(:,:,Para.k_ind.mid,ni) );
         
     end
     
