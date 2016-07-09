@@ -55,9 +55,6 @@ H_grad_ky = permute( reshape( H_grad_ky,Para.nr.k,9 ),[2,1] ) * Para.energy_conv
 HH_TB = permute( HH_TB, [2 3 1 4] );
 
 
-
-
-
 for ni = 1:tri_max
 
     for nk = 1:Para.nr.k
@@ -69,15 +66,16 @@ for ni = 1:tri_max
         
     end
     
-    if Ctrl.TB_t_symm == 1
+    if Ctrl.TB_t_symm
         
         Ek_noSOC(:,Para.k_ind.dwn,ni) = Ek_noSOC(:,Para.k_ind.up,ni);   % Unnecessary
+        Ek_noSOC(:,:,ni+3) = Ek_noSOC(:,:,ni);
         
         Ek(4:6,Para.k_ind.dwn,ni) = Ek(1:3,Para.k_ind.up,ni);           % Equivalence of spin bands in tri
-        Ek(1:3,Para.k_ind.dwn,ni) = Ek(4:6,Para.k_ind.up,ni);
-        
+        Ek(1:3,Para.k_ind.dwn,ni) = Ek(4:6,Para.k_ind.up,ni);    
         Ek(:,Para.k_ind.mid,ni) = ...                                                           % Mean value at middle of redBZ
             repmat( ( Ek(1:3,Para.k_ind.mid,ni) + Ek(4:6,Para.k_ind.mid,ni) ) / 2 , 2 , 1 );    % Unnecessary with H_SOC(k)
+        Ek(:,:,ni+3) = Ek(:,:,ni);
                                                                             
         Ev_noSOC(:,:,Para.k_ind.dwn,ni+3) = conj( Ev_noSOC(:,:,Para.k_ind.up,ni) );
         Ev_noSOC(:,:,Para.k_ind.up,ni+3) = conj( Ev_noSOC(:,:,Para.k_ind.dwn,ni) );
@@ -102,6 +100,6 @@ end
 
 
 
-Ek = Ek - max(Ek(1,:));
-Ek_noSOC = Ek_noSOC - max(Ek_noSOC(1,:));
+Ek = Ek - max(Ek(1,:,1));
+Ek_noSOC = Ek_noSOC - max(Ek_noSOC(1,:,1));
 

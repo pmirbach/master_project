@@ -89,6 +89,9 @@ fprintf('   -   Finished in %g seconds\n',toc)
 [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[1 2]);
 
 
+%%
+% scatter3( Data.k(1,:), Data.k(2,:) , Data.Ek(1,:) )
+
 
 %% Simulation-preperations
 fprintf('Preperations:              Start'); tic
