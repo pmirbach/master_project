@@ -28,7 +28,7 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 [ Para , W90Data ] = call_para(Ctrl, constAg);
 
 % Achtung: orbital order in Maltes TB modell different
-% Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
+Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
 
 
 
@@ -99,6 +99,30 @@ fprintf('   -   Finished in %g seconds\n',toc)
 
 [fig.bandstr_surf2, fig.bandstr_path2] = plot_bandstr(Ctrl,Para,Data.k,Prep.Eks,[1 2]);
 
+%%
+% figure; hold on
+% for ii = 1:6
+% scatter3( Data.k(1,:,ii) , Data.k(2,:,ii), Prep.minq(end,:,ii) )
+% end
+
+% figure; hold on
+% for ii = 1:Para.nr.b
+%     quiver(0,0,Para.k.b(1,ii),Para.k.b(2,ii),'MaxHeadSize',0.1,'AutoScaleFactor',0.89,'AutoScale','off')
+% end
+
+%%
+% Energy_Alex = importdata('Alexander/disp_120.dat');
+% % scatter3( kx,ky, Prep.Eks(1,:) )
+% % hold on
+% % scatter3( Energy_Alex(:,1), Energy_Alex(:,2), Energy_Alex(:,3) )
+% 
+% index = [3 5 7 4 6 8];
+% figure
+% for ii = 1:6
+%     subplot(2,3,ii)
+%     
+%     compare_alex( Data.k(:,:,1), Energy_Alex(:,1:2) , Prep.Eks(ii,:), Energy_Alex(:,index(ii)) , 'abs' )
+% end
 
 
 %% Dipolmatrix
@@ -119,43 +143,64 @@ for ii = 1:Para.nr.dipol
 end
 
 %%
-% scatter3(kx,ky,Ploter.dipol_r(:,1)/10)
 
-%% Thermische Anregung
-fprintf('Excitation:                Start'); tic
+% Dipol_Alex = importdata('Alexander/dip_60.dat');
 
-[Data.fk, Para.mu] = excitation(Ctrl,constAg,Para,Data.wk,Prep.Eks);
+% figure
+% for ii = 1:4
+%     subplot(2,2,ii)
+%     scatter3(kx,ky,Ploter.dipol_l(:,ii)/10)
+%     hold on
+%     scatter3(Dipol_Alex(:,1),Dipol_Alex(:,2),Dipol_Alex(:,ii+2))
+% end
 
-fprintf('   -   Finished in %g seconds\n',toc)
 
-[fig.exc_surf, fig.exc_path] = plot_excitation(Ctrl,Para,Data.k,Data.fk,[2 3]);
+% figure
+% for ii = 1:4
+%     subplot(2,2,ii)
+%     compare_alex( Data.k(:,:,1), Dipol_Alex(:,1:2) , Ploter.dipol_l(:,ii)/10, Dipol_Alex(:,ii+2),'abs' )
+% end
+% 
+% figure
+% for ii = 1:4
+%     subplot(2,2,ii)
+%     compare_alex( Data.k(:,:,1), Dipol_Alex(:,1:2) , Ploter.dipol_r(:,ii)/10, Dipol_Alex(:,ii+6),'abs' )
+% end
 
+%% Anregung, Bandrenormierung (Coulomb)     -   keine Zeit mehr
+% %% Thermische Anregung
+% fprintf('Excitation:                Start'); tic
+% 
+% [Data.fk, Para.mu] = excitation(Ctrl,constAg,Para,Data.wk,Prep.Eks);
+% 
+% fprintf('   -   Finished in %g seconds\n',toc)
+% 
+% [fig.exc_surf, fig.exc_path] = plot_excitation(Ctrl,Para,Data.k,Data.fk,[2 3]);
+% 
+% 
+% %% Coulomb WW
+% fprintf('Coulomb matrix:            Start'); tic
+% 
+% [Data.V.f, Data.V.h, Data.V.h_off] = coulomb_hf( Ctrl , Para , Prep );
+% 
+% fprintf('   -   Finished in %g seconds\n',toc)
+% 
+% %% Coulomb Plots
+% 
+% [fig.coulomb_up, fig.coulomb_down] = plot_coulomb( Ctrl , Para,Data.k , Data.V.f , Para.k_ind.symm(2) );
+% 
+% %% Band renorm
+% 
+% fprintf('Band renormalization:      Start'); tic
+% 
+% [Data.Ek_hf, Data.Ek_h, Data.Ek_f, Test.ren_h] = renorm2(Para, Data.Ek, Data.V, Data.fk, Data.wk);
+% 
+% fprintf('   -   Finished in %g seconds\n',toc)
+% 
+% [fig.ren_bandstr_surf, fig.ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Para,Data.k,[Data.Ek(:,:,1);Data.Ek_h],[2 3]);
+% 
+% % as1 = plot_path(Ctrl,Para,Data.k,Test.ren_h,200);      % Test der Hartree Renormierung
 
-%% Coulomb WW
-fprintf('Coulomb matrix:            Start'); tic
-
-[Data.V.f, Data.V.h, Data.V.h_off] = coulomb_hf( Ctrl , Para , Prep );
-
-fprintf('   -   Finished in %g seconds\n',toc)
-
-%% Coulomb Plots
-
-[fig.coulomb_up, fig.coulomb_down] = plot_coulomb( Ctrl , Para,Data.k , Data.V.f , Para.k_ind.symm(2) );
-
-%% Band renorm
-
-fprintf('Band renormalization:      Start'); tic
-
-[Data.Ek_hf, Data.Ek_h, Data.Ek_f, Test.ren_h] = renorm2(Para, Data.Ek, Data.V, Data.fk, Data.wk);
-
-fprintf('   -   Finished in %g seconds\n',toc)
-
-[fig.ren_bandstr_surf, fig.ren_bandstr_path] = plot_renorm_bandstr(Ctrl,Para,Data.k,[Data.Ek(:,:,1);Data.Ek_h],[2 3]);
-
-% as1 = plot_path(Ctrl,Para,Data.k,Test.ren_h,200);      % Test der Hartree Renormierung
-
-%%
-% as2 = plot_path(Ctrl,Para,Data.k,Prep.Eks,200);
 
 %% structure für Variablen für Blochgleichungen
 
@@ -195,7 +240,9 @@ for ii = 1:Para.nr.dipol
     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).' / 10; 
 %     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).';
     
-    Bloch.feff( Bloch.ind(:,ii) ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';
+
+%     Rausgek�rzt V
+%     Bloch.feff( Bloch.ind(:,ii) ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';      
     
 end
 
@@ -218,6 +265,37 @@ E = linspace(Emin,Emax,1001)';
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
 
 Para.nr.w = numel(Bloch.w);
+
+%%
+
+
+
+%%
+V_rabi_fock_2 = coulomb_rabi_f_2(Ctrl, Para, Prep);
+%%
+
+% V = V_rabi_fock_2(:,:,:,1);
+% % scatter3( Data.k(1,:) , Data.k(2,:), V(1,:) )
+% 
+% Coul_Alex = importdata('Alexander/Coul_Fock_60.dat'); % kx,ky,12up,13up,12dwn,13dwn, alles nochmal mit anderer Pol.
+% nrkt = size(Coul_Alex,1) / 5;
+% 
+% 
+% ACk = Coul_Alex(1:nrkt,1:2);
+% ACC = Coul_Alex(:,3);
+% % 
+% D = [cos(pi/6) -sin(pi/6) ; sin(pi/6) cos(pi/6)];
+% 
+% ACk2 = D * ACk.';
+% 
+% Ak = round( ACk2 , 6 );
+% Pk = round( Data.k(1:2,:), 6 );
+% 
+% % hold on
+% % scatter3( Coul_Alex(1:nrkt,1), Coul_Alex(1:nrkt,2), Coul_Alex(1:nrkt,3) )
+% 
+% 
+% compare_alex( Pk, Ak , V(331,:), Coul_Alex(1:nrkt,3),'rel' )
 
 %%
 
@@ -302,7 +380,58 @@ Para.nr.w = numel(Bloch.w);
 % % scatter3(k2(1,:),k2(2,:),Dipol_Alex(:,7) , 'g')
 % % scatter3( MoS2.kpts(:,1,1) , MoS2.kpts(:,2,1) , abs(MoS2.d_k(3,:)) , 'r' )
 
-
+%%
+% D = [cos(pi/6) +sin(pi/6) ; -sin(pi/6) cos(pi/6)];
+% 
+% for ii = 1:6
+%     kl_60 = DataCopy.k(1:2,:,ii);
+%     kl(:,:,ii) = D * kl_60;
+% end
+% 
+% % scatter3( kx, ky , Data.Ek(band,:,1) )
+% % hold on
+% % scatter3( kl(1,:), kl(2,:) , DataCopy.Ek(band,:,1) )
+% 
+% % figure
+% % for ii = 1:2
+% %     subplot(1,2,ii)
+% %     compare_alex( [kx; ky], kl , Ploter.dipol_r(:,ii) , PloterCopy.dipol_r(:,ii),'rel' )
+% % end
+% 
+% 
+% V = V_rabi_fock_2(:,:,:,2);
+% Vl = V_rabi_fock_2Copy(:,:,:,2);
+% 
+% 
+% scatter3( Data.k(1,:) , Data.k(2,:), V(end,:) )
+% hold on
+% scatter3( kl(1,:) , kl(2,:), Vl(end,:) )
+% 
+% 
+% 
+% % figure
+% % for ii = 1:2
+% %     
+% %     V = V_rabi_fock_2(:,:,:,ii);
+% %     Vl = V_rabi_fock_2Copy(:,:,:,ii);
+% %     
+% %     subplot(1,2,ii)
+% %     compare_alex( Data.k(:,:) , kl(:,:) , V(end,:) , Vl(301,:) ,'abs' )
+% % end
+%%
+% TInt = 1 / ( 2 * pi )^2 * Bloch.coulomb(:,:,1) *  Bloch.wkentire ;
+% TIntl = 1 / ( 2 * pi )^2 * BlochCopy.coulomb(:,:,1) *  BlochCopy.wkentire ;
+% 
+% D = [cos(pi/6) +sin(pi/6) ; -sin(pi/6) cos(pi/6)];
+% kl_60 = DataCopy.k(1:2,:,1);
+% kl = D * kl_60;
+% 
+% scatter3( kx,ky,TInt )
+% hold on
+% scatter3( kl(1,:), kl(2,:), TIntl )
+% 
+% figure
+% compare_alex( Data.k(:,:,1) , kl , TInt , TIntl ,'rel' )
 
 
 %% Zeitentwicklung
@@ -331,7 +460,7 @@ chi_w = P_w ./ E_w;
 % close all
 
 % figure
-plot(E , imag(chi_w))
+% plot(E , imag(chi_w))
 % 
 % hold on
 % load('spec_V_dip.mat')
@@ -343,15 +472,15 @@ plot(E , imag(chi_w))
 % xlim([-500 0])
 
 %%
-% % close all
-% file = 'abs_spec_0.000E+00_0.000E+00_3.000E+02_2_2_3.18_1.000E+00_1.000E+00cR_1.400E+01_60_30_1.000E-07_1.000E-03_+0.000E+00_HF_self_g0w0-tb_3_r_c_me_soc_1.519E+01_2.dat';
-% Aspec = ...
-%     importdata( file );
-% 
-% figure
-% plot(E + 2640.47 , imag(chi_w))
-% hold on
-% plot(Aspec(:,1),Aspec(:,5),'r--')
+close all
+file = 'abs_spec_0.000E+00_0.000E+00_3.000E+02_2_2_3.18_1.000E+00_1.000E+00cR_1.400E+01_60_30_1.000E-07_1.000E-03_+0.000E+00_HF_self_g0w0-tb_3_r_c_me_soc_1.519E+01_2.dat';
+Aspec = ...
+    importdata( file );
+
+figure
+plot(E + 2640.47 , imag(chi_w))
+hold on
+plot(Aspec(:,1),Aspec(:,5),'r--')
 
 
 %%

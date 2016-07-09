@@ -26,7 +26,7 @@ minq = min(allq,[],4);
 minq( minq < Para.k.qmin / 2 ) = 0;
 
 % Tests
-sample = get_sample( size( minq ) , 10 );
+sample = get_sample( size( minq ) , 500 );
 for ii = 1:size(sample,1)
     nk = sample(ii,1);
     nks = sample(ii,2);

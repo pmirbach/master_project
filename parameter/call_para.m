@@ -59,7 +59,7 @@ Para.TB_ind{2} = [2,3,5,6];
 
 
 
-Para.BZ.a = norm(Para.BZred.symmpts{2}(:,2));
+Para.BZ.a = max( sqrt( sum( Para.BZred.symmpts{2}.^2 , 1 ) ) );
 Para.BZ.area = 3 * sqrt(3) / 2 * Para.BZ.a^2;
 
 Para.BZsmall.a = Para.BZ.a / Ctrl.k_mesh.qr;

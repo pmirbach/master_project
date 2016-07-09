@@ -15,7 +15,7 @@ Ctrl.k_mesh.qr = 60;        % Unterteilungsgröße (Vielfaches von 6!). 60 -> 63
 %%%%%%%%%%%%% Tight-Binding modell %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%      
 Ctrl.TB_modell = 'ab_initio';   % Tight-Binding modell: Roesner ab initio or liu
 % Ctrl.TB_modell = 'liu';
-Ctrl.TB_t_symm = 1;             % Time symmetrization (only possible with k-mesh: symm) 
+Ctrl.TB_t_symm = 0;             % Time symmetrization (only possible with k-mesh: symm) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
