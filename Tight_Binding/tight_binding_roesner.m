@@ -90,39 +90,6 @@ for ni = 1:tri_max
 end
 
 
-
-% for ni = 1:tri_max
-%             
-%     for nk = 1:Para.nr.k
-%         
-%         H_TB(:,:) = HH_TB(:,:,nk,ni);
-%         H_TB_SOC_up = (H_TB + H_SOC );
-%         H_TB_SOC_down = (H_TB - H_SOC );
-%         
-%         
-%         [ef, ev] = eig( H_TB );
-%         
-%         [Ek_noSOC(:,nk,ni), I] = sort(diag(real(ev)));
-%         Ev_noSOC(:,:,nk,ni) = ef(:, I);
-%         
-%         
-%         [ef_up, ev_up] = eig( H_TB_SOC_up );
-%         [ef_down, ev_down] = eig( H_TB_SOC_down );
-%         
-%         [Ek(1:3,nk,ni), I] = sort(diag(real(ev_up)));
-%         Ev(1:3,1:3,nk,ni) = ef_up(:, I);
-%         
-%         [Ek(4:6,nk,ni), I] = sort(diag(real(ev_down)));
-%         Ev(4:6,4:6,nk,ni) = ef_down(:, I);
-%         
-%     end
-%     
-% end
-
-
-
-
-
 % Tests
 % sample = get_sample( [ Para.nr.k, Para.nr.tri ] , 10 );
 % for ii = 1:size( sample , 1 )
