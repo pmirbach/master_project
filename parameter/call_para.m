@@ -1,4 +1,4 @@
-function [ Para , W90Data ] = call_para(Ctrl, constAg)
+function [ Para , W90Data , Coul_ME ] = call_para(Ctrl, constAg)
 
 if strcmp( Ctrl.TB_modell , 'ab_initio' ) || Ctrl.coul
     a0_form = num2str( 10 * Ctrl.lattice_constant , '%.3f' );
@@ -69,6 +69,10 @@ Para.k.qmin = Para.BZsmall.a * sqrt(3);                                         
 
 Para.k.b = call_bnn( Para.k.GV );
 Para.nr.b = size(Para.k.b,2);
+
+
+
+[ Coul_ME ] = read_Coulomb_data( seed );
 
 [Para.coul.screened, Para.coul.names] = load_coul_parameter( Ctrl );
 Para.coul.pol = 3 * sqrt(3) * log(3) * Para.BZsmall.a / Para.BZsmall.area;

@@ -1,25 +1,13 @@
-clear variables
-close all
-clc
-
-Ctrl.material = 'MoS2';
-Ctrl.lattice_constant = 0.318;
-a0_form = num2str( 10 * Ctrl.lattice_constant , '%.3f' );
-seed = fullfile('Tight_Binding','ab_initio','02_Materials',Ctrl.material,['a0_',a0_form, 'A']);
-
+function [ Coul_ME ] = read_Coulomb_data( seed )
 
 coulomb_path = fullfile( seed , '02_CoulombME' );
-
-
 coulombFile = fullfile( coulomb_path , 'FitParameters.txt' );
 
-
+disp(['reading ', coulombFile, ' ...']);
 
 fid = fopen(coulombFile, 'r');
 
-
 tline = fgetl(fid);      % Read first line for while loop
-
 while ischar( tline )
     
     test = strfind(tline, '(1.1.1.1)');

@@ -25,7 +25,7 @@ end
 
 
 load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
-[ Para , W90Data ] = call_para(Ctrl, constAg);
+[ Para , W90Data , Coul_ME ] = call_para(Ctrl, constAg);
 
 % Achtung: orbital order in Maltes TB modell different
 Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
@@ -96,7 +96,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 %% Simulation-preperations
 fprintf('Preperations:              Start'); tic
 
-[Prep.Eks, Prep.CV, Prep.CV_noSOC, Prep.minq] = prep(Para, Data, Prep.Ev_noSOC);
+[Prep.CV, Prep.CV_noSOC, Prep.minq] = prep(Para, Data, Prep.Ev_noSOC , Coul_ME );
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
