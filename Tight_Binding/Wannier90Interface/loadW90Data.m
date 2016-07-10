@@ -1,8 +1,8 @@
-function W90Data = loadW90Data(seed, SOCSettings)
+function W90Data = loadW90Data(seed, trans_me , SOCSettings)
 
 % settings ================================================================
 
-w90path = fullfile( seed , '01_WannierTB','02_G0W0','02_Mo3d' );
+w90path = fullfile( seed , '01_WannierTB','02_G0W0',['02_' , trans_me , '3d'] );
 
 % wannier90 input file (to get the basis labeling and lattice vectors)
 wannier90File = fullfile( w90path , 'wannier90.win' );

@@ -103,7 +103,7 @@ end
 % Check band gap
 EGap_noSOC = min( Ek_noSOC( 2, : , 1 ) - Ek_noSOC( 1, : , 1 ) );
 if round( EGap_noSOC ) ~= W90Data.EGapAct * Para.energy_conversion
-    error( 'Calculated band gap does not agree with Malte!' )
+    warning( 'Calculated band gap does not agree with Malte!' )
 end
 
 EGap = min( min( Ek( [2 5], : , 1 ) - Ek( [1 4], : , 1 ) ) ) + W90Data.EGapCorr * Para.energy_conversion;

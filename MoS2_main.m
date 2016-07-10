@@ -215,7 +215,7 @@ Bloch.nrk = Para.nr.k;
 
 
 % Kommt noch dazu
-Emin = -1000;
+Emin = -1500;
 Emax = 0;
 E = linspace(Emin,Emax,3001)';
 
@@ -250,10 +250,11 @@ chi_w = P_w ./ E_w;
 
 % close all
 
-figure
-plot( E + Data.EGap , imag(chi_w) )
-
-hold on
+% figure
+% plot( E + Data.EGap , imag(chi_w) )
+% plot( E  , imag(chi_w) )
+% 
+% hold on
 % load('spec_V_dip.mat')
 % load ist_egal.mat
 % plot(spec_12(:,1)*Bloch.hbar , spec_12(:,3),'r--')
@@ -264,14 +265,14 @@ hold on
 
 %%
 % % close all
-% file = 'abs_spec_0.000E+00_0.000E+00_3.000E+02_2_2_3.18_1.000E+00_1.000E+00cR_1.400E+01_60_30_1.000E-07_1.000E-03_+0.000E+00_HF_self_g0w0-tb_3_r_c_me_soc_1.519E+01_2.dat';
-% Aspec = ...
-%     importdata( file );
-% 
-% figure
-% plot(E + Data.EGap , imag(chi_w))
-% hold on
-% plot(Aspec(:,1),Aspec(:,5),'r--')
+file = 'abs_spec_0.000E+00_0.000E+00_3.000E+02_2_2_3.18_1.000E+00_1.000E+00cR_1.400E+01_60_30_1.000E-07_1.000E-03_+0.000E+00_HF_self_g0w0-tb_3_r_c_me_soc_1.519E+01_2.dat';
+Aspec = ...
+    importdata( file );
+
+figure
+plot(E + Data.EGap , imag(chi_w))
+hold on
+plot(Aspec(:,1),Aspec(:,5),'r--')
 
 
 %%

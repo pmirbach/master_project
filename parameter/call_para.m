@@ -8,7 +8,7 @@ end
 if strcmp( Ctrl.TB_modell , 'ab_initio' ) 
     
     SOCSettings.type  = 'none';                 % 'first' or 'second' or 'none'
-    W90Data = loadW90Data(seed, SOCSettings);   % load wannier90 Data
+    W90Data = loadW90Data(seed, Ctrl.material_trans_me, SOCSettings);   % load wannier90 Data
     
 elseif strcmp( Ctrl.TB_modell , 'liu' )
     

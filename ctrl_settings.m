@@ -2,12 +2,31 @@ function Ctrl = ctrl_settings
 
 
 %%%%%%%%%%%%% Material - lattice %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%      
-Ctrl.material = 'MoSe2';         % Materialien: MoS2 WS2 MoSe2 WSe2 ( MoTe2 WTe2 later )
-% ab initio TB: MoS2:   0.3160, 0.3180, 0.3200
-%               MoSe2:  0.3320
-%               WS2:    0.3191
-%               WSe2:   0.3325
-Ctrl.lattice_constant = 0.3320;  % ab initio TB: MoS2: .316, .318, .320   (in liu a = 0.319 auto)
+% Ctrl.material = 'MoS2';         % Materialien: MoS2 WS2 MoSe2 WSe2 ( MoTe2 WTe2 later )
+% Ctrl.material_trans_me = 'Mo';
+% % ab initio TB: MoS2:   0.3160, 0.3180, 0.3200
+% %               MoSe2:  0.3320
+% %               WS2:    0.3191
+% %               WSe2:   0.3325
+% Ctrl.lattice_constant = 0.3180;
+
+Ctrl.material = 'MoS2';
+Ctrl.material_trans_me = 'Mo';
+Ctrl.lattice_constant = 0.3180;
+
+% Ctrl.material = 'MoSe2';
+% Ctrl.material_trans_me = 'Mo';
+% Ctrl.lattice_constant = 0.3320;
+
+% Ctrl.material = 'WS2';
+% Ctrl.material_trans_me = 'W';
+% Ctrl.lattice_constant = 0.3191;
+
+% Ctrl.material = 'WSe2';
+% Ctrl.material_trans_me = 'W';
+% Ctrl.lattice_constant = 0.3325;
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%% k-mesh %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -52,7 +71,7 @@ Ctrl.plot.path = {'K','M', 'K*', '\Gamma', 'K','M','\Gamma'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 1];         % Bandstructure
+Ctrl.plot.tb = [0 , 0];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 Ctrl.plot.coul = 0;
