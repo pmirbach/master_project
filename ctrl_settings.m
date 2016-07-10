@@ -2,8 +2,12 @@ function Ctrl = ctrl_settings
 
 
 %%%%%%%%%%%%% Material - lattice %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%      
-Ctrl.material = 'MoS2';         % Materialien: MoS2 WS2 MoSe2 WSe2 MoTe2 WTe2 
-Ctrl.lattice_constant = 0.318;  % ab initio TB: MoS2: .316, .318, .320   (in liu a = 0.319 auto)
+Ctrl.material = 'MoSe2';         % Materialien: MoS2 WS2 MoSe2 WSe2 ( MoTe2 WTe2 later )
+% ab initio TB: MoS2:   0.3160, 0.3180, 0.3200
+%               MoSe2:  0.3320
+%               WS2:    0.3191
+%               WSe2:   0.3325
+Ctrl.lattice_constant = 0.3320;  % ab initio TB: MoS2: .316, .318, .320   (in liu a = 0.319 auto)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%% k-mesh %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -20,8 +24,12 @@ Ctrl.TB_t_symm = 1;             % Time symmetrization (only possible with k-mesh
 
 
 %%%%%%%%%%%%% Coulomb interaction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-Ctrl.coul = 1;                  % Coulomb interaction active or not
-Ctrl.eps_r = 1;                 % Permiabilitaet
+Ctrl.Coul.active = 1;                % Coulomb interaction active or not
+Ctrl.Coul.eps_r = 1;                 % Permiabilitaet
+
+Ctrl.Coul.Resta_fit_eps = 1;
+Ctrl.Coul.eps_2 = 0;
+Ctrl.Coul.eps_3 = 0;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Anregungsdichte
@@ -44,7 +52,7 @@ Ctrl.plot.path = {'K','M', 'K*', '\Gamma', 'K','M','\Gamma'};
 
 Ctrl.plot.k_mesh = [0 , 0];     % Kontrollbilder
 % 1: Surface, 2: Pathplot
-Ctrl.plot.tb = [0 , 0];         % Bandstructure
+Ctrl.plot.tb = [0 , 1];         % Bandstructure
 Ctrl.plot.exc = [0 , 0];         % Excitation
 Ctrl.plot.dipol = [0 , 0];      % Dipol matrix elements
 Ctrl.plot.coul = 0;

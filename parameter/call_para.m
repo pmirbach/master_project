@@ -1,6 +1,6 @@
 function [ Para , W90Data , Coul_ME ] = call_para(Ctrl, constAg)
 
-if strcmp( Ctrl.TB_modell , 'ab_initio' ) || Ctrl.coul
+if strcmp( Ctrl.TB_modell , 'ab_initio' ) || Ctrl.Coul.active
     a0_form = num2str( 10 * Ctrl.lattice_constant , '%.3f' );
     seed = fullfile('Tight_Binding','ab_initio','02_Materials',Ctrl.material,['a0_',a0_form, 'A']);
 end
@@ -88,7 +88,7 @@ Para.coul_indices = call_coul_indices;
 
 Para.vorf.dipol = constAg.ec;
 
-Para.vorf.coul = constAg.ec^2 / ( 2 * constAg.eps_0 * Ctrl.eps_r);
+Para.vorf.coul = constAg.ec^2 / ( 2 * constAg.eps_0 * Ctrl.Coul.eps_r);
 
 Para.nr.tri = 6;
 

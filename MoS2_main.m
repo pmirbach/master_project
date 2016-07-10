@@ -28,7 +28,7 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 [ Para , W90Data , Coul_ME ] = call_para(Ctrl, constAg);
 
 % Achtung: orbital order in Maltes TB modell different
-Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
+% Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
 
 
 
@@ -96,7 +96,7 @@ fprintf('   -   Finished in %g seconds\n',toc)
 %% Simulation-preperations
 fprintf('Preperations:              Start'); tic
 
-[Prep.CV, Prep.CV_noSOC, Prep.minq] = prep(Para, Data, Prep.Ev_noSOC , Coul_ME );
+[Prep.CV, Prep.CV_noSOC, Prep.minq, Prep.V_ab_interpl ] = prep( Ctrl, Para, Data, Prep.Ev_noSOC , Coul_ME );
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
@@ -161,9 +161,22 @@ end
 Bloch.nrd = Para.nr.dipol;
 Bloch.ind = reshape( 1 : Para.nr.dipol*Para.nr.k ,[], Para.nr.dipol);
 
+% tic
+% [V_rabi_fock] = coulomb_rabi_f(Ctrl, Para, Prep, Data.Ev);                           % All coulomb matrices. (in 3rd dimension)
+% toc
+tic
+[V_rabi_fock_interpl] = coulomb_rabi_f_interpl(Ctrl, Para, Prep );
+toc
+% %%
+% figure; scatter3(kx,ky,V_rabi_fock(1,:,1))
+% hold on
+% scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
+% % figure; scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
 
-[V_rabi_fock] = coulomb_rabi_f(Ctrl, Para, Prep, Data.Ev);                           % All coulomb matrices. (in 3rd dimension)
-Bloch.coulomb = V_rabi_fock;
+%%
+
+Bloch.coulomb = V_rabi_fock_interpl;
+% Bloch.coulomb = V_rabi_fock;
 
 % Hab ich schon
 Bloch.hbar = constAg.hbar;
@@ -237,8 +250,8 @@ chi_w = P_w ./ E_w;
 
 % close all
 
-% figure
-plot(E , imag(chi_w))
+figure
+plot( E + Data.EGap , imag(chi_w) )
 
 hold on
 % load('spec_V_dip.mat')
@@ -250,15 +263,15 @@ hold on
 % xlim([-500 0])
 
 %%
-% close all
-file = 'abs_spec_0.000E+00_0.000E+00_3.000E+02_2_2_3.18_1.000E+00_1.000E+00cR_1.400E+01_60_30_1.000E-07_1.000E-03_+0.000E+00_HF_self_g0w0-tb_3_r_c_me_soc_1.519E+01_2.dat';
-Aspec = ...
-    importdata( file );
-
-figure
-plot(E + Data.EGap , imag(chi_w))
-hold on
-plot(Aspec(:,1),Aspec(:,5),'r--')
+% % close all
+% file = 'abs_spec_0.000E+00_0.000E+00_3.000E+02_2_2_3.18_1.000E+00_1.000E+00cR_1.400E+01_60_30_1.000E-07_1.000E-03_+0.000E+00_HF_self_g0w0-tb_3_r_c_me_soc_1.519E+01_2.dat';
+% Aspec = ...
+%     importdata( file );
+% 
+% figure
+% plot(E + Data.EGap , imag(chi_w))
+% hold on
+% plot(Aspec(:,1),Aspec(:,5),'r--')
 
 
 %%
