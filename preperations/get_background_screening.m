@@ -1,20 +1,21 @@
 function [ V_ab_interpl ] = get_background_screening( Ctrl , Para , Coul_ME , minq )
 
-minq = round(minq,12);
 q_pts = sort( unique( round( minq,12 ) ) );
 q_pts( q_pts == 0 ) = [];
+q = q_pts.';
 
-
-% q_max = max(q_pts);
-% q_min = min(q_pts);
-% del = 1000;
+% q_max = max(minq(:))/2;
+% q_min = min(minq(:))*2;
+% del = 100;
 % q = q_min : (q_max - q_min) / del : q_max;
+% q( q == 0 ) = [];
 
-q = q_pts;
+
+
 nr_q = numel( q );
 
 
-A = Para.real.area;
+A = Para.real.area * 100;
 
 
 U_diag = zeros(3,3,nr_q);
@@ -57,6 +58,8 @@ eps_diag(3,3,:) = repmat( Coul_ME.eps.micro(2) , 1 , nr_q );
 
 V_ab_q = zeros(3,3,nr_q);
 
+% V_ab_q_old_model = zeros(6,nr_q+1);
+
 
 for ii = 1:nr_q
     
@@ -66,13 +69,19 @@ for ii = 1:nr_q
     
 end
 
+% for ii = 1:6
+%     tmp = final_coul_scr([0,q],Para.coul.screened(ii,:),Para.coul.pol);
+%     V_ab_q_old_model(ii,:) = tmp.';
+% end
+
+
 V_ab_q( V_ab_q < 0 ) = 0;
 
 V_new = reshape( V_ab_q, 9 , [] );
 V_new( [4 7 8], : ) = [];
 
-
-q = [0 ; q];
+q = [0 , q];
+% q = [0 ; q];
 V_new = [Para.coul.pol * ones(6,1) , V_new];
 
 
@@ -81,12 +90,17 @@ for ii = 1:6
     V_ab_interpl{ii} = griddedInterpolant( q , V_new(ii,:) );    
 end
 
+% Tests:
+
 % figure
 % for ii = 1:6
 %     subplot(2,3,ii)
-%     plot(q, V_new(ii,:) )
+%     plot(q, V_new(ii,:),'-' )
+%     hold on
+%     plot(q, V_ab_q_old_model(ii,:), '-')
 % end
-% 
+% %
+
 % figure
 % for ii = 1:6
 %     subplot(2,3,ii)
