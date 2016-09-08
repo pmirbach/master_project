@@ -27,9 +27,9 @@ if Ctrl.plot.dipol(1) == 1
             ax(jj).Title.String = titlestr{jj};
             ax(jj).Position = ax(jj).Position  + [-.03 -.03 0.03 0.03];
             cb(jj).FontSize = 10;
-            cb(jj).Title.String = 'E - E_f (eV)';
+            cb(jj).Title.String = 'nm pA ps';
         end
-        mtit('Dispersion der Energiebänder','fontsize',18,...
+        mtit('Dipol-Matrixelemente','fontsize',18,...
             'xoff',0,'yoff',.03)
     end
     if Ctrl.plot.save == 1

@@ -36,20 +36,15 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 
 
 %% k - mesh
+q_max = 2;
+N_q = 100;
+N_phi = 30;
 
-if strcmp( Ctrl.k_mesh.type , 'symm' )
-    
-    [ Data.k , Data.wk , Para.nr.k , Para.k_ind ] = k_mesh_AG(Ctrl, Para);
-    
-elseif strcmp( Ctrl.k_mesh.type , 'liu' )
-    
-    [ Data.k , Data.wk , Para.nr.k , Para.k_ind.symm ] = k_mesh_liu(Ctrl, Para);
-    
-end
+Ctrl.k_mesh.qr = 240;
 
+[ Data.k , Data.wk , Para.nr.k , index_isoc ] = k_mesh_isotrop( q_max, N_q, N_phi );
 
-%%
-
+% plot(Data.k(1,:),Data.k(2,:),'x')
 
 
 
@@ -60,34 +55,23 @@ end
 % [Para, Data, Daniel] = load_daniel_data(Ctrl, Para, Data, file); % overwrites k, wk, coul_pol, wk_area, nr_k
 % 
 % % Fast kx, ky for scatter3 plots:
-kx = Data.k(1,:,1);
-ky = Data.k(2,:,1);
+kx = Data.k(1,:);
+ky = Data.k(2,:);
 
 
 
 
 %% Tight-Binding
+Ctrl.TB_t_symm = 0;
 
-if strcmp(Ctrl.TB_modell,'ab_initio') 
-    
-    fprintf('Tight-binding (ab initio): Start'); tic 
-    
-    [Data.Ek, Data.Ev, Data.EGap, Prep.Ev_noSOC, Prep.H_grad_kx, Prep.H_grad_ky, Ek_old] = tight_binding_roesner(Ctrl, Para, Data.k, W90Data);  
-    
-elseif strcmp(Ctrl.TB_modell,'liu')
-    
-    fprintf('Tight-binding (liu):       Start'); tic 
-    
-    [Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC, Prep.H_grad_kx, Prep.H_grad_ky] = tight_binding_liu(Ctrl, Para, Data.k);
-    
-else
-    error('TB-modell must be ab_initio or liu!')
-end
+fprintf('Tight-binding (ab initio): Start'); tic
+
+[Data.Ek, Data.Ev, Data.EGap, Prep.Ev_noSOC, Prep.H_grad_kx, Prep.H_grad_ky, Ek_old] = tight_binding_roesner_1d(Ctrl, Para, Data.k, W90Data);
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
 % [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
-[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Ek_old(:,:,1),[2 3]);
+% [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Ek_old(:,:,1),[2 3]);
 
 %%
 % scatter3( Data.k(1,:), Data.k(2,:) , Data.Ek(1,:) )
@@ -121,7 +105,7 @@ for ii = 1:Para.nr.dipol
 end
 
 %%
-
+1
 
 %% Anregung, Bandrenormierung (Coulomb)     -   keine Zeit mehr
 % %% Thermische Anregung
@@ -170,9 +154,8 @@ tic
 [V_rabi_fock_interpl] = coulomb_rabi_f_interpl(Ctrl, Para, Prep );
 toc
 % %%
-% figure; 
-hold on
-scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
+% figure; hold on
+% scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
 % scatter3(kx,ky,V_rabi_fock(1,:,1),'r')
 % % % figure; scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
 
@@ -230,13 +213,6 @@ Para.nr.w = numel(Bloch.w);
 
 1;
 
-%%
-
-kx;
-ky;
-
-
-
 %% Zeitentwicklung
 
 Bloch.coul_ctrl = 1;                    % Coulomb Interaktion
@@ -279,65 +255,16 @@ Data.E = E;
 Data.chi_w = chi_w;
 
 %%
-% plot(E + Data.EGap , imag(chi_w))
-
-
-
-% figure
-% set(gcf,'color','w');
-% hold on
-
-plot(E , imag(chi_w))
-set(gca,'fontsize',18)
-
-xlabel('Energie E-E_{Gap} in meV')
-ylabel('\Im{\chi(\omega)}')
-legend('Spin \uparrow','Spin \downarrow')
-
-title('WS_2')
-
-
-%%
-% hold on
+% close all
 % file = 'abs_spec_0.000E+00_0.000E+00_3.000E+02_2_2_3.18_1.000E+00_1.000E+00cR_1.400E+01_60_30_1.000E-07_1.000E-03_+0.000E+00_HF_self_g0w0-tb_3_r_c_me_soc_1.519E+01_2.dat';
 % Aspec = ...
 %     importdata( file );
-
+% 
+figure
+plot(E + Data.EGap , imag(chi_w))
 % hold on
 % plot(Aspec(:,1),Aspec(:,5),'r--')
 
-%%
-% P_t2 = zeros(1,numel(t));
-% 
-% for ii = 1:numel(t)
-%     P_t2(ii) = 1 / (2 * pi)^2 * Bloch.wk.' * (conj(Bloch.dipol) .*  psik_E(ii,1:Bloch.nrd*Bloch.nrk).' );
-% end
-% 
-% figure
-% plot(real(P_t2))
-% hold on
-% plot(imag(P_t2))
-% 
-% % E_t2 = Bloch.E0 * exp(-1/2 * ( ( t.' - Bloch.t_peak ) / Bloch.sigma ).^2 * 4 * log(2) );
-% %
-% % P_w2 = fft(P_t2);
-% % E_w2 = fft(E_t2);
-% %
-% % chi_w2 = P_w2 ./ E_w2;
-% %
-% % close all
-% % plot(imag(P_w2))
-
-%%
-
-% figure
-% plot(t,real(P_t2))
-% hold on
-% plot(t,imag(P_t2),'r')
-% legend('real','imag')
-
-%%
-% plot_surf(Para,Data.k(:,:,1),Bloch.dipol,[1,1])
 
 %%
 if Ctrl.profile_flag == 1

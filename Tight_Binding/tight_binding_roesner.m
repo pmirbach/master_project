@@ -1,4 +1,4 @@
-function [Ek, Ev, EGap, Ev_noSOC, H_grad_kx, H_grad_ky] = tight_binding_roesner(Ctrl, Para, k, W90Data)
+function [Ek, Ev, EGap, Ev_noSOC, H_grad_kx, H_grad_ky, Ek_old] = tight_binding_roesner(Ctrl, Para, k, W90Data)
 
 D = [cos( Para.k.alpha ) -sin( Para.k.alpha ) ; sin( Para.k.alpha ) cos( Para.k.alpha )];
 for ni = 1:6
@@ -9,7 +9,7 @@ TM = W90Data.kLat(1:2,1:2).' * 10;
 
 
 % Vorläufiger SOC Ansatz:
-lambda = 0.074;                                     % ???  Daniel: 0.074 ??
+lambda = Ctrl.material_lambda;                                     % ???  Daniel: 0.074 ??
 L_z = -[0 0 0; 0 0 2i; 0 -2i 0];
 H_SOC = lambda / 2 * L_z * Para.energy_conversion;
 
@@ -99,6 +99,7 @@ end
 %     end
 % end
 %%
+Ek_old = Ek(:,:,1) - max( max( Ek( Para.TB_ind{1}, : , 1 ) ) );
 
 % Check band gap
 EGap_noSOC = min( Ek_noSOC( 2, : , 1 ) - Ek_noSOC( 1, : , 1 ) );

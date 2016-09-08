@@ -25,7 +25,7 @@ if Ctrl.plot.tb(1) == 1
             cb(jj).FontSize = 10;
             cb(jj).Title.String = 'E - E_f (eV)';
         end
-        mtit('Dispersion der Energieb√§nder','fontsize',18,...
+        mtit('Dispersion der Energieb‰nder','fontsize',18,...
             'xoff',0,'yoff',.03)
     end
     if Ctrl.plot.save == 1

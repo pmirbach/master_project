@@ -193,14 +193,14 @@ function k_mesh_test_plots( Ctrl , k_redBZ , wk , ind , k_BZ )
 % % 
 % % 
 % % 
-% % Test Plot: Gewichtung
-% % in = wk == 6;
-% % on = wk == 3;
-% % symm = wk == 1;
-% % figure; hold on
-% % plot(kall(1,in,2),kall(2,in,2),'rx')
-% % plot(kall(1,on,2),kall(2,on,2),'r^')
-% % plot(kall(1,symm,2),kall(2,symm,2),'rs')
+% Test Plot: Gewichtung
+in = wk == 6;
+on = wk == 3;
+symm = wk == 1;
+figure; hold on
+plot(k_redBZ(1,in,1),k_redBZ(2,in,1),'rx')
+plot(k_redBZ(1,on,1),k_redBZ(2,on,1),'r^')
+plot(k_redBZ(1,symm,1),k_redBZ(2,symm,1),'rs')
 % % 
 % % % Test Plot: Indizierung 1.1 - Speicherordnung
 % % figure; hold on

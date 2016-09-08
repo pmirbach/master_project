@@ -4,7 +4,7 @@
 
 wahl = 4;
 
-a = 0.319;
+a = 0.318;
 
 switch wahl
     case 1
@@ -16,9 +16,13 @@ switch wahl
     case 3
         a1 = a / 2 * [ 2 , 0 , 0 ];
         a2 = a / 2 * [ -1 , sqrt(3) , 0 ];
+        
+        
     case 4
         a1 = a / 2 * [ sqrt(3) , -1 , 0 ];
         a2 = a / 2 * [ 0 , 2 , 0 ];
+        
+        
     case 5
         a1 = a / 2 * [ sqrt(3) , 1 , 0 ];
         a2 = a / 2 * [ 0 , 2 , 0 ];

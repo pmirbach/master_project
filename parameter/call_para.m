@@ -80,6 +80,9 @@ Para.coul.kappa = 0;             % Kappa, because of Singularity
 
 
 Para.dipol_trans = [ 1, 2 ; 4 , 5  ];
+% Para.dipol_trans = [ 1, 2 ];
+% Para.dipol_trans = [ 4, 5 ];
+
 % Para.dipol_trans = [1, 2 ; 1 , 3 ; 4 , 5 ; 4 , 6 ];
 Para.nr.dipol = size(Para.dipol_trans,1);
 

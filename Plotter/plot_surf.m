@@ -25,7 +25,7 @@ if size(k,3) > 1
 else
     x_lim = [ min(k(1,:)) , max(k(1,:)) ];
     y_lim = [ min(k(2,:)) , max(k(2,:)) ];
-    gen = 200;
+    gen = 400;
     k_plot = k(:,:);
 end
 
@@ -60,7 +60,8 @@ for ii = 1:Nplots
     f = scatteredInterpolant(k_plot(1,:)',k_plot(2,:)',...
         Daten_plot(:),'linear','none');
     Z = f(X,Y);
-    
+    Z(Z>1e6) = 0;
+    Z(Z<-1e6) = 0;
     % figure
 %     over_data = max(max(Daten)) + 10000;
 %     plot3(corners(1,:),corners(2,:),over_data * ones(1,size(corners,2)),'k-x')
@@ -70,8 +71,10 @@ for ii = 1:Nplots
     colormap jet
     colorbar
     
-%     d = [(x_lim(2) - x_lim(1)) / 15, (y_lim(2) - y_lim(1)) / 15];
-%     axis([x_lim(1)-d(1), x_lim(2)+d(1), y_lim(1)-d(2), y_lim(2)+d(2)]);       
+%     axis equal
+    
+    d = [(x_lim(2) - x_lim(1)) / 15, (y_lim(2) - y_lim(1)) / 15];
+    axis([x_lim(1)-d(1), x_lim(2)+d(1), y_lim(1)-d(2), y_lim(2)+d(2)]);       
 %     axis equal
 %     axis off
     
