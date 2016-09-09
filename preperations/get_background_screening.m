@@ -1,7 +1,7 @@
-function [ V_ab_interpl ] = get_background_screening( Ctrl , Para , Coul_ME , minq )
+function V_ab_interpl = get_background_screening( Ctrl , Para , Coul_ME , minq )
 
-% % Define q for coulomb-interaction
-% % Find q (unique in minq)
+% Define q for coulomb-interaction
+% Find q (unique in minq)
 q_pts = sort( unique( round( minq,12 ) ) );
 q_pts( q_pts == 0 ) = [];
 q = q_pts.';
@@ -13,7 +13,10 @@ q = q_pts.';
 % q = q_min : (q_max - q_min) / del : q_max;
 % q( q == 0 ) = [];
 %%
+% q = linspace(0,27,1000);
+% q(1) = [];
 
+%%
 nr_q = numel( q );
 A = Para.real.area;
 
@@ -46,7 +49,7 @@ if Ctrl.Coul.Resta_fit_eps                                                      
     
     eps_inf_q = ( a + q.^2 ) ./ ( a / b  * sin( q * c ) ./ ( q * c ) + q.^2 ) + e;
     height = d;
-    
+       
 else
     
     eps_inf_q = repmat( Coul_ME.eps.inf , 1 , nr_q );
@@ -72,8 +75,8 @@ eps_diag(3,3,:) = repmat( Coul_ME.eps.micro(2) , 1 , nr_q );
 % Ev = Coul_ME.U_Ev ;
 
 Ev2 = Coul_ME.U_Ev;
-Ev2(:,1) = 1/sqrt(3);
-Ev2(:,3) = [ 0; -1/sqrt(2); 1/sqrt(2) ];
+% Ev2(:,1) = 1/sqrt(3);
+% Ev2(:,3) = [ 0; -1/sqrt(2); 1/sqrt(2) ];
 
 Ev = Ev2;
 
@@ -86,8 +89,8 @@ for ii = 1:nr_q
 %     U_ab_q(:,:,ii) = Ev * U_diag(:,:,ii) * transpose( Ev );
     U_ab_q(:,:,ii) = Ev * ( U_diag(:,:,ii) / Ev );
     
-%     V_ab_q(:,:,ii) = Ev * V_diag * transpose( Ev );
-    V_ab_q(:,:,ii) = Ev * ( V_diag / Ev );
+    V_ab_q(:,:,ii) = Ev * V_diag * transpose( Ev );
+%     V_ab_q(:,:,ii) = Ev * ( V_diag / Ev );
     
 end
 
@@ -100,7 +103,19 @@ V_ab_q = reshape( V_ab_q , 9 , []);
 V_ab_q( [4 7 8], : ) = [];
 U_ab_q( [4 7 8], : ) = [];
 
-
+% %%%%%%%%%%%%%%%%%%
+% load('V_ab_qq.mat')
+% V_ab_q_d = reshape(V_ab_qq, 9 , []);
+% V_ab_q_d( [4 7 8], : ) = [];
+% for ii = 1:6
+%     subplot(2,3,ii)
+% %     plot(q,Para.vorf.coul * V_ab_q(ii,:) - V_ab_q_d(ii,2:end))
+%     
+%     plot(q,Para.vorf.coul * V_ab_q(ii,:))
+%     hold on
+%     plot(q,V_ab_q_d(ii,2:end))
+% end
+% %%%%%%%%%%%%%%%%%%
 
 q = [0 , q];
 V_ab_q = [Para.coul.pol * ones(6,1) , V_ab_q];
@@ -111,13 +126,13 @@ for ii = 1:6
 end
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
-% Für die Arbeit!
+% Fï¿½r die Arbeit!
 
-titlestring = {'d_{z^2} d_{z^2}','d_{z^2} d_{x^2-y^2}','d_{z^2} d_{xy}','d_{x^2-y^2} d_{x^2-y^2}','d_{x^2-y^2} d_{xy}','d_{xy} d_{xy}'};
-
+% titlestring = {'d_{z^2} d_{z^2}','d_{z^2} d_{x^2-y^2}','d_{z^2} d_{xy}','d_{x^2-y^2} d_{x^2-y^2}','d_{x^2-y^2} d_{xy}','d_{xy} d_{xy}'};
+% 
 % figure(6)
 % set(gcf,'color','w');
-
+% 
 % for ii = 1:6
 %     subplot(2,3,ii)
 %     title(titlestring{ii})

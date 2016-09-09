@@ -1,4 +1,4 @@
-function [ CV, CVnoSOC, minq, V_ab_interpl] = prep( Ctrl, Para, Data, EvnoSOC , Coul_ME)
+function [ CV, CVnoSOC, minq, V_ab_interpl ] = prep( Ctrl, Para, Data, EvnoSOC , Coul_ME)
 
 % Eks = call_eks(Data.Ek);
 

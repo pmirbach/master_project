@@ -21,7 +21,7 @@ end
 
 
 Para.real.a = Ctrl.lattice_constant;
-Para.real.area = Para.real.a^2*sqrt(3)/2;
+Para.real.area = Para.real.a^2 * sqrt(3) / 2;
 
 
 

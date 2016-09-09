@@ -170,9 +170,9 @@ tic
 [V_rabi_fock_interpl] = coulomb_rabi_f_interpl(Ctrl, Para, Prep );
 toc
 % %%
-% figure; 
-hold on
-scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
+% % figure; 
+% hold on
+% scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
 % scatter3(kx,ky,V_rabi_fock(1,:,1),'r')
 % % % figure; scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
 
@@ -201,7 +201,7 @@ for ii = 1:Para.nr.dipol
 %     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).';
     
 
-%     Rausgekürzt V
+%     Rausgekï¿½rzt V
 %     Bloch.feff( Bloch.ind(:,ii) ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';      
     
 end

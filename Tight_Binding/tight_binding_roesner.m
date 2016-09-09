@@ -103,8 +103,9 @@ Ek_old = Ek(:,:,1) - max( max( Ek( Para.TB_ind{1}, : , 1 ) ) );
 
 % Check band gap
 EGap_noSOC = min( Ek_noSOC( 2, : , 1 ) - Ek_noSOC( 1, : , 1 ) );
-if round( EGap_noSOC ) ~= W90Data.EGapAct * Para.energy_conversion
-    warning( 'Calculated band gap does not agree with Malte!' )
+if round( EGap_noSOC , 1 ) ~= round( W90Data.EGapAct * Para.energy_conversion , 1 )
+    warning( 'Calculated band gap (%.1f meV) does not agree with Malte (%.1f meV)!' , ...
+        round( EGap_noSOC , 1), round( W90Data.EGapAct * Para.energy_conversion , 1 ) )
 end
 
 EGap = min( min( Ek( [2 5], : , 1 ) - Ek( [1 4], : , 1 ) ) ) + W90Data.EGapCorr * Para.energy_conversion;

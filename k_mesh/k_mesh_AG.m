@@ -2,7 +2,7 @@ function [ k_BZ , wk , Nrk , ind ] = k_mesh_AG(Ctrl, Para)
 
 Ctrl.plot.k_meshAG = [ 1 1 1 1 ];
 
-a = 0.318;
+a = Para.real.a;
 
 b1 = 2 * pi / a * [ 2 / sqrt(3) ; 0 ];
 b2 = 2 * pi / a * [ 1 / sqrt(3) ; 1 ];
