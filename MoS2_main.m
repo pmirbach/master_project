@@ -15,6 +15,10 @@ addpath(genpath(pwd))
 
 Ctrl = ctrl_settings;
 
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+Ctrl.k_mesh.qr = asdf;
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
 if Ctrl.profile_flag == 1
     profile on
 end
@@ -218,7 +222,7 @@ Bloch.nrk = Para.nr.k;
 
 
 % Kommt noch dazu
-Emin = -2000;
+Emin = -1000;
 Emax = 0;
 E = linspace(Emin,Emax,3001)';
 
@@ -281,20 +285,33 @@ Data.chi_w = chi_w;
 %%
 % plot(E + Data.EGap , imag(chi_w))
 
-
-
-% figure
-% set(gcf,'color','w');
+% 
+% 
+% % figure
+% % set(gcf,'color','w');
 % hold on
+% 
+% plot(E , imag(chi_w))
+% set(gca,'fontsize',18)
+% 
+% xlabel('Energie E-E_{Gap} in meV')
+% ylabel('\Im{\chi(\omega)}')
+% % legend('Spin \uparrow','Spin \downarrow')
 
-plot(E , imag(chi_w))
-set(gca,'fontsize',18)
-
-xlabel('Energie E-E_{Gap} in meV')
-ylabel('\Im{\chi(\omega)}')
-legend('Spin \uparrow','Spin \downarrow')
-
-title('WS_2')
+% title('WS_2')
+%%
+% warning('off','MATLAB:polyfit:RepeatedPointsOrRescale')
+% measuredperaks = findpeaksG(E,imag(chi_w),.0001,2,27,18,3);
+% warning('on','MATLAB:polyfit:RepeatedPointsOrRescale')
+% 
+% fprintf('Anzahl k-Punkte: %.0f\n',Para.nr.k)
+% fprintf('A-Exziton:       %.1f\n',measuredperaks(1,2))
+% fprintf('B-Exziton:       %.1f\n',measuredperaks(2,2))
+% 
+% 
+% fileID = fopen('Ergebnisse\Konvergenz_WSe2.txt','a');
+% fprintf(fileID,'%.0f %.0f %.1f %.1f\n',Ctrl.k_mesh.qr,Para.nr.k,measuredperaks(1,2),measuredperaks(2,2));
+% fclose(fileID);
 
 
 %%
