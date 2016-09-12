@@ -15,10 +15,6 @@ addpath(genpath(pwd))
 
 Ctrl = ctrl_settings;
 
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
-Ctrl.k_mesh.qr = asdf;
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-
 if Ctrl.profile_flag == 1
     profile on
 end
@@ -33,9 +29,6 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 
 % Achtung: orbital order in Maltes TB modell different
 % Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
-
-
-
 
 
 
@@ -165,20 +158,53 @@ end
 %% structure für Variablen für Blochgleichungen
 
 Bloch.nrd = Para.nr.dipol;
-Bloch.ind = reshape( 1 : Para.nr.dipol*Para.nr.k ,[], Para.nr.dipol);
+Bloch.ind = reshape( 1 : Para.nr.dipol * Para.nr.k ,[], Para.nr.dipol);
 
 % tic
 % [V_rabi_fock] = coulomb_rabi_f(Ctrl, Para, Prep, Data.Ev);                           % All coulomb matrices. (in 3rd dimension)
 % toc
-tic
+
+fprintf('Rabi-Energie Coulombmatrixelemente:  Start'); tic
+
 [V_rabi_fock_interpl] = coulomb_rabi_f_interpl(Ctrl, Para, Prep );
-toc
+
+fprintf('   -   Finished in %g seconds\n',toc)
+
 % %%
 % % figure; 
 % hold on
 % scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
 % scatter3(kx,ky,V_rabi_fock(1,:,1),'r')
 % % % figure; scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
+
+%%
+% figure(15)
+% subplot(1,2,1)
+% plot(kx,ky,'x')
+% 
+% load k_stdmp_631.mat
+% D = [cos(pi/6) sin(pi/6) ; -sin(pi/6) cos(pi/6)];
+% k_daniel_rot = k(:,1:2,1);
+% k_daniel = D * k_daniel_rot.';
+% 
+% subplot(1,2,2)
+% plot(k_daniel(1,:),k_daniel(2,:),'x')
+
+%%
+% 
+% load COUL_malwieder.mat
+% 
+% asdf = squeeze(COUL.D(1,end,:)) ./ squeeze(k(:,3,1));
+% 
+% figure(16)
+% scatter3(k_daniel(1,:),k_daniel(2,:),asdf)
+% hold on
+% scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) / 6 )
+% 
+% %%
+% 
+% figure(17)
+% compare_alex( Data.k(:,:,1), k_daniel, V_rabi_fock_interpl(1,:,1) / 6 , asdf , 'abs' )
 
 %%
 
@@ -213,7 +239,9 @@ end
 % Bloch.dipol = 5e4 * ones(Para.nr.k * Para.nr.dipol,1);                % ? 1-3 too strong.
 
 
-Bloch.gamma = 10;
+Bloch.gamma = 10;           % Dephrasing
+
+
 Bloch.E0 = 1e-7;
 Bloch.t_peak = 2.038 * 1e-3;
 Bloch.sigma = 1e-3;
@@ -282,6 +310,23 @@ chi_w = P_w ./ E_w;
 Data.E = E;
 Data.chi_w = chi_w;
 
+%% Umrechnung auf Absorptionskoeffizienten
+
+w = ( Data.E.' + Data.EGap ) / constAg.hbar;
+Y_w = 1i * w / ( 2 * constAg.c  * constAg.eps_0 ) .* Data.chi_w;
+R = abs( Y_w ).^2 ./ abs( 1 - Y_w ).^2;
+T = 1 ./ abs( 1 - Y_w ).^2;
+
+alpha = 1 - R - T;
+
+plot( E  , alpha )
+
+% hold on
+% filename_spec = ['abs_spec_0.000E+00_0.000E+00_3.000E+02_2_2_3.18_' ...
+%     '1.000E+00_1.000E+00cR_60_30_1.000E-07_1.000E-03_+0.000E+00_HF_g0w0-tb_3_r_c_me_sock_7.596E+00_5.dat'];
+% absspec0 = import_alex_spec(filename_spec);
+% plot(absspec0(:,1),absspec0(:,5))
+
 %%
 % plot(E + Data.EGap , imag(chi_w))
 
@@ -299,6 +344,8 @@ Data.chi_w = chi_w;
 % % legend('Spin \uparrow','Spin \downarrow')
 
 % title('WS_2')
+
+
 %%
 % warning('off','MATLAB:polyfit:RepeatedPointsOrRescale')
 % measuredperaks = findpeaksG(E,imag(chi_w),.0001,2,27,18,3);

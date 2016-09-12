@@ -111,9 +111,9 @@ U_ab_q( [4 7 8], : ) = [];
 %     subplot(2,3,ii)
 % %     plot(q,Para.vorf.coul * V_ab_q(ii,:) - V_ab_q_d(ii,2:end))
 %     
-%     plot(q,Para.vorf.coul * V_ab_q(ii,:))
-%     hold on
-%     plot(q,V_ab_q_d(ii,2:end))
+%     plot(q,Para.vorf.coul * V_ab_q(ii,:) - V_ab_q_d(ii,2:end))
+% %     hold on
+% %     plot(q,V_ab_q_d(ii,2:end))
 % end
 % %%%%%%%%%%%%%%%%%%
 

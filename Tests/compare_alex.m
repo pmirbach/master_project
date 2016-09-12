@@ -19,8 +19,8 @@ end
 
 
 
-k_P = round( k_P , 6 ) ;
-k_A = round( k_A , 6 ) ;
+k_P = round( k_P , 4 ) ;
+k_A = round( k_A , 4 ) ;
 
 [k_P_sort, index_P] = sortrows( k_P );
 [k_A_sort, index_A] = sortrows( k_A );
