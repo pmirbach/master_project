@@ -30,7 +30,6 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 % Achtung: orbital order in Maltes TB modell different
 % Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
 
-Para.vorf.coul = 0;
 
 
 %% k - mesh
@@ -265,8 +264,8 @@ Bloch.nrk = Para.nr.k;
 
 
 % Kommt noch dazu
-Emin = 0;
-Emax = 1000;
+Emin = -1000;
+Emax = 0;
 E = linspace(Emin,Emax,3001)';
 
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
