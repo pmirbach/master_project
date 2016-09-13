@@ -1,14 +1,16 @@
 function [bandstr_surf, bandstr_path] = plot_dipol(Ctrl,Para,k,Daten,layout,titlestr)
 
-if any(Ctrl.plot.dipol)
-        
-    Daten_plot = zeros(size(Para.dipol_trans,1) , Para.nr.k);
-    
-    for ii = 1:size(Para.dipol_trans,1)   
-        Daten_plot(ii,:) = abs( 1 / sqrt(2) * (Daten{ii}(1,:) - 1i * Daten{ii}(2,:)) );
-    end
-        
-end
+% if any(Ctrl.plot.dipol)
+%         
+%     Daten_plot = zeros(size(Para.dipol_trans,1) , Para.nr.k);
+%     
+%     for ii = 1:size(Para.dipol_trans,1)   
+%         Daten_plot(ii,:) = abs( 1 / sqrt(2) * (Daten{ii}(1,:) - 1i * Daten{ii}(2,:)) );
+%     end
+%         
+% end
+
+Daten_plot = Daten.';
 
 if Ctrl.plot.dipol(1) == 1
     if Ctrl.plot.entireBZ == 1

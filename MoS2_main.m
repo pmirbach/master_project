@@ -30,6 +30,7 @@ load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 % Achtung: orbital order in Maltes TB modell different
 % Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
 
+Para.vorf.coul = 0;
 
 
 %% k - mesh
@@ -75,7 +76,7 @@ elseif strcmp(Ctrl.TB_modell,'liu')
     
     fprintf('Tight-binding (liu):       Start'); tic 
     
-    [Data.Ek, Data.Ev, Prep.Ek_noSOC, Prep.Ev_noSOC, Prep.H_grad_kx, Prep.H_grad_ky] = tight_binding_liu(Ctrl, Para, Data.k);
+    [Data.Ek, Data.Ev, Data.EGap, Prep.Ek_noSOC, Prep.Ev_noSOC, Prep.H_grad_kx, Prep.H_grad_ky] = tight_binding_liu(Ctrl, Para, Data.k);
     
 else
     error('TB-modell must be ab_initio or liu!')
@@ -84,7 +85,7 @@ end
 fprintf('   -   Finished in %g seconds\n',toc)
 
 % [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
-[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Ek_old(:,:,1),[2 3]);
+% [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Ek_old(:,:,1),[2 3]);
 
 %%
 % scatter3( Data.k(1,:), Data.k(2,:) , Data.Ek(1,:) )
@@ -107,15 +108,24 @@ Data.dipol = dipol(Para, Prep, Data);
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
-titlestr = {'1 \rightarrow 2 \uparrow','1 \rightarrow 3 \uparrow','1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow'};
-[fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,Data.dipol,[2 2],titlestr);
-clear titlestr
+% titlestr = {'1 \rightarrow 2 \uparrow','1 \rightarrow 3 \uparrow','1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow'};
+% [fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,Data.dipol,[2 2],titlestr);
+% clear titlestr
 
 Ploter.dipol = zeros( Para.nr.k, Para.nr.dipol );
 for ii = 1:Para.nr.dipol
     Ploter.dipol_l(:,ii) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).'; 
     Ploter.dipol_r(:,ii) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
 end
+
+%%
+
+test = [Ploter.dipol_l,Ploter.dipol_r];
+titlestr = {'1 \rightarrow 2, \uparrow, \sigma_+','1 \rightarrow 2, \downarrow, \sigma_+',...
+    '1 \rightarrow 2, \uparrow, \sigma_-','1 \rightarrow 2, \downarrow, \sigma_-'};
+[fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,test,[2 2],titlestr);
+
+1
 
 %%
 
@@ -227,7 +237,12 @@ for ii = 1:Para.nr.dipol
     Bloch.Esum( Bloch.ind(:,ii) ) = ( Data.Ek( Para.dipol_trans(ii,1),: , 1 ) + Data.Ek( Para.dipol_trans(ii,2),: , 1 ) ).' ;
 %     Bloch.Esum( Bloch.ind(:,ii) ) = ( - Data.Ek( Para.dipol_trans(ii,1),: , 1 ) + Data.Ek( Para.dipol_trans(ii,2),: , 1 ) ).' ;
     
+%     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).' * 10; 
+    
     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).' / 10; 
+
+
+
 %     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).';
     
 
@@ -250,8 +265,8 @@ Bloch.nrk = Para.nr.k;
 
 
 % Kommt noch dazu
-Emin = -1000;
-Emax = 0;
+Emin = 0;
+Emax = 1000;
 E = linspace(Emin,Emax,3001)';
 
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
@@ -294,9 +309,9 @@ chi_w = P_w ./ E_w;
 
 % close all
 
-% figure
+figure
 % plot( E + Data.EGap , imag(chi_w) )
-% plot( E  , imag(chi_w) )
+plot( E  , imag(chi_w) )
 % 
 % hold on
 % load('spec_V_dip.mat')
@@ -326,6 +341,14 @@ plot( E  , alpha )
 %     '1.000E+00_1.000E+00cR_60_30_1.000E-07_1.000E-03_+0.000E+00_HF_g0w0-tb_3_r_c_me_sock_7.596E+00_5.dat'];
 % absspec0 = import_alex_spec(filename_spec);
 % plot(absspec0(:,1),absspec0(:,5))
+
+%% Saving
+
+Ergebnis.E = E;
+Ergebnis.alpha = alpha;
+Ergebnis.chi_w = chi_w;
+Ergebnis.EGap = Data.EGap;
+
 
 %%
 % plot(E + Data.EGap , imag(chi_w))

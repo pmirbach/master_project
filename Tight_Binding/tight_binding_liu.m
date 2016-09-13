@@ -1,4 +1,4 @@
-function [Ek, Ev, Ek_noSOC, Ev_noSOC, H_grad_kx , H_grad_ky] = tight_binding_liu(Ctrl, Para, k)
+function [Ek, Ev, EGap, Ek_noSOC, Ev_noSOC, H_grad_kx , H_grad_ky] = tight_binding_liu(Ctrl, Para, k)
 
 D = [cos( Para.k.alpha ) -sin( Para.k.alpha ) ; sin( Para.k.alpha ) cos( Para.k.alpha )];
 for ni = 1:6
@@ -71,9 +71,14 @@ Ek_noSOC = Ek_noSOC - max(Ek_noSOC(1,:));
 
 [H_grad_kx , H_grad_ky] = grad_TB_Liu_TNN_fun(k(1:2,:,1),Para.TB);
 
-
 H_grad_kx = Para.energy_conversion * H_grad_kx;
 H_grad_ky = Para.energy_conversion * H_grad_ky;
+
+
+EGap = min( min( Ek( [2 5], : , 1 ) - Ek( [1 4], : , 1 ) ) );
+
+Ek( Para.TB_ind{1}, : , : ) = - Ek( Para.TB_ind{1}, : , : ) + max( max( Ek( Para.TB_ind{1}, : , 1 ) ) );
+Ek( Para.TB_ind{2}, : , : ) = Ek( Para.TB_ind{2}, : , : ) - min( min( Ek( Para.TB_ind{2}, Para.k_ind.symm , 1 ) ) );
 
 
 
