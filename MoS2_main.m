@@ -264,7 +264,7 @@ Bloch.nrk = Para.nr.k;
 
 % Kommt noch dazu
 Emin = -1000;
-Emax = 0;
+Emax = 1000;
 E = linspace(Emin,Emax,2001)';
 
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
@@ -332,6 +332,7 @@ T = 1 ./ abs( 1 - Y_w ).^2;
 
 alpha = 1 - R - T;
 
+figure
 plot( E  , alpha )
 
 % hold on

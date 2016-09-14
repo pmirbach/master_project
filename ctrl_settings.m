@@ -46,6 +46,12 @@ Ctrl.TB_t_symm = 1;             % Time symmetrization (only possible with k-mesh
 Ctrl.TB_SOC_k = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%% Dipol - Transitions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Ctrl.dipol_trans = [ 1, 2 ; 4 , 5  ];                   % Only Valence and lower conduction band
+% Ctrl.dipol_trans = [ 1, 2 ]; % + 3;                   % Only 1 spin system
+% Ctrl.dipol_trans = [1, 2 ; 1 , 3 ; 4 , 5 ; 4 , 6 ];   % All bands / spins
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%% Coulomb interaction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
 Ctrl.Coul.active = 1;                % Coulomb interaction active or not
