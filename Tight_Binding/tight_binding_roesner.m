@@ -8,10 +8,13 @@ end
 TM = W90Data.kLat(1:2,1:2).' * 10;
 
 
-% Vorläufiger SOC Ansatz:
-lambda = Ctrl.material_lambda;                                     % ???  Daniel: 0.074 ??
-L_z = -[0 0 0; 0 0 2i; 0 -2i 0];
-H_SOC = lambda / 2 * L_z * Para.energy_conversion;
+if Ctrl.TB_SOC_k
+    K_symm_rot = D * Para.BZred.symmpts{2}(:,[1,3]);            % K, K' in Malte's BZ
+    lambda = get_SOC_lambda( Para.SOC.lambda_0 , k(:,:,1) , K_symm_rot );
+else
+    lambda = Para.SOC.lambda_0 * ones(1,Para.nr.k);
+end
+L_z = -[0 0 0; 0 0 1i; 0 -1i 0];
 
 
 % Berechnung der Eigenwerte und Eigenvektoren ueber das k-mesh
@@ -60,6 +63,8 @@ for ni = 1:tri_max
     for nk = 1:Para.nr.k
         
         [ Ek_noSOC(:,nk,ni) , Ev_noSOC(:,:,nk,ni) ] = solve_sort_eig( HH_TB(:,:,nk,ni) );
+        
+        H_SOC = lambda(nk) * L_z;
         
         [ Ek(1:3,nk,ni) , Ev(1:3,1:3,nk,ni) ] = solve_sort_eig( HH_TB(:,:,nk,ni) + H_SOC );
         [ Ek(4:6,nk,ni) , Ev(4:6,4:6,nk,ni) ] = solve_sort_eig( HH_TB(:,:,nk,ni) - H_SOC );

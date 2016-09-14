@@ -13,22 +13,22 @@ function Ctrl = ctrl_settings
 Ctrl.material = 'MoS2';
 Ctrl.material_trans_me = 'Mo';
 Ctrl.lattice_constant = 0.3180;
-Ctrl.material_lambda = 0.074; 
+Ctrl.material_lambda_0 = 0.074; 
 
 % Ctrl.material = 'MoSe2';
 % Ctrl.material_trans_me = 'Mo';
 % Ctrl.lattice_constant = 0.3320;
-% Ctrl.material_lambda = 0.091; 
+% Ctrl.material_lambda_0 = 0.091; 
 
 % Ctrl.material = 'WS2';
 % Ctrl.material_trans_me = 'W';
 % Ctrl.lattice_constant = 0.3191;
-% Ctrl.material_lambda = 0.2135; 
+% Ctrl.material_lambda_0 = 0.2135; 
 
 % Ctrl.material = 'WSe2';
 % Ctrl.material_trans_me = 'W';
 % Ctrl.lattice_constant = 0.3325;
-% Ctrl.material_lambda = 0.232; 
+% Ctrl.material_lambda_0 = 0.232; 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -36,13 +36,14 @@ Ctrl.material_lambda = 0.074;
 %%%%%%%%%%%%% k-mesh %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 Ctrl.k_mesh.type = 'symm';     % Orientation of k-mesh:   liu, symm
 % Ctrl.k_mesh.type = 'liu';
-Ctrl.k_mesh.qr = 150;        % Unterteilungsgröße (Vielfaches von 6!). 60 -> 631 kpts; 120 -> 2461 kpts
+Ctrl.k_mesh.qr = 60;        % Unterteilungsgröße (Vielfaches von 6!). 60 -> 631 kpts; 120 -> 2461 kpts
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%% Tight-Binding modell %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%      
 Ctrl.TB_modell = 'ab_initio';   % Tight-Binding modell: Roesner ab initio or liu
 % Ctrl.TB_modell = 'liu';
 Ctrl.TB_t_symm = 1;             % Time symmetrization (only possible with k-mesh: symm) 
+Ctrl.TB_SOC_k = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

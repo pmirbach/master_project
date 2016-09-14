@@ -56,6 +56,7 @@ Para.energy_conversion = 1e3;                               % Umrechnung von ev 
 Para.TB_ind{1} = [1,4]; 
 Para.TB_ind{2} = [2,3,5,6];
 
+Para.SOC.lambda_0 = Ctrl.material_lambda_0 * Para.energy_conversion;
 
 
 

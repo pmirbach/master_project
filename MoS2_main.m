@@ -124,7 +124,6 @@ titlestr = {'1 \rightarrow 2, \uparrow, \sigma_+','1 \rightarrow 2, \downarrow, 
     '1 \rightarrow 2, \uparrow, \sigma_-','1 \rightarrow 2, \downarrow, \sigma_-'};
 [fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,test,[2 2],titlestr);
 
-1
 
 %%
 
@@ -266,7 +265,7 @@ Bloch.nrk = Para.nr.k;
 % Kommt noch dazu
 Emin = -1000;
 Emax = 0;
-E = linspace(Emin,Emax,3001)';
+E = linspace(Emin,Emax,2001)';
 
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
 

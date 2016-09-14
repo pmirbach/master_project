@@ -2,16 +2,16 @@ function V_ab_interpl = get_background_screening( Ctrl , Para , Coul_ME , minq )
 
 % Define q for coulomb-interaction
 % Find q (unique in minq)
-% q_pts = sort( unique( round( minq,12 ) ) );
-% q_pts( q_pts == 0 ) = [];
-% q = q_pts.';
+q_pts = sort( unique( round( minq,12 ) ) );
+q_pts( q_pts == 0 ) = [];
+q = q_pts.';
 
 %% Alternative declaration as a linear q mesh
-q_max = max(minq(:));
-q_min = min(minq(:));
-del = 5000;
-q = q_min : (q_max - q_min) / del : q_max;
-q( q == 0 ) = [];
+% q_max = max(minq(:));
+% q_min = min(minq(:));
+% del = 5000;
+% q = q_min : (q_max - q_min) / del : q_max;
+% q( q == 0 ) = [];
 %%
 % q = linspace(0,27,1000);
 % q(1) = [];
@@ -106,18 +106,20 @@ U_ab_q( [4 7 8], : ) = [];
 % %%%%%%%%%%%%%%%%%%
 % Danielq = load('qgrid_631.mat');
 % DanielV = load('V_ab_q_von631aus.mat');
+% 
 % q_d = Danielq.q(631,:,1);
 % V_ab_qq = DanielV.V_ab_q;
 % 
+% V_ab_qq = permute(V_ab_qq,[2,3,1]);
 % V_ab_q_d = reshape(V_ab_qq, 9 , []);
 % V_ab_q_d( [4 7 8], : ) = [];
 % for ii = 1:6
 %     subplot(2,3,ii)
 % %     plot(q,Para.vorf.coul * V_ab_q(ii,:) - V_ab_q_d(ii,2:end))
 %     
-%     plot(q,Para.vorf.coul * V_ab_q(ii,:))
+%     plot(q,Para.vorf.coul * V_ab_q(ii,:),'-x')
 %     hold on
-%     plot(q_d,V_ab_q_d(ii,:))
+%     plot(q_d,V_ab_q_d(ii,:)./q_d,'x')
 % end
 % %%%%%%%%%%%%%%%%%%
 
