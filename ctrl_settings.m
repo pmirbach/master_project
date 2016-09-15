@@ -4,31 +4,31 @@ function Ctrl = ctrl_settings
 %%%%%%%%%%%%% Material - lattice %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%      
 % Ctrl.material = 'MoS2';         % Materialien: MoS2 WS2 MoSe2 WSe2 ( MoTe2 WTe2 later )
 % Ctrl.material_trans_me = 'Mo';
-% % ab initio TB: MoS2:   0.3160, 0.3180, 0.3200
-% %               MoSe2:  0.3320
-% %               WS2:    0.3191
-% %               WSe2:   0.3325
-% Ctrl.lattice_constant = 0.3180;
+% % ab initio TB: MoS2:   0.3160, 0.3180, 0.3200    nm
+% %               MoSe2:  0.3320                    nm
+% %               WS2:    0.3191                    nm
+% %               WSe2:   0.3325                    nm
+% Ctrl.lattice_constant = 0.3180;                   nm
 
 Ctrl.material = 'MoS2';
 Ctrl.material_trans_me = 'Mo';
 Ctrl.lattice_constant = 0.3180;
-Ctrl.material_lambda_0 = 0.074; 
+Ctrl.material_lambda_0 = 74;                        % meV
 
 % Ctrl.material = 'MoSe2';
 % Ctrl.material_trans_me = 'Mo';
 % Ctrl.lattice_constant = 0.3320;
-% Ctrl.material_lambda_0 = 0.091; 
+% Ctrl.material_lambda_0 = 91;                      % meV
 
 % Ctrl.material = 'WS2';
 % Ctrl.material_trans_me = 'W';
 % Ctrl.lattice_constant = 0.3191;
-% Ctrl.material_lambda_0 = 0.2135; 
+% Ctrl.material_lambda_0 = 213.5;                   % meV
 
 % Ctrl.material = 'WSe2';
 % Ctrl.material_trans_me = 'W';
 % Ctrl.lattice_constant = 0.3325;
-% Ctrl.material_lambda_0 = 0.232; 
+% Ctrl.material_lambda_0 = 232;                     % meV
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,6 +45,12 @@ Ctrl.TB_modell = 'ab_initio';   % Tight-Binding modell: Roesner ab initio or liu
 Ctrl.TB_t_symm = 1;             % Time symmetrization (only possible with k-mesh: symm) 
 Ctrl.TB_SOC_k = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%% Exciting Field %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Ctrl.E.polarization = 1;                               % 1: left polarized +, 2: right polarized -
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%% Dipol - Transitions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Ctrl.dipol_trans = [ 1, 2 ; 4 , 5  ];                   % Only Valence and lower conduction band

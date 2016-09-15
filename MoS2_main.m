@@ -21,15 +21,11 @@ end
 
 %% Material & Tight-Binding Parameter & Hochsymmetriepunkte
 
-% Einheitensystem:  mEv,  Ang,  ps,  pA
-
+% System of units:
+% Energy: mEv, Length: nm, Time: ps, Electric current: pA
 
 load('KonstantenAg.mat')    % Naturkonstanten (Ag Jahnke)
 [ Para , W90Data , Coul_ME ] = call_para(Ctrl, constAg);
-
-% Achtung: orbital order in Maltes TB modell different
-% Para.coul.screened = Para.coul.screened([1,3,2,6,5,4],:);                                             % ??? Kein Unterschied???
-
 
 
 %% k - mesh
@@ -43,24 +39,6 @@ elseif strcmp( Ctrl.k_mesh.type , 'liu' )
     [ Data.k , Data.wk , Para.nr.k , Para.k_ind.symm ] = k_mesh_liu(Ctrl, Para);
     
 end
-
-
-%%
-
-
-
-
-%%
-
-
-% file = 'Daniel/MoS2_gradtest.mat';
-% [Para, Data, Daniel] = load_daniel_data(Ctrl, Para, Data, file); % overwrites k, wk, coul_pol, wk_area, nr_k
-% 
-% % Fast kx, ky for scatter3 plots:
-kx = Data.k(1,:,1);
-ky = Data.k(2,:,1);
-
-
 
 
 %% Tight-Binding
@@ -86,9 +64,6 @@ fprintf('   -   Finished in %g seconds\n',toc)
 % [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
 % [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Ek_old(:,:,1),[2 3]);
 
-%%
-% scatter3( Data.k(1,:), Data.k(2,:) , Data.Ek(1,:) )
-
 
 %% Simulation-preperations
 fprintf('Preperations:              Start'); tic
@@ -103,29 +78,23 @@ fprintf('   -   Finished in %g seconds\n',toc)
 %% Dipolmatrix
 fprintf('Dipol:                     Start'); tic
 
-Data.dipol = dipol(Para, Prep, Data);
+Data.dipol = dipol( Para , Prep , Data );
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
+
+%% Dipol Plot
 % titlestr = {'1 \rightarrow 2 \uparrow','1 \rightarrow 3 \uparrow','1 \rightarrow 2 \downarrow','1 \rightarrow 3 \downarrow'};
 % [fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,Data.dipol,[2 2],titlestr);
 % clear titlestr
 
-Ploter.dipol = zeros( Para.nr.k, Para.nr.dipol );
-for ii = 1:Para.nr.dipol
-    Ploter.dipol_l(:,ii) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).'; 
-    Ploter.dipol_r(:,ii) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
-end
+A = cell2mat(Data.dipol);
+As = reshape(A,Para.nr.k,[]);
 
-%%
-
-test = [Ploter.dipol_l,Ploter.dipol_r];
 titlestr = {'1 \rightarrow 2, \uparrow, \sigma_+','1 \rightarrow 2, \downarrow, \sigma_+',...
     '1 \rightarrow 2, \uparrow, \sigma_-','1 \rightarrow 2, \downarrow, \sigma_-'};
-[fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,test,[2 2],titlestr);
+[fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,As,[2 2],titlestr);
 
-
-%%
 
 
 %% Anregung, Bandrenormierung (Coulomb)     -   keine Zeit mehr
@@ -228,20 +197,18 @@ Bloch.wkentire = Data.wk.' * Para.BZsmall.area / 6;                         % Sp
 
 
 Bloch.Esum = zeros(Para.nr.k * Para.nr.dipol , 1 );
-Bloch.dipol = zeros(Para.nr.k * Para.nr.dipol , 1 );
+% Bloch.dipol = zeros(Para.nr.k * Para.nr.dipol , 1 );
 Bloch.feff = zeros(Para.nr.k * Para.nr.dipol , 1 );                         % In the linear regime. feff const.
+
+
+Bloch.dipol = A(:,1);
 
 for ii = 1:Para.nr.dipol
     Bloch.Esum( Bloch.ind(:,ii) ) = ( Data.Ek( Para.dipol_trans(ii,1),: , 1 ) + Data.Ek( Para.dipol_trans(ii,2),: , 1 ) ).' ;
 %     Bloch.Esum( Bloch.ind(:,ii) ) = ( - Data.Ek( Para.dipol_trans(ii,1),: , 1 ) + Data.Ek( Para.dipol_trans(ii,2),: , 1 ) ).' ;
-    
-%     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).' * 10; 
-    
-    Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).' / 10; 
+        
+%     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
 
-
-
-%     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) + 1i * Data.dipol{ii}(2,:) ).';
     
 
 %     Rausgek�rzt V
@@ -274,13 +241,6 @@ Para.nr.w = numel(Bloch.w);
 
 
 1;
-
-%%
-
-kx;
-ky;
-
-
 
 %% Zeitentwicklung
 

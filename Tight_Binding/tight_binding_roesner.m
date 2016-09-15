@@ -52,11 +52,13 @@ for ni = 1:tri_max
     HH_TB(:,:,:,ni) = HH_TB(:,:,:,ni) * Para.energy_conversion;
 end
 
-H_grad_kx = permute( reshape( H_grad_kx,Para.nr.k,9 ),[2,1] ) * Para.energy_conversion;
-H_grad_ky = permute( reshape( H_grad_ky,Para.nr.k,9 ),[2,1] ) * Para.energy_conversion;
+% Hamiltonian calculated in eV. 
+% Lenght in angs. -> [d/dk] = angs. = 1/10 nm
+H_grad_kx = permute( reshape( H_grad_kx , Para.nr.k , 9 ) , [2,1] ) * Para.energy_conversion / 10;
+H_grad_ky = permute( reshape( H_grad_ky , Para.nr.k , 9 ) , [2,1] ) * Para.energy_conversion / 10;
+
 
 HH_TB = permute( HH_TB, [2 3 1 4] );
-
 
 for ni = 1:tri_max
 
@@ -64,7 +66,7 @@ for ni = 1:tri_max
         
         [ Ek_noSOC(:,nk,ni) , Ev_noSOC(:,:,nk,ni) ] = solve_sort_eig( HH_TB(:,:,nk,ni) );
         
-        H_SOC = lambda(nk) * L_z;
+        H_SOC = lambda(nk) * L_z;   % SOC Hamiltonian with lambda(k)
         
         [ Ek(1:3,nk,ni) , Ev(1:3,1:3,nk,ni) ] = solve_sort_eig( HH_TB(:,:,nk,ni) + H_SOC );
         [ Ek(4:6,nk,ni) , Ev(4:6,4:6,nk,ni) ] = solve_sort_eig( HH_TB(:,:,nk,ni) - H_SOC );
