@@ -253,8 +253,10 @@ psik_E_ini = zeros(1 , Para.nr.dipol * Para.nr.k + size(Bloch.w,1) * 2);
 
 % options=odeset('OutputFcn',@odeprog,'Events',@odeabort);
 options=odeset('OutputFcn',@odeprog,'Events',@odeabort,'RelTol',1e-6,'AbsTol',1e-8);
+ops = odeset('OutputFcn',@odetpbar,'RelTol',1e-6,'AbsTol',1e-8); 
 % opts = odeset('RelTol',1e-1,'AbsTol',1e-3);
-[t,psik_E] = ode113(@(t,psik_E) dgl_bloch(t,psik_E,Bloch), tspan, psik_E_ini, options);
+[t,psik_E] = ode113(@(t,psik_E) dgl_bloch(t,psik_E,Bloch), tspan, psik_E_ini, ops);
+% [t,psik_E] = ode113(@(t,psik_E) dgl_bloch(t,psik_E,Bloch), tspan, psik_E_ini, options);
 
 
 %
@@ -267,9 +269,9 @@ chi_w = P_w ./ E_w;
 
 % close all
 
-figure
+% figure
 % plot( E + Data.EGap , imag(chi_w) )
-plot( E  , imag(chi_w) )
+% plot( E  , imag(chi_w) )
 % 
 % hold on
 % load('spec_V_dip.mat')
