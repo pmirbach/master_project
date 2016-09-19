@@ -83,6 +83,9 @@ Para.coul.kappa = 0;             % Kappa, because of Singularity
 Para.dipol_trans = Ctrl.dipol_trans;
 Para.nr.dipol = size(Para.dipol_trans,1);
 
+[ Para.coul_rabi_unique , Para.coul_dip_mapping ] = call_coul_rabi_indices( Para.dipol_trans );
+Para.nr.dipol_coul = size(Para.coul_rabi_unique,1);
+
 Para.coul_indices = call_coul_indices;
 
 

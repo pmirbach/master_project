@@ -14,7 +14,7 @@ if Bloch.coul_ctrl == 1
     hbarOmega = E_t * conj( Bloch.dipol );
     for ii = 1:Bloch.nrd
         hbarOmega( Bloch.ind(:,ii) ) = hbarOmega( Bloch.ind(:,ii) ) ...
-            + 1 / ( 2 * pi )^2 * Bloch.coulomb(:,:,ii) * ( psi_k( Bloch.ind(:,ii) ) .* Bloch.wkentire ) ;
+            + 1 / ( 2 * pi )^2 * Bloch.coulomb(:,:,Bloch.coul_dip_mapping(ii)) * ( psi_k( Bloch.ind(:,ii) ) .* Bloch.wkentire ) ;
     end
 else 
     hbarOmega = E_t * conj( Bloch.dipol );

@@ -132,18 +132,11 @@ titlestr = {'1 \rightarrow 2, \uparrow, \sigma_+','1 \rightarrow 2, \downarrow, 
 % % as1 = plot_path(Ctrl,Para,Data.k,Test.ren_h,200);      % Test der Hartree Renormierung
 
 
-%% structure für Variablen für Blochgleichungen
-
-Bloch.nrd = Para.nr.dipol;
-Bloch.ind = reshape( 1 : Para.nr.dipol * Para.nr.k ,[], Para.nr.dipol);
-
-% tic
-% [V_rabi_fock] = coulomb_rabi_f(Ctrl, Para, Prep, Data.Ev);                           % All coulomb matrices. (in 3rd dimension)
-% toc
+%% Coulomb-Me for Rabi-energy renormization
 
 fprintf('Rabi-Energie Coulombmatrixelemente:  Start'); tic
 
-[V_rabi_fock_interpl] = coulomb_rabi_f_interpl(Ctrl, Para, Prep );
+[ Data.V_rabi ] = coulomb_rabi_f_interpl(Ctrl, Para, Prep );
 
 fprintf('   -   Finished in %g seconds\n',toc)
 
@@ -154,84 +147,16 @@ fprintf('   -   Finished in %g seconds\n',toc)
 % scatter3(kx,ky,V_rabi_fock(1,:,1),'r')
 % % % figure; scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
 
-%%
-% figure(15)
-% subplot(1,2,1)
-% plot(kx,ky,'x')
-% 
-% load k_stdmp_631.mat
-% D = [cos(pi/6) sin(pi/6) ; -sin(pi/6) cos(pi/6)];
-% k_daniel_rot = k(:,1:2,1);
-% k_daniel = D * k_daniel_rot.';
-% 
-% subplot(1,2,2)
-% plot(k_daniel(1,:),k_daniel(2,:),'x')
 
-%%
-% 
-% load COUL_malwieder.mat
-% 
-% asdf = squeeze(COUL.D(1,end,:)) ./ squeeze(k(:,3,1));
-% 
-% figure(16)
-% scatter3(k_daniel(1,:),k_daniel(2,:),asdf)
-% hold on
-% scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) / 6 )
-% 
-% %%
-% 
-% figure(17)
-% compare_alex( Data.k(:,:,1), k_daniel, V_rabi_fock_interpl(1,:,1) / 6 , asdf , 'abs' )
-
-%%
-
-Bloch.coulomb = V_rabi_fock_interpl;
-% Bloch.coulomb = V_rabi_fock;
-
-% Hab ich schon
-Bloch.hbar = constAg.hbar;
-Bloch.wk = repmat( Data.wk.' * Para.BZsmall.area , [Para.nr.dipol,1] );     % Spaltenvektor
-Bloch.wkentire = Data.wk.' * Para.BZsmall.area / 6;                         % Spaltenvektor
-% Bloch.wkentire = Bloch.wk / 6; 
+%% structure für Variablen für Blochgleichungen
 
 
-
-Bloch.Esum = zeros(Para.nr.k * Para.nr.dipol , 1 );
-% Bloch.dipol = zeros(Para.nr.k * Para.nr.dipol , 1 );
-Bloch.feff = zeros(Para.nr.k * Para.nr.dipol , 1 );                         % In the linear regime. feff const.
-
-
-Bloch.dipol = A(:,1);
-
-for ii = 1:Para.nr.dipol
-    Bloch.Esum( Bloch.ind(:,ii) ) = ( Data.Ek( Para.dipol_trans(ii,1),: , 1 ) + Data.Ek( Para.dipol_trans(ii,2),: , 1 ) ).' ;
-%     Bloch.Esum( Bloch.ind(:,ii) ) = ( - Data.Ek( Para.dipol_trans(ii,1),: , 1 ) + Data.Ek( Para.dipol_trans(ii,2),: , 1 ) ).' ;
-        
-%     Bloch.dipol( Bloch.ind(:,ii) ) = 1 / sqrt(2) * abs( Data.dipol{ii}(1,:) - 1i * Data.dipol{ii}(2,:) ).'; 
-
-    
-
-%     Rausgek�rzt V
-%     Bloch.feff( Bloch.ind(:,ii) ) = 1 - ( Data.fk(Para.dipol_trans(ii,1),:) + Data.fk(Para.dipol_trans(ii,2),:) ).';      
-    
-end
-
-% Bloch.dipol = 5e4 * ones(Para.nr.k * Para.nr.dipol,1);                % ? 1-3 too strong.
-
-
-Bloch.gamma = 10;           % Dephrasing
-
-
-Bloch.E0 = 1e-7;
-Bloch.t_peak = 2.038 * 1e-3;
-Bloch.sigma = 1e-3;
-Bloch.nrk = Para.nr.k;
 
 
 
 % Kommt noch dazu
 Emin = -1000;
-Emax = 1000;
+Emax = 0;
 E = linspace(Emin,Emax,2001)';
 
 Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
@@ -244,7 +169,7 @@ Para.nr.w = numel(Bloch.w);
 
 %% Zeitentwicklung
 
-Bloch.coul_ctrl = 1;                    % Coulomb Interaktion
+Bloch.coul_ctrl = Ctrl.Coul.active;                    % Coulomb Interaktion
 
 
 tspan = [0 0.4];
