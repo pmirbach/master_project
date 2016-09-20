@@ -95,7 +95,3 @@ Para.vorf.coul = constAg.ec^2 / ( 2 * constAg.eps_0 * Ctrl.Coul.eps_r);
 
 Para.nr.tri = 6;
 
-
-
-
-

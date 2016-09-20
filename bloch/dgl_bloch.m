@@ -3,16 +3,16 @@ function dpsik_E = dgl_bloch(t,psik_E,Bloch)
 % Übergange: 1 -> 2, 1 -> 3, 4 -> 5, 4 -> 6 
 
 % Berechnung des E-Feldes:
-E_t = Bloch.E0 * exp( -1/2 * ( ( t - Bloch.t_peak ) / Bloch.sigma )^2 * 4 * log(2) );
+E_t = Bloch.E.E0 * exp( -1/2 * ( ( t - Bloch.E.t_peak ) / Bloch.E.sigma )^2 * 4 * log(2) );
 
 % Extraktion der Psis:
-psi_k = psik_E(1:Bloch.nrd * Bloch.nrk);
+psi_k = psik_E(1:Bloch.nr.d * Bloch.nr.k);
 
 
 % Berechnung von        hbar * Omega:
 if Bloch.coul_ctrl == 1
     hbarOmega = E_t * conj( Bloch.dipol );
-    for ii = 1:Bloch.nrd
+    for ii = 1:Bloch.nr.d
         hbarOmega( Bloch.ind(:,ii) ) = hbarOmega( Bloch.ind(:,ii) ) ...
             + 1 / ( 2 * pi )^2 * Bloch.coulomb(:,:,Bloch.coul_dip_mapping(ii)) * ( psi_k( Bloch.ind(:,ii) ) .* Bloch.wkentire ) ;
     end

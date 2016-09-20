@@ -48,7 +48,19 @@ Ctrl.TB_SOC_k = 1;
 
 
 %%%%%%%%%%%%% Exciting Field %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Ctrl.E.polarization = 1;                               % 1: left polarized +, 2: right polarized -
+Ctrl.E.polarization = 1;                                % 1: left polarized +, 2: right polarized -
+Ctrl.E.E0 = 1e-7;                                       % Amplitude E
+Ctrl.E.t_peak = 2.038 * 1e-3;                           % Point in time of peak
+Ctrl.E.sigma = 1e-3;                                    % Widening of peak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%% ODE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Ctrl.ode.tspan = [0 0.4];                               % Time span for ode solving
+% linspace(0, 0.4, 10000);
+Ctrl.ode.energy_range = [ -1000 , 0 ];                  % Energy range in meV
+Ctrl.ode.energy_steps = 2001;                           % Energy range in meV
+Ctrl.ode.dephrasing = 10;                               % Dephrasing in meV
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

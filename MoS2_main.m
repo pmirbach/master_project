@@ -148,43 +148,23 @@ fprintf('   -   Finished in %g seconds\n',toc)
 % % % figure; scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
 
 
-%% structure für Variablen für Blochgleichungen
+%% Structure for all needed variables in ode
 
+[ Bloch , Data.energy , Para.nr.w ] = call_bloch_structure( Ctrl, constAg , Para , Data );
 
-
-
-
-% Kommt noch dazu
-Emin = -1000;
-Emax = 0;
-E = linspace(Emin,Emax,2001)';
-
-Bloch.w = E / constAg.hbar;             % Energiefenster in omega ???
-
-Para.nr.w = numel(Bloch.w);
-
-
-
-1;
 
 %% Zeitentwicklung
 
-Bloch.coul_ctrl = Ctrl.Coul.active;                    % Coulomb Interaktion
-
-
-tspan = [0 0.4];
-% tspan = linspace(0, 0.4, 10000);
 psik_E_ini = zeros(1 , Para.nr.dipol * Para.nr.k + size(Bloch.w,1) * 2);
 
-% options=odeset('OutputFcn',@odeprog,'Events',@odeabort);
 options=odeset('OutputFcn',@odeprog,'Events',@odeabort,'RelTol',1e-6,'AbsTol',1e-8);
 ops = odeset('OutputFcn',@odetpbar,'RelTol',1e-6,'AbsTol',1e-8); 
 % opts = odeset('RelTol',1e-1,'AbsTol',1e-3);
-[t,psik_E] = ode113(@(t,psik_E) dgl_bloch(t,psik_E,Bloch), tspan, psik_E_ini, ops);
+[t,psik_E] = ode113(@(t,psik_E) dgl_bloch(t,psik_E,Bloch) , Ctrl.ode.tspan , psik_E_ini , ops);
 % [t,psik_E] = ode113(@(t,psik_E) dgl_bloch(t,psik_E,Bloch), tspan, psik_E_ini, options);
 
 
-%
+%%
 
 % psik = psik_E(:,1:Parameter.nrk);
 P_w = psik_E(end,( end - 2 * Para.nr.w + 1 ):( end - 1 * Para.nr.w ));
@@ -207,12 +187,11 @@ chi_w = P_w ./ E_w;
 
 % xlim([-500 0])
 
-Data.E = E;
 Data.chi_w = chi_w;
 
 %% Umrechnung auf Absorptionskoeffizienten
 
-w = ( Data.E.' + Data.EGap ) / constAg.hbar;
+w = ( Data.energy.' + Data.EGap ) / constAg.hbar;
 Y_w = 1i * w / ( 2 * constAg.c  * constAg.eps_0 ) .* Data.chi_w;
 R = abs( Y_w ).^2 ./ abs( 1 - Y_w ).^2;
 T = 1 ./ abs( 1 - Y_w ).^2;
@@ -220,20 +199,15 @@ T = 1 ./ abs( 1 - Y_w ).^2;
 alpha = 1 - R - T;
 
 figure
-plot( E  , alpha )
+plot( Data.energy  , alpha )
 
-% hold on
-% filename_spec = ['abs_spec_0.000E+00_0.000E+00_3.000E+02_2_2_3.18_' ...
-%     '1.000E+00_1.000E+00cR_60_30_1.000E-07_1.000E-03_+0.000E+00_HF_g0w0-tb_3_r_c_me_sock_7.596E+00_5.dat'];
-% absspec0 = import_alex_spec(filename_spec);
-% plot(absspec0(:,1),absspec0(:,5))
 
 %% Saving
 
-Ergebnis.E = E;
-Ergebnis.alpha = alpha;
-Ergebnis.chi_w = chi_w;
-Ergebnis.EGap = Data.EGap;
+% Ergebnis.E = E;
+% Ergebnis.alpha = alpha;
+% Ergebnis.chi_w = chi_w;
+% Ergebnis.EGap = Data.EGap;
 
 
 %%
