@@ -201,6 +201,8 @@ figure; hold on
 plot(k_redBZ(1,in,1),k_redBZ(2,in,1),'rx')
 plot(k_redBZ(1,on,1),k_redBZ(2,on,1),'r^')
 plot(k_redBZ(1,symm,1),k_redBZ(2,symm,1),'rs')
+
+1
 % % 
 % % % Test Plot: Indizierung 1.1 - Speicherordnung
 % % figure; hold on

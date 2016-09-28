@@ -40,7 +40,7 @@ else
 end
 
 if Ctrl.plot.tb(2) == 1
-    bandstr_path = plot_path(Ctrl,Para,k,Daten_plot,200);
+    bandstr_path = plot_path(Ctrl,Para,k,Daten_plot,1000);
     
     ax = findobj(bandstr_path,'type','axes');
     ax.Title.String = 'Bandstruktur entlang eines Pfades durch die BZ';

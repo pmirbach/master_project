@@ -2,16 +2,16 @@ function V_ab_interpl = get_background_screening( Ctrl , Para , Coul_ME , minq )
 
 % Define q for coulomb-interaction
 % Find q (unique in minq)
-q_pts = sort( unique( round( minq,12 ) ) );
-q_pts( q_pts == 0 ) = [];
-q = q_pts.';
+% q_pts = sort( unique( round( minq,12 ) ) );
+% q_pts( q_pts == 0 ) = [];
+% q = q_pts.';
 
 %% Alternative declaration as a linear q mesh
-% q_max = max(minq(:));
-% q_min = min(minq(:));
-% del = 5000;
-% q = q_min : (q_max - q_min) / del : q_max;
-% q( q == 0 ) = [];
+q_max = max(minq(:));
+q_min = min(minq(:));
+del = 5000;
+q = q_min : (q_max - q_min) / del : q_max;
+q( q == 0 ) = [];
 %%
 % q = linspace(0,27,1000);
 % q(1) = [];
@@ -138,7 +138,7 @@ end
 % 
 % figure(6)
 % set(gcf,'color','w');
-% 
+
 % for ii = 1:6
 %     subplot(2,3,ii)
 %     title(titlestring{ii})
@@ -150,7 +150,7 @@ end
 %     
 %     ylabel('V in ev')
 %     
-%     legend('MoS_2','MoSe_2','WS_2','WSe_2')
+% %     legend('MoS_2','MoSe_2','WS_2','WSe_2')
 % end
 
 % for ii = 1:6
@@ -162,6 +162,24 @@ end
 %     
 %     ylabel(char(949))
 % end
+
+figure(6)
+set(gcf,'units','normalized','position',[.1 .1 .4 .4])
+hold on
+set(gcf,'color','w');
+plot(q(2:end),U_ab_q(1,:) ./ V_ab_q(1,2:end),'k','linewidth',2)
+axis([0 13.17 0 9.5])
+set(gca,'fontsize',18);
+ylabel(char(949))
+xlabel('q in nm^{-1}')
+% 
+% figure(7)
+% set(gcf,'color','w');
+% plot(q,Para.vorf.coul*V_ab_q(ii,:)/Para.energy_conversion,'k','linewidth',2)
+% set(gca,'fontsize',18);
+% axis([-inf 10 0 20])
+% ylabel('V in eV')
+% xlabel('q in nm^{-1}')
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 

@@ -11,8 +11,8 @@ for ii = 1:n_path
 end
 
 for ii = 1:n_path-1
-    gew(ii) = ( symm_points{2}(1,ind(ii)) - symm_points{2}(1,ind(ii+1)) )^2 ...
-    + ( symm_points{2}(2,ind(ii)) - symm_points{2}(2,ind(ii+1)) )^2;
+    gew(ii) = sqrt( ( symm_points{2}(1,ind(ii)) - symm_points{2}(1,ind(ii+1)) )^2 ...
+    + ( symm_points{2}(2,ind(ii)) - symm_points{2}(2,ind(ii+1)) )^2 );
 end
 gew = round(gen * gew / max(gew));
 

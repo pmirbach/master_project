@@ -107,6 +107,7 @@ end
 % end
 %%
 Ek_old = Ek(:,:,1) - max( max( Ek( Para.TB_ind{1}, : , 1 ) ) );
+Ek_old( [2 3 5 6] , : ) = Ek_old( [2 3 5 6] , : ) + W90Data.EGapCorr * Para.energy_conversion;
 
 % Check band gap
 EGap_noSOC = min( Ek_noSOC( 2, : , 1 ) - Ek_noSOC( 1, : , 1 ) );

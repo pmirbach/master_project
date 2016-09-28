@@ -20,7 +20,8 @@ handle_path.Units = 'normalized';
 handle_path.Position = [0.1 0.1 0.8 0.8];
 handle_path.Color = [1 1 1];
 
-colors = {'b','r','k','g','c','m'};
+% colors = {'b','r','k','g','c','m'};
+colors = {'k','k','k','r','r','r'};
 colors = [colors, colors];
 
 linest = {'-','-','-','-','-','-','--','--','--','--','--','--'};
@@ -29,10 +30,10 @@ for ii = 1:size(Daten,1)
     Daten_interp = repmat(Daten(ii,:),1,6*4);
     f = scatteredInterpolant(k_interp(1,:)',k_interp(2,:)',...
         Daten_interp(:),'linear','none');
-    plot(k_p_tick,f(k_p'),'color',colors{ii},'linestyle',linest{ii})
+    plot(k_p_tick,f(k_p'),'color',colors{ii},'linestyle',linest{ii},'LineWidth',2)
 end
 ax = gca;
-ax.FontSize = 16';
+ax.FontSize = 18;
 
 ax.XTick = path_tick;
 ax.XTickLabel = Ctrl.plot.path;

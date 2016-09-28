@@ -25,14 +25,14 @@ if Ctrl.plot.dipol(1) == 1
         cb = flip(findobj(bandstr_surf(ii),'type','colorbar'),1);
         
         for jj = 1:size(ax,1)
-            ax(jj).FontSize = 12;
+            ax(jj).FontSize = 14;
             ax(jj).Title.String = titlestr{jj};
             ax(jj).Position = ax(jj).Position  + [-.03 -.03 0.03 0.03];
-            cb(jj).FontSize = 10;
-            cb(jj).Title.String = 'nm pA ps';
+            cb(jj).FontSize = 14;
+            cb(jj).Title.String = '10^4 nm pA ps';
         end
-        mtit('Dipol-Matrixelemente','fontsize',18,...
-            'xoff',0,'yoff',.03)
+%         mtit('Dipol-Matrixelemente','fontsize',18,...
+%             'xoff',0,'yoff',.03)
     end
     if Ctrl.plot.save == 1
         for ii = 1:size(bandstr_surf,2)

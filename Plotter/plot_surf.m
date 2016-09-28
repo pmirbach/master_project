@@ -11,8 +11,10 @@ x2 = ones(Nsubplots,1)*(1:Nr_fig);
 er = reshape(x2,1,Nr_fig * Nsubplots);
 
 % Reihenfolge der Symm Pts zum Plotten
-corners = [Para.BZred.symmpts{2} ...
-    * [1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0], [0; 0]];
+% corners = [Para.BZred.symmpts{2} ...
+%     * [1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0], [0; 0]];
+corners = Para.BZred.symmpts{2}(:,[2 1 4 3 2]);
+
 
 if size(k,3) > 1
     x_lim = [ min(min(k(1,:,:)))  , max(max(k(1,:,:)))  ];
@@ -39,7 +41,7 @@ handle_surf = gobjects(1,Nr_fig);
 for ii = 1:Nr_fig
     handle_surf(ii) = figure;
     set(handle_surf(ii), ...
-        'units','normalized','outerposition',[0.1 0.1 0.8 0.8]);
+        'units','normalized','outerposition',[0.1 0.1 0.5 0.8]);
     set(handle_surf(ii), 'Color', 'w');
 end
 
@@ -63,8 +65,8 @@ for ii = 1:Nplots
     Z(Z>1e6) = 0;
     Z(Z<-1e6) = 0;
     % figure
-%     over_data = max(max(Daten)) + 10000;
-%     plot3(corners(1,:),corners(2,:),over_data * ones(1,size(corners,2)),'k-x')
+    over_data = max(max(Daten)) + 10000;
+    plot3(corners(1,:),corners(2,:),over_data * ones(1,size(corners,2)),'k-x')
     surf(X,Y,Z,'EdgeColor','none','LineStyle','none',...
         'FaceLighting','phong');
     view(2)
@@ -76,10 +78,12 @@ for ii = 1:Nplots
     d = [(x_lim(2) - x_lim(1)) / 15, (y_lim(2) - y_lim(1)) / 15];
     axis([x_lim(1)-d(1), x_lim(2)+d(1), y_lim(1)-d(2), y_lim(2)+d(2)]);       
 %     axis equal
-%     axis off
+    axis off
     
-%     text(Para.BZred.symmpts{2}(1,:) + 0.8 * [-0.3 -0.3 -0.3 0.5], ...
-%         Para.BZred.symmpts{2}(2,:) + 0.8 * [-1 -1 1 0.5], ...
-%         Para.BZred.symmpts{1})
+    corners_string = {'K' '\Gamma' 'K''' 'M'};
+    
+    text(Para.BZred.symmpts{2}(1,:) + 0.8 * [0.3 -0.3 0.3 0.3], ...
+        Para.BZred.symmpts{2}(2,:) + 0.5 * [-1 -1.4 1 0.5], ...
+        corners_string,'FontSize',14)
 end
 warning('on','MATLAB:scatteredInterpolant:DupPtsAvValuesWarnId')

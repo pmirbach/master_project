@@ -62,8 +62,8 @@ end
 fprintf('   -   Finished in %g seconds\n',toc)
 
 % [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
-% [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Ek_old(:,:,1),[2 3]);
-
+[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Ek_old(:,:,1)/1000,[2 3]);
+fig.bandstr_path.Position = [0.1 0.1 .4 0.6];
 
 %% Simulation-preperations
 fprintf('Preperations:              Start'); tic
@@ -91,9 +91,11 @@ fprintf('   -   Finished in %g seconds\n',toc)
 A = cell2mat(Data.dipol);
 As = reshape(A,Para.nr.k,[]);
 
-titlestr = {'1 \rightarrow 2, \uparrow, \sigma_+','1 \rightarrow 2, \downarrow, \sigma_+',...
-    '1 \rightarrow 2, \uparrow, \sigma_-','1 \rightarrow 2, \downarrow, \sigma_-'};
-[fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,As,[2 2],titlestr);
+% titlestr = {'1 \rightarrow 2, \uparrow, \sigma_+','1 \rightarrow 2, \downarrow, \sigma_+',...
+%     '1 \rightarrow 2, \uparrow, \sigma_-','1 \rightarrow 2, \downarrow, \sigma_-'};
+titlestr = {'\uparrow, \sigma_+','\downarrow, \sigma_+',...
+    '\uparrow, \sigma_-','\downarrow, \sigma_-'};
+[fig.dipolUp_surf, fig.dipolUp_path] = plot_dipol(Ctrl,Para,Data.k,As*1e-4,[2 2],titlestr);
 
 
 
@@ -143,9 +145,33 @@ fprintf('   -   Finished in %g seconds\n',toc)
 % %%
 % % figure; 
 % hold on
-% scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
-% scatter3(kx,ky,V_rabi_fock(1,:,1),'r')
-% % % figure; scatter3(kx,ky,V_rabi_fock_interpl(1,:,1) )
+%%
+% huhu = figure(8);
+% 
+% huhu.Position = [100 100 900 900];
+% 
+% set(gcf,'color','w')
+% scatter3(Data.k(1,:,1),Data.k(2,:,1),Data.V_rabi(end,:,1)/6 , 20, (Data.V_rabi(end,:,1)/6).^(1/1) ,'filled' )
+% set(gca,'fontsize',14)
+% colormap jet
+% 
+% axis off
+% hold on
+% 
+% cb = colorbar; 
+% set(cb,'position',[.8 .2 .05 .5])
+% cb.Title.String = 'eV';
+% 
+% corners = [Para.BZred.symmpts{2};0 0 0 0];
+% plot3( corners(1,1:2),corners(2,1:2),corners(3,1:2), 'k', 'linewidth',1 )
+% plot3( corners(1,2:3),corners(2,2:3),corners(3,2:3), 'k', 'linewidth',1 )
+% plot3( corners(1,[3 1]),corners(2,[3 1]),corners(3,[3 1]), 'k', 'linewidth',1 )
+% 
+% corners_string = {'K' '\Gamma' 'K''' 'M'};
+% text(corners(1,:) + 0.8 * [0.3 -0.3 0.3 0.3], ...
+%         corners(2,:) + 0.5 * [-1 -1.4 1 0.5], ...
+%         3000*[1 1 1 1], ...
+%         corners_string,'FontSize',14)
 
 
 %% Structure for all needed variables in ode
@@ -198,17 +224,32 @@ T = 1 ./ abs( 1 - Y_w ).^2;
 
 alpha = 1 - R - T;
 
-figure
-plot( Data.energy  , alpha )
+%%
 
+figure(10)
+hold on
+set(gcf,'color','w')
+set(gcf,'units','normalized','position',[.1 .1 .8 .45])
+
+plot( (Data.energy + Data.EGap)/1000 + W90Data.EGapCorr  , alpha )
+set(gca,'fontsize',16)
+box on
+
+xlabel('Energie in eV')
+ylabel('Absoprtionskoeff. \alpha')
+
+%%
+% xlim([min((Data.energy + Data.EGap)/1000 + W90Data.EGapCorr) max((Data.energy + Data.EGap)/1000 + W90Data.EGapCorr)])
+% legend('\uparrow & \downarrow', '\uparrow', '\downarrow','location','northwest')
+% linie = plot([Data.EGap/1000 + W90Data.EGapCorr , Data.EGap/1000 + W90Data.EGapCorr ],get(gca,'YLim'),'color',0.4*[1 1 1]);
 
 %% Saving
 
-% Ergebnis.E = E;
-% Ergebnis.alpha = alpha;
-% Ergebnis.chi_w = chi_w;
-% Ergebnis.EGap = Data.EGap;
-
+Ergebnis.energy = Data.energy;
+Ergebnis.alpha = alpha;
+Ergebnis.chi_w = chi_w;
+Ergebnis.EGap = Data.EGap;
+Ergebnis.EGapCorr = W90Data.EGapCorr;
 
 %%
 % plot(E + Data.EGap , imag(chi_w))
