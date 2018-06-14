@@ -62,8 +62,8 @@ end
 fprintf('   -   Finished in %g seconds\n',toc)
 
 % [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Data.Ek(:,:,1),[2 3]);
-[fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Ek_old(:,:,1)/1000,[2 3]);
-fig.bandstr_path.Position = [0.1 0.1 .4 0.6];
+% [fig.bandstr_surf, fig.bandstr_path] = plot_bandstr(Ctrl,Para,Data.k,Ek_old(:,:,1)/1000,[2 3]);
+% fig.bandstr_path.Position = [0.1 0.1 .4 0.6];
 
 %% Simulation-preperations
 fprintf('Preperations:              Start'); tic
@@ -231,7 +231,8 @@ hold on
 set(gcf,'color','w')
 set(gcf,'units','normalized','position',[.1 .1 .8 .45])
 
-plot( (Data.energy + Data.EGap)/1000 + W90Data.EGapCorr  , alpha )
+plot( (Data.energy )/1000 , alpha )
+% plot( (Data.energy + Data.EGap)/1000 + W90Data.EGapCorr  , alpha )
 set(gca,'fontsize',16)
 box on
 
@@ -245,11 +246,11 @@ ylabel('Absoprtionskoeff. \alpha')
 
 %% Saving
 
-Ergebnis.energy = Data.energy;
-Ergebnis.alpha = alpha;
-Ergebnis.chi_w = chi_w;
-Ergebnis.EGap = Data.EGap;
-Ergebnis.EGapCorr = W90Data.EGapCorr;
+% Ergebnis.energy = Data.energy;
+% Ergebnis.alpha = alpha;
+% Ergebnis.chi_w = chi_w;
+% Ergebnis.EGap = Data.EGap;
+% Ergebnis.EGapCorr = W90Data.EGapCorr;
 
 %%
 % plot(E + Data.EGap , imag(chi_w))

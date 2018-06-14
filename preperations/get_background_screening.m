@@ -163,15 +163,15 @@ end
 %     ylabel(char(949))
 % end
 
-figure(6)
-set(gcf,'units','normalized','position',[.1 .1 .4 .4])
-hold on
-set(gcf,'color','w');
-plot(q(2:end),U_ab_q(1,:) ./ V_ab_q(1,2:end),'k','linewidth',2)
-axis([0 13.17 0 9.5])
-set(gca,'fontsize',18);
-ylabel(char(949))
-xlabel('q in nm^{-1}')
+% figure(6)
+% set(gcf,'units','normalized','position',[.1 .1 .4 .4])
+% hold on
+% set(gcf,'color','w');
+% plot(q(2:end),U_ab_q(1,:) ./ V_ab_q(1,2:end),'k','linewidth',2)
+% axis([0 13.17 0 9.5])
+% set(gca,'fontsize',18);
+% ylabel(char(949))
+% xlabel('q in nm^{-1}')
 % 
 % figure(7)
 % set(gcf,'color','w');
